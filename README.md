@@ -31,7 +31,7 @@ which should come down to running:
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-After you install Nix, you can boostrap Flakebox in any Rust project,
+After you install Nix, you can bootstrap Flakebox in any Rust project
 by running the following in its root directory:
 
 ```sh
