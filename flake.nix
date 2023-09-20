@@ -25,7 +25,6 @@
     in
     { } //
     flake-utils.lib.eachDefaultSystem (system:
-
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -34,5 +33,9 @@
       in
       {
         inherit lib;
+
+        packages = {
+          bootstrap = pkgs.writeShellScriptBin "flakebox-boostrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
+        };
       });
 }
