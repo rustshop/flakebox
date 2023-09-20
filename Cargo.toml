@@ -19,5 +19,3 @@ lto = "off"
 
 [profile.release]
 debug = "line-tables-only"
-lto = "fat"
-codegen-units = 1
