@@ -29,13 +29,19 @@
         pkgs = import nixpkgs {
           inherit system;
         };
-        lib = mkLib pkgs;
+        flakeboxLib = mkLib pkgs;
       in
       {
-        inherit lib;
+        lib = flakeboxLib;
 
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-boostrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
+        };
+
+        devShells = {
+          default = flakeboxLib.mkDevShell {
+            packages = [ ];
+          };
         };
       });
 }
