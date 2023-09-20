@@ -41,7 +41,7 @@
 
         devShells = {
           default = flakeboxLib.mkDevShell {
-            packages = [ ];
+            packages = [ pkgs.mold ];
           };
         };
       });

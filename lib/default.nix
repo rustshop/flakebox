@@ -41,6 +41,8 @@ in
       path = ../.;
     };
 
+    nativeBuildInputs = [ pkgs.mold ];
+
     installCargoArtifactsMode = "use-zstd";
   };
 

@@ -14,10 +14,8 @@ use tracing_subscriber::EnvFilter;
 use walkdir::WalkDir;
 
 #[derive(Error, Debug)]
-enum AppError {
-    #[error("Io error: {0}")]
-    Io(PathBuf),
-}
+#[error("application error")]
+struct AppError;
 
 type AppResult<T> = error_stack::Result<T, AppError>;
 
@@ -27,7 +25,7 @@ fn main() -> AppResult<()> {
 
     match opts.command {
         Commands::Init => init(&opts)?,
-        Commands::Install => install(&opts)?,
+        Commands::Install => install(&opts).change_context(AppError)?,
     }
 
     Ok(())
@@ -53,29 +51,47 @@ impl Opts {
     }
 }
 
-fn install(opts: &Opts) -> AppResult<()> {
+#[derive(Error, Debug)]
+enum InstallError {
+    #[error("IO error: {0}")]
+    PathIo(PathBuf),
+    #[error("Dir creation error: {0}")]
+    CreateDir(PathBuf),
+    #[error("Copy file error: {src} -> {dst}")]
+    CopyError { src: PathBuf, dst: PathBuf },
+}
+
+type InstallResult<T> = error_stack::Result<T, InstallError>;
+
+fn install(opts: &Opts) -> InstallResult<()> {
     let root = opts.project_root_overlay_src();
     for entry in WalkDir::new(&root) {
-        let entry = entry.change_context_lazy(|| AppError::Io(root.clone()))?;
+        let entry = entry.change_context_lazy(|| InstallError::PathIo(root.clone()))?;
         let source_path = entry.path();
         let metadata = fs::metadata(source_path)
-            .change_context_lazy(|| AppError::Io(source_path.to_owned()))?;
+            .change_context_lazy(|| InstallError::PathIo(source_path.to_owned()))?;
         let relative_path = source_path.strip_prefix(&root).expect("Prefixed with root");
         let dst_path = opts.project_root_dir().join(relative_path);
         if metadata.is_dir() {
             fs::create_dir_all(dst_path)
-                .change_context_lazy(|| AppError::Io(relative_path.to_owned()))?;
+                .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?;
         } else {
-            fs::copy(source_path, dst_path)
-                .change_context_lazy(|| AppError::Io(relative_path.to_owned()))?;
+            if dst_path.symlink_metadata().is_ok() {
+                fs::remove_file(&dst_path)
+                    .change_context_lazy(|| InstallError::PathIo(dst_path.to_owned()))?;
+            }
+            fs::copy(source_path, &dst_path).change_context_lazy(|| InstallError::CopyError {
+                src: source_path.to_owned(),
+                dst: dst_path,
+            })?;
         }
     }
 
     fs::create_dir_all(opts.project_dot_config_dir())
-        .change_context_lazy(|| AppError::Io(opts.project_dot_config_dir()))?;
+        .change_context_lazy(|| InstallError::CreateDir(opts.project_dot_config_dir()))?;
 
     unix::fs::symlink(opts.share_dir(), opts.project_fakebox_share_stamp())
-        .change_context_lazy(|| AppError::Io(opts.project_fakebox_share_stamp()))?;
+        .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
 
     Ok(())
 }
@@ -87,7 +103,7 @@ fn init(opts: &Opts) -> AppResult<()> {
         return Ok(());
     }
 
-    let stamp = fs::read_link(&stamp_path).change_context_lazy(|| AppError::Io(stamp_path))?;
+    let stamp = fs::read_link(&stamp_path).change_context_lazy(|| AppError)?;
 
     if stamp != opts.share_dir {
         eprintln!("ℹ️  Flakebox files not up to date. Call `flakebox install`.");
