@@ -13,9 +13,16 @@ with dedicated tooling team. Just because you're a part of dedicated
 tooling system in a mature team, doesn't mean you shouldn't benefit
 from all the best ideas wider community has to offer.
 
+You don't have to copy, paste and keep updating the same set of of
+scripts between tens of your projects.
+
+There's a better way: Flakebox.
+
 **Warning:** Rustshop Flakebox is currently very immature. Expect
-rought edges and some amount of churns before we figure out the
-core pieces.
+rought edges and some amount of churn before we figure out the
+core pieces. We're currently targeting developers already using
+Nix Flakes and Nix Development shells that are interested in
+more active partipation.
 
 ## Setting up Flakebox in your Rust project
 
