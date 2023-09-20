@@ -36,6 +36,7 @@
 
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
+          share = flakeboxLib.share;
         };
 
         devShells = {
