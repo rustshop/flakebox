@@ -106,5 +106,7 @@ in your project, you can integrate Flakebox manually:
       }
 ```
 
+## Join the Community
 
-
+[Our Github Discussions page](https://github.com/rustshop/flakebox/discussions) is the
+place to ask questions and participate in building Flakebox. Don't be shy.
