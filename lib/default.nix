@@ -32,7 +32,7 @@ in
   craneLib = crane.lib.${system}.overrideToolchain self.toolchain;
 
   # common args for crane, used for building internal Rust binaries
-  # not meant to be modifed as part of downstream customizations
+  # not meant to be modified as part of downstream customizations
   cranePrivateCommonArgs = {
     pname = "flakebox";
 
@@ -53,4 +53,6 @@ in
   mkDevShell = callPackage ./mkDevShell.nix { };
 
   flakeboxBin = callPackage ./flakeboxBin.nix { };
+
+  filter = callPackage ./filter { };
 })

@@ -1,5 +1,14 @@
 #!/usr/bin/bash
 
+# install git hooks
+dot_git="$(git rev-parse --git-common-dir)"
+if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi
+
+rm -f "${dot_git}/hooks/pre-commit"
+rm -f "${dot_git}/hooks/commit-msg"
+ln -sf "$(pwd)/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"
+ln -sf "$(pwd)/misc/git-hooks/commit-msg" "${dot_git}/hooks/commit-msg"
+
 # if running in direnv
 if [ -n "${DIRENV_IN_ENVRC:-}" ]; then
   # and not set DIRENV_LOG_FORMAT
@@ -11,7 +20,3 @@ fi
 >&2 echo "💡 Run 'just' for a list of available 'just ...' helper recipes"
 
 flakebox init
-
-dot_git="$(git rev-parse --git-common-dir)"
-if [[ ! -d "''${dot_git}/hooks" ]]; then mkdir "''${dot_git}/hooks"; fi
-

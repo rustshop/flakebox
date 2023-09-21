@@ -1,6 +1,7 @@
 mod opts;
 
 use std::fs;
+use std::io;
 use std::os::unix;
 use std::path::Path;
 use std::path::PathBuf;
@@ -76,10 +77,8 @@ fn install(opts: &Opts) -> InstallResult<()> {
             fs::create_dir_all(dst_path)
                 .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?;
         } else {
-            if dst_path.symlink_metadata().is_ok() {
-                fs::remove_file(&dst_path)
-                    .change_context_lazy(|| InstallError::PathIo(dst_path.to_owned()))?;
-            }
+            remove_symlink(&dst_path)
+                .change_context_lazy(|| InstallError::PathIo(dst_path.to_owned()))?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| InstallError::CopyError {
                 src: source_path.to_owned(),
                 dst: dst_path,
@@ -90,8 +89,18 @@ fn install(opts: &Opts) -> InstallResult<()> {
     fs::create_dir_all(opts.project_dot_config_dir())
         .change_context_lazy(|| InstallError::CreateDir(opts.project_dot_config_dir()))?;
 
+    remove_symlink(&opts.project_fakebox_share_stamp())
+        .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
     unix::fs::symlink(opts.share_dir(), opts.project_fakebox_share_stamp())
         .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
+
+    Ok(())
+}
+
+fn remove_symlink(path: &PathBuf) -> io::Result<()> {
+    if path.symlink_metadata().is_ok() {
+        fs::remove_file(path)?;
+    }
 
     Ok(())
 }
