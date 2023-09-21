@@ -19,13 +19,30 @@ let
     "rustfmt"
   ]);
 
+  pathToDerivation = src:
+    let
+      builderScript = pkgs.writeScript "copy-path.sh" ''
+        cp -rT $src $out
+      '';
+    in
+    derivation {
+      name = "copy-path-derivation";
+      builder = "${pkgs.bash}/bin/bash";
+      args = [ builderScript ];
+      system = pkgs.system;
+      inherit src;
+      PATH = with pkgs;
+        lib.makeBinPath [ coreutils ];
+    };
 in
 {
-  # package containing all the Rust/cargo toolchain binaries to import in the dev shells
+  # package containing all the Rust/cargo toolchain binaries to import in the dev shells and use by default
   toolchain = fenixToolchain;
-  # package containing rust-analyzer
+
+  # package containing rust-analyzer to import into dev shell
   rust-analyzer = pkgs.rust-analyzer;
-  # package containing rustfmt (by default nightly rustfmt, as it supports lots of handy directives)
+
+  # package containing rustfmt  to import into dev shell (by default nightly rustfmt, as it supports lots of handy directives)
   rustfmt = fenixToolchainRustfmt;
 
   # craneLib from `crane` package - for building Rust packages with Nix
@@ -47,7 +64,7 @@ in
   };
 
   # flakebox files available to `flakebox` tool
-  share = ../share;
+  share = pathToDerivation ../share;
 
   # wrapper over `mkShell` setting up flakebox env
   mkDevShell = callPackage ./mkDevShell.nix { };
@@ -55,4 +72,5 @@ in
   flakeboxBin = callPackage ./flakeboxBin.nix { };
 
   filter = callPackage ./filter { };
+  ci = callPackage ./ci { };
 })
