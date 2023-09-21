@@ -1,5 +1,4 @@
-{ pkgs
-}:
+{ pkgs }:
 let
   lib = pkgs.lib;
   cleanSourceWith = lib.cleanSourceWith;
