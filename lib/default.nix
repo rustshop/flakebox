@@ -1,23 +1,36 @@
 { pkgs, crane, fenix }:
+{ modules ? [ ]
+, config ? { }
+,
+}:
+let
+  lib = pkgs.lib;
+  userConfig = config;
+in
 pkgs.lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
   system = pkgs.system;
 
-  fenixChannel = fenix.packages.${system}.stable;
-  fenixChannelNightly = fenix.packages.${system}.latest;
+  evalModulesRes = pkgs.lib.evalModules {
+    specialArgs = {
+      inherit fenix crane pkgs;
+    };
 
-  fenixToolchain = (fenixChannel.withComponents [
-    "rustc"
-    "cargo"
-    "clippy"
-    "rust-analysis"
-    "rust-src"
-  ]);
+    modules = [
+      {
+        imports = [ ./toolchain.nix ];
+      }
+    ] ++
+    modules
+    ++ [
+      {
+        config = userConfig;
+      }
+    ];
+  };
+  config = evalModulesRes.config;
 
-  fenixToolchainRustfmt = (fenixChannelNightly.withComponents [
-    "rustfmt"
-  ]);
 
   pathToDerivation = src:
     let
@@ -37,16 +50,16 @@ let
 in
 {
   # package containing all the Rust/cargo toolchain binaries to import in the dev shells and use by default
-  toolchain = fenixToolchain;
+  toolchain = config.toolchain.default;
 
   # package containing rust-analyzer to import into dev shell
   rust-analyzer = pkgs.rust-analyzer;
 
   # package containing rustfmt  to import into dev shell (by default nightly rustfmt, as it supports lots of handy directives)
-  rustfmt = fenixToolchainRustfmt;
+  rustfmt = config.toolchain.rustfmt;
 
   # craneLib from `crane` package - for building Rust packages with Nix
-  craneLib = crane.lib.${system}.overrideToolchain self.toolchain;
+  craneLib = crane.lib.${system}.overrideToolchain config.toolchain.default;
 
   # common args for crane, used for building internal Rust binaries
   # not meant to be modified as part of downstream customizations
