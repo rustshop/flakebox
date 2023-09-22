@@ -55,9 +55,29 @@ function check_cargo_lock() {
 }
 export -f check_cargo_lock
 
+function check_leftover_dbg() {
+    set -euo pipefail
+
+    errors=""
+    for path in $(echo "$git_ls_nonbinary_files" | grep  '.*\.rs'); do
+      if grep 'dbg!(' "$path"  > /dev/null; then
+        >&2 echo "$path contains dbg! macro"
+        errors="true"
+      fi
+    done
+    
+    if [ -n "$errors" ]; then
+      >&2 echo "Fix the problems above or use --no-verify" 1>&2
+      return 1
+    fi
+    
+}
+export -f check_leftover_dbg
+
 parallel \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \
+    check_leftover_dbg \
     # newline for the last \ to work
 
