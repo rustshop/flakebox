@@ -7,7 +7,7 @@ let
   lib = pkgs.lib;
   userConfig = config;
 
-  evalModules = pkgs.lib.evalModules {
+  evalModules = lib.evalModules {
     prefix = [ "config" ];
     specialArgs = {
       inherit fenix crane pkgs;
@@ -17,10 +17,12 @@ let
       {
         imports = [
           # TODO: readDir
-          ./modules/toolchain.nix
+          ./modules/cargo.nix
+          ./modules/convco.nix
           ./modules/crane.nix
           ./modules/git.nix
           ./modules/shareDir.nix
+          ./modules/toolchain.nix
         ];
       }
     ] ++
@@ -44,9 +46,8 @@ let
     pkgs.runCommand "options-doc.md" { } ''
       cat ${optionsDoc.optionsCommonMark} >> $out
     '';
-
 in
-pkgs.lib.makeScope pkgs.newScope (self:
+lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
 in

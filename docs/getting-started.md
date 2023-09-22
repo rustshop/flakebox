@@ -68,7 +68,7 @@ in your project, you can integrate Flakebox manually:
       # ...
 
         devShells = {
-          # $. Use `mkDevShell` wrapper instead of the usual `mkShell`
+          # 4. Use `mkDevShell` wrapper instead of the usual `mkShell`
           default = flakeboxLib.mkDevShell {
             packages = [ ];
           };
