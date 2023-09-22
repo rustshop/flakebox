@@ -1,6 +1,6 @@
-{ craneLib
-, cranePrivateCommonArgs
+{ cranePrivateCommonArgs
 , filter
+, craneLib
 }:
 craneLib.buildPackage (cranePrivateCommonArgs // {
   src = filter.filterSubdirs {

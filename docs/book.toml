@@ -1,0 +1,6 @@
+[book]
+authors = ["Dawid Ciężarkiewicz"]
+language = "en"
+multilingual = false
+src = "."
+title = "Flakebox"

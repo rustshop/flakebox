@@ -6,20 +6,22 @@
 let
   lib = pkgs.lib;
   userConfig = config;
-in
-pkgs.lib.makeScope pkgs.newScope (self:
-let
-  inherit (self) callPackage;
-  system = pkgs.system;
 
-  evalModulesRes = pkgs.lib.evalModules {
+  evalModules = pkgs.lib.evalModules {
+    prefix = [ "config" ];
     specialArgs = {
       inherit fenix crane pkgs;
     };
 
     modules = [
       {
-        imports = [ ./toolchain.nix ];
+        imports = [
+          # TODO: readDir
+          ./modules/toolchain.nix
+          ./modules/crane.nix
+          ./modules/git.nix
+          ./modules/shareDir.nix
+        ];
       }
     ] ++
     modules
@@ -29,37 +31,29 @@ let
       }
     ];
   };
-  config = evalModulesRes.config;
+  finalConfig = evalModules.config;
 
+  optionsDoc = pkgs.nixosOptionsDoc {
+    inherit (evalModules) options;
+    documentType = "none";
+    allowDocBook = false;
+    markdownByDefault = true;
+  };
 
-  pathToDerivation = src:
-    let
-      builderScript = pkgs.writeScript "copy-path.sh" ''
-        cp -rT $src $out
-      '';
-    in
-    derivation {
-      name = "copy-path-derivation";
-      builder = "${pkgs.bash}/bin/bash";
-      args = [ builderScript ];
-      system = pkgs.system;
-      inherit src;
-      PATH = with pkgs;
-        lib.makeBinPath [ coreutils ];
-    };
+  optionsDocMd =
+    pkgs.runCommand "options-doc.md" { } ''
+      cat ${optionsDoc.optionsCommonMark} >> $out
+    '';
+
+in
+pkgs.lib.makeScope pkgs.newScope (self:
+let
+  inherit (self) callPackage;
 in
 {
-  # package containing all the Rust/cargo toolchain binaries to import in the dev shells and use by default
-  toolchain = config.toolchain.default;
+  system = pkgs.system;
 
-  # package containing rust-analyzer to import into dev shell
-  rust-analyzer = pkgs.rust-analyzer;
-
-  # package containing rustfmt  to import into dev shell (by default nightly rustfmt, as it supports lots of handy directives)
-  rustfmt = config.toolchain.rustfmt;
-
-  # craneLib from `crane` package - for building Rust packages with Nix
-  craneLib = crane.lib.${system}.overrideToolchain config.toolchain.default;
+  config = finalConfig;
 
   # common args for crane, used for building internal Rust binaries
   # not meant to be modified as part of downstream customizations
@@ -76,8 +70,39 @@ in
     installCargoArtifactsMode = "use-zstd";
   };
 
-  # flakebox files available to `flakebox` tool
-  share = pathToDerivation ../share;
+  docs =
+    pkgs.stdenv.mkDerivation {
+      name = "docs";
+      src = ../docs;
+
+      # depend on our options doc derivation
+      buildInput = [ optionsDocMd ];
+
+      # mkdocs dependencies
+      nativeBuildInputs = builtins.attrValues {
+        inherit (pkgs) mdbook;
+      };
+
+      # symlink our generated docs into the correct folder before generating
+      buildPhase = ''
+        ln -s ${optionsDocMd} "./nixos-options.md"
+        # generate the site
+        mdbook build
+      '';
+
+      # copy the resulting output to the derivation's $out directory
+      installPhase = ''
+        mv book $out
+      '';
+    };
+
+  share = self.config.shareDirPackage;
+
+  craneLib = self.config.craneLib.default;
+  craneLibNightly = self.config.craneLib.nightly;
+  craneLibStable = self.config.craneLib.stable;
+
+
 
   # wrapper over `mkShell` setting up flakebox env
   mkDevShell = callPackage ./mkDevShell.nix { };
