@@ -7,7 +7,7 @@ let
   lib = pkgs.lib;
   userConfig = config;
 
-  evalModules = pkgs.lib.evalModules {
+  evalModules = lib.evalModules {
     prefix = [ "config" ];
     specialArgs = {
       inherit fenix crane pkgs;
@@ -15,13 +15,12 @@ let
 
     modules = [
       {
-        imports = [
-          # TODO: readDir
-          ./modules/toolchain.nix
-          ./modules/crane.nix
-          ./modules/git.nix
-          ./modules/shareDir.nix
-        ];
+        imports =
+          lib.mapAttrsToList
+            (name: type: ./modules/${name})
+            (lib.filterAttrs
+              (name: type: lib.strings.hasSuffix ".nix" name)
+              (builtins.readDir ./modules));
       }
     ] ++
     modules
@@ -44,9 +43,8 @@ let
     pkgs.runCommand "options-doc.md" { } ''
       cat ${optionsDoc.optionsCommonMark} >> $out
     '';
-
 in
-pkgs.lib.makeScope pkgs.newScope (self:
+lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
 in
@@ -85,6 +83,7 @@ in
 
       # symlink our generated docs into the correct folder before generating
       buildPhase = ''
+        rm -f ./nixos-options.md
         ln -s ${optionsDocMd} "./nixos-options.md"
         # generate the site
         mdbook build
@@ -93,6 +92,8 @@ in
       # copy the resulting output to the derivation's $out directory
       installPhase = ''
         mv book $out
+        # copy the md file so it's easy to update the checked-in version
+        cp ./nixos-options.md $out/
       '';
     };
 

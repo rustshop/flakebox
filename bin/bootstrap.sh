@@ -28,7 +28,7 @@ if [ -e "flake.nix" ]; then
 fi
 
 # cat to set permissions to default
-cat < "$flake_nix_template" > "flake.nix"
+cat < "$flake_nix_template" > flake.nix
 $git_cmd add flake.nix
 
 >&2 echo "✅ Successfully installed"

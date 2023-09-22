@@ -11,7 +11,7 @@
   outputs = { self, nixpkgs, flake-utils, flakebox }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        flakeboxLib = flakebox.lib.${system};
+        flakeboxLib = flakebox.lib.${system} { };
       in
       {
         devShells = {
