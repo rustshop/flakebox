@@ -19,6 +19,8 @@ let
           # TODO: readDir
           ./modules/toolchain.nix
           ./modules/crane.nix
+          ./modules/git.nix
+          ./modules/shareDir.nix
         ];
       }
     ] ++
@@ -42,22 +44,6 @@ let
     pkgs.runCommand "options-doc.md" { } ''
       cat ${optionsDoc.optionsCommonMark} >> $out
     '';
-
-  pathToDerivation = src:
-    let
-      builderScript = pkgs.writeScript "copy-path.sh" ''
-        cp -rT $src $out
-      '';
-    in
-    derivation {
-      name = "copy-path-derivation";
-      builder = "${pkgs.bash}/bin/bash";
-      args = [ builderScript ];
-      system = pkgs.system;
-      inherit src;
-      PATH = with pkgs;
-        lib.makeBinPath [ coreutils ];
-    };
 
 in
 pkgs.lib.makeScope pkgs.newScope (self:
@@ -110,13 +96,13 @@ in
       '';
     };
 
+  share = self.config.shareDirPackage;
+
   craneLib = self.config.craneLib.default;
   craneLibNightly = self.config.craneLib.nightly;
   craneLibStable = self.config.craneLib.stable;
 
 
-  # flakebox files available to `flakebox` tool
-  share = pathToDerivation ../share;
 
   # wrapper over `mkShell` setting up flakebox env
   mkDevShell = callPackage ./mkDevShell.nix { };
