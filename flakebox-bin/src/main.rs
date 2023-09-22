@@ -108,7 +108,7 @@ fn install(opts: &Opts) -> InstallResult<()> {
                 src: source_path.to_owned(),
                 dst: dst_path.to_owned(),
             })?;
-            let _ = dbg!(cmd!("git", "add", dbg!(&relative_path)).run());
+            let _ = cmd!("git", "add", &relative_path).run();
         }
     }
 
