@@ -1,6 +1,7 @@
 { pkgs
 , flakeboxBin
 , config
+, share
 }:
 let
   defaultToolchain = config.toolchain.default;
@@ -46,7 +47,7 @@ pkgs.mkShell (cleanedArgs // {
 
   shellHook = ''
     # set the share dir
-    export FLAKEBOX_SHARE_DIR=${../share}
+    export FLAKEBOX_SHARE_DIR=${share}
     export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
     # make sure we have git in the PATH
     export PATH=${pkgs.git}/bin/:''${PATH}

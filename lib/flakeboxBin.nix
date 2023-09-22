@@ -2,7 +2,7 @@
 , filter
 , craneLib
 }:
-craneLib.buildPackage (cranePrivateCommonArgs // {
+let
   src = filter.filterSubdirs {
     root = cranePrivateCommonArgs.src;
     dirs = [
@@ -12,7 +12,15 @@ craneLib.buildPackage (cranePrivateCommonArgs // {
       "flakebox-bin"
     ];
   };
+  craneArgs = (cranePrivateCommonArgs // {
+    inherit src;
 
-  name = "flakebox";
-  cargoExtraArgs = "--locked -p flakebox";
+    name = "flakebox";
+    cargoExtraArgs = "--locked -p flakebox";
+  });
+  deps =
+    craneLib.buildDepsOnly craneArgs;
+in
+craneLib.buildPackage (craneArgs // {
+  cargoArtifacts = deps;
 })

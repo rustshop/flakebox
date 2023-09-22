@@ -1,7 +1,4 @@
-#!/usr/bin/env bash
-
-set -eu
-
+#!/nix/store/vqvj60h076bhqj6977caz0pfxs6543nb-bash-5.2-p15/bin/bash
 # Sanitize file first, by removing leading lines that are empty or start with a hash,
 # as `convco` currently does not do it automatically (but git will)
 # TODO: next release of convco should be able to do it automatically
@@ -24,3 +21,4 @@ if ! convco check --from-stdin <<<"$MESSAGE" ; then
    >&2 echo "Use git recommit <args> to fix your commit"
   exit 1
 fi
+

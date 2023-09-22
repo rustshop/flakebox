@@ -3,7 +3,6 @@
 # install git hooks
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi
-
 rm -f "${dot_git}/hooks/pre-commit"
 rm -f "${dot_git}/hooks/commit-msg"
 ln -sf "$(pwd)/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"

@@ -1,5 +1,6 @@
 mod opts;
 
+use std::env;
 use std::fs;
 use std::io;
 use std::os::unix;
@@ -7,6 +8,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use clap::Parser;
+use duct::cmd;
 use error_stack::ResultExt;
 use opts::Commands;
 use opts::Opts;
@@ -15,8 +17,12 @@ use tracing_subscriber::EnvFilter;
 use walkdir::WalkDir;
 
 #[derive(Error, Debug)]
-#[error("application error")]
-struct AppError;
+enum AppError {
+    #[error("application error")]
+    General,
+    #[error("must be run in project directory")]
+    CwdOutside,
+}
 
 type AppResult<T> = error_stack::Result<T, AppError>;
 
@@ -26,7 +32,7 @@ fn main() -> AppResult<()> {
 
     match opts.command {
         Commands::Init => init(&opts)?,
-        Commands::Install => install(&opts).change_context(AppError)?,
+        Commands::Install => install(&opts).change_context(AppError::General)?,
     }
 
     Ok(())
@@ -36,8 +42,17 @@ impl Opts {
     fn share_dir(&self) -> &Path {
         &self.share_dir
     }
+
     fn project_root_dir(&self) -> &Path {
         &self.project_root_dir
+    }
+
+    fn project_root_dir_cwd_rel(&self) -> AppResult<&Path> {
+        let current_dir = env::current_dir().expect("Failed to get current directory");
+
+        self.project_root_dir()
+            .strip_prefix(&current_dir)
+            .change_context(AppError::CwdOutside)
     }
 
     fn project_root_overlay_src(&self) -> PathBuf {
@@ -47,8 +62,16 @@ impl Opts {
     fn project_dot_config_dir(&self) -> PathBuf {
         self.project_root_dir().join(".config")
     }
+
+    fn project_dot_config_dir_cwd_rel(&self) -> AppResult<PathBuf> {
+        Ok(self.project_root_dir_cwd_rel()?.join(".config"))
+    }
+
     fn project_fakebox_share_stamp(&self) -> PathBuf {
         self.project_dot_config_dir().join("last-share")
+    }
+    fn project_fakebox_share_stamp_cwd_rel(&self) -> AppResult<PathBuf> {
+        Ok(self.project_dot_config_dir_cwd_rel()?.join("last-share"))
     }
 }
 
@@ -60,6 +83,8 @@ enum InstallError {
     CreateDir(PathBuf),
     #[error("Copy file error: {src} -> {dst}")]
     CopyError { src: PathBuf, dst: PathBuf },
+    #[error("Wrong usage")]
+    Usage,
 }
 
 type InstallResult<T> = error_stack::Result<T, InstallError>;
@@ -81,8 +106,9 @@ fn install(opts: &Opts) -> InstallResult<()> {
                 .change_context_lazy(|| InstallError::PathIo(dst_path.to_owned()))?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| InstallError::CopyError {
                 src: source_path.to_owned(),
-                dst: dst_path,
+                dst: dst_path.to_owned(),
             })?;
+            let _ = dbg!(cmd!("git", "add", dbg!(&relative_path)).run());
         }
     }
 
@@ -93,6 +119,15 @@ fn install(opts: &Opts) -> InstallResult<()> {
         .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
     unix::fs::symlink(opts.share_dir(), opts.project_fakebox_share_stamp())
         .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
+
+    let _ = cmd!(
+        "git",
+        "add",
+        &opts
+            .project_fakebox_share_stamp_cwd_rel()
+            .change_context(InstallError::Usage)?
+    )
+    .run();
 
     Ok(())
 }
@@ -112,7 +147,7 @@ fn init(opts: &Opts) -> AppResult<()> {
         return Ok(());
     }
 
-    let stamp = fs::read_link(&stamp_path).change_context_lazy(|| AppError)?;
+    let stamp = fs::read_link(&stamp_path).change_context_lazy(|| AppError::General)?;
 
     if stamp != opts.share_dir {
         eprintln!("ℹ️  Flakebox files not up to date. Call `flakebox install`.");
