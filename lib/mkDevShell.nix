@@ -1,10 +1,13 @@
 { pkgs
-, rust-analyzer
-, toolchain
-, rustfmt
 , flakeboxBin
+, config
 }:
-let defaultToolchain = toolchain; in
+let
+  defaultToolchain = config.toolchain.default;
+  rustfmt = config.toolchain.rustfmt;
+  rust-analyzer = config.toolchain.rust-analyzer;
+
+in
 
 { packages ? [ ]
 , toolchain ? defaultToolchain
