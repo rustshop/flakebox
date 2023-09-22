@@ -1,3 +1,5 @@
+<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->
+
 # Rustshop Flakebox - Rust dev experience we can share and love.
 
 Flakebox is to your Rust project DX (RDX!), what NixOS is to your OS, or
@@ -43,3 +45,5 @@ how Flakebox works.
 
 [Our Github Discussions page](https://github.com/rustshop/flakebox/discussions) is the
 place to ask questions and participate in building Flakebox. Don't be shy.
+
+<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->
