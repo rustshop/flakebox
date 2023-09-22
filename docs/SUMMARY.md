@@ -1,3 +1,4 @@
 [Introduction](README.md)
 
-- [Flakebox Config Options](./nixos-options.md)
+- [Setting up Flakebox](./getting-started.md)
+- [Config Options](./nixos-options.md)

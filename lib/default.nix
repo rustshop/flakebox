@@ -8,7 +8,7 @@ let
   userConfig = config;
 
   evalModules = pkgs.lib.evalModules {
-    prefix = [ "flakebox" ];
+    prefix = [ "config" ];
     specialArgs = {
       inherit fenix crane pkgs;
     };
