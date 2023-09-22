@@ -41,7 +41,7 @@ impl Opts {
     }
 
     fn project_root_overlay_src(&self) -> PathBuf {
-        self.share_dir().join("project-root-overlay")
+        self.share_dir().join("overlay")
     }
 
     fn project_dot_config_dir(&self) -> PathBuf {

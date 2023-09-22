@@ -61,7 +61,9 @@ in your project, you can integrate Flakebox manually:
 
       let
         # 3. Set up the flakebox lib for your system
-        flakeboxLib = flakebox.lib.${system};
+        flakeboxLib = flakebox.lib.${system} {
+          # customizations will go here in the future
+        };
       in
       {
 

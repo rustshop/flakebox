@@ -15,15 +15,12 @@ let
 
     modules = [
       {
-        imports = [
-          # TODO: readDir
-          ./modules/cargo.nix
-          ./modules/convco.nix
-          ./modules/crane.nix
-          ./modules/git.nix
-          ./modules/shareDir.nix
-          ./modules/toolchain.nix
-        ];
+        imports =
+          lib.mapAttrsToList
+            (name: type: ./modules/${name})
+            (lib.filterAttrs
+              (name: type: lib.strings.hasSuffix ".nix" name)
+              (builtins.readDir ./modules));
       }
     ] ++
     modules
@@ -86,6 +83,7 @@ in
 
       # symlink our generated docs into the correct folder before generating
       buildPhase = ''
+        rm -f ./nixos-options.md
         ln -s ${optionsDocMd} "./nixos-options.md"
         # generate the site
         mdbook build
@@ -94,6 +92,8 @@ in
       # copy the resulting output to the derivation's $out directory
       installPhase = ''
         mv book $out
+        # copy the md file so it's easy to update the checked-in version
+        cp ./nixos-options.md $out/
       '';
     };
 
