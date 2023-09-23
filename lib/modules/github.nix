@@ -1,11 +1,9 @@
-{ pkgs
-}:
+{ pkgs, lib, config, ... }:
 let
-  lib = pkgs.lib;
-  yaml = name: body: (pkgs.formats.yaml { }).generate name body;
-
+  inherit (lib) types;
+  writeYaml = name: body: (pkgs.formats.yaml { }).generate "flakebox-${name}-yaml-gen" body;
   flakebox-ci = {
-    name = "Continuous Integration";
+    name = "CI";
 
     on = {
       push = {
@@ -28,7 +26,7 @@ let
         steps = [
           { uses = "actions/checkout@v4"; }
           {
-            named = "Check Nix flake inputs";
+            name = "Check Nix flake inputs";
             uses = "DeterminateSystems/flake-checker-action@v5";
             "with" = {
               fail-mode = true;
@@ -57,9 +55,7 @@ let
             uses = "actions/cache@v3";
             "with" = {
               path = "~/.cargo";
-              key = ''
-                ''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}
-              '';
+              key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
             };
           }
 
@@ -72,37 +68,35 @@ let
           }
         ];
       };
-    };
 
 
-    build = {
-      name = "Build";
-      runs-on = "ubuntu-latest";
-      steps = [
-        { uses = "actions/checkout@v4"; }
+      build = {
+        name = "Build";
+        runs-on = "ubuntu-latest";
+        steps = [
+          { uses = "actions/checkout@v4"; }
 
-        {
-          name = "Install Nix";
-          uses = "DeterminateSystems/nix-installer-action@v4";
-        }
+          {
+            name = "Install Nix";
+            uses = "DeterminateSystems/nix-installer-action@v4";
+          }
 
-        {
-          name = "Magic Nix Cache";
-          uses = "DeterminateSystems/magic-nix-cache-action@v2";
-        }
+          {
+            name = "Magic Nix Cache";
+            uses = "DeterminateSystems/magic-nix-cache-action@v2";
+          }
 
-        {
-          name = "Build Flake";
-          run = ''
-            # run the same check that git `pre-commit` hook does
-            nix flake check .#
-          '';
-        }
-      ];
+          {
+            name = "Build Flake";
+            run = ''
+              # run the same check that git `pre-commit` hook does
+              nix flake check .#
+            '';
+          }
+        ];
+      };
     };
   };
-
-
   flakebox-flakehub-publish = {
     name = "Publish to Flakehub";
 
@@ -157,11 +151,67 @@ let
     };
 
   };
-
 in
 {
-  workflows =
-    {
-      inherit flakebox-ci flakebox-flakehub-publish;
+  options.github = {
+    ci = {
+      enable = lib.mkEnableOption "just integration" // {
+        default = true;
+      };
+
+      workflows = lib.mkOption {
+        default = { };
+        description = lib.mdDoc ''
+          Set of workflows to generate in `.github/workflows/`".
+        '';
+
+        type = types.attrsOf (types.submodule (
+          { name, config, options, ... }:
+          {
+            options = {
+
+              enable = lib.mkOption {
+                type = types.bool;
+                default = true;
+                description = lib.mdDoc ''
+                  Whether this workflow file should be generated. This
+                  option allows specific workflow files to be disabled.
+                '';
+              };
+
+
+              content = lib.mkOption {
+                default = null;
+                type = types.attrsOf types.anything;
+                description = "Content of the workflow";
+              };
+            };
+          }
+        ));
+
+        apply = value: lib.filterAttrs (n: v: v.enable == true) value;
+      };
     };
+  };
+
+  config = lib.mkIf config.github.ci.enable {
+
+    github.ci.workflows = {
+      flakebox-ci = {
+        content = flakebox-ci;
+      };
+      flakebox-flakehub-publish = {
+        content = flakebox-flakehub-publish;
+      };
+    };
+
+    shareDir = lib.mapAttrs'
+      (k: v:
+        lib.nameValuePair
+          "overlay/.github/workflows/${k}.yml"
+          {
+            source = writeYaml k v.content;
+          })
+      config.github.ci.workflows;
+  };
 }
