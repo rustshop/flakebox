@@ -55,6 +55,14 @@ function check_cargo_lock() {
 }
 export -f check_cargo_lock
 
+function check_clippy() {
+    set -euo pipefail
+
+    cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
+
+}
+export -f check_clippy
+
 function check_leftover_dbg() {
     set -euo pipefail
 
@@ -99,6 +107,16 @@ function check_semgrep() {
 }
 export -f check_semgrep
 
+function check_shellcheck() {
+    set -euo pipefail
+
+    for path in $(echo "$git_ls_nonbinary_files" | grep -E '.*\.sh$')  ; do
+      shellcheck --severity=warning "$path"
+    done
+
+}
+export -f check_shellcheck
+
 function check_typos() {
     set -euo pipefail
 
@@ -114,8 +132,10 @@ parallel \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \
+    check_clippy \
     check_leftover_dbg \
     check_semgrep \
+    check_shellcheck \
     check_typos \
     # newline for the last \ to work
 

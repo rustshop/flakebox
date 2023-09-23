@@ -48,12 +48,14 @@
     ];
 
     just.rules = {
-      semgrep = ''
-        # run `semgrep`
-        semgrep:
-          env SEMGREP_ENABLE_VERSION_CHECK=0 \
-            semgrep --error --config .config/semgrep.yaml
-      '';
+      semgrep = {
+        content = ''
+          # run `semgrep`
+          semgrep:
+            env SEMGREP_ENABLE_VERSION_CHECK=0 \
+              semgrep --error --config .config/semgrep.yaml
+        '';
+      };
     };
   };
 }

@@ -1,0 +1,30 @@
+{ lib, config, pkgs, ... }:
+{
+
+  options.shellcheck = {
+    enable = lib.mkEnableOption "shellcheck integration" // {
+      default = true;
+    };
+
+    pre-commit = {
+      enable = lib.mkEnableOption "shellcheck git pre-commit hook" // {
+        default = true;
+      };
+    };
+  };
+
+
+  config = lib.mkIf config.shellcheck.enable {
+    git.pre-commit.hooks = {
+      shellcheck = ''
+        for path in $(echo "$git_ls_nonbinary_files" | grep -E '.*\.sh$')  ; do
+          shellcheck --severity=warning "$path"
+        done
+      '';
+    };
+
+    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
+      pkgs.shellcheck
+    ];
+  };
+}

@@ -51,6 +51,8 @@ pkgs.mkShell (cleanedArgs // {
     export FLAKEBOX_SHARE_DIR=${share}
     export FLAKEBOX_DOCS_DIR=${docs}
     export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
+    export PATH=${share}/bin/:''${PATH}
+
     # make sure we have git in the PATH
     export PATH=${pkgs.git}/bin/:''${PATH}
 
