@@ -42,7 +42,7 @@ function check_cargo_fmt() {
     set -euo pipefail
 
     cargo fmt --all --check
-    
+
 }
 export -f check_cargo_fmt
 
@@ -51,7 +51,7 @@ function check_cargo_lock() {
 
     # https://users.rust-lang.org/t/check-if-the-cargo-lock-is-up-to-date-without-building-anything/91048/5
     cargo update --workspace --locked
-    
+
 }
 export -f check_cargo_lock
 
@@ -65,12 +65,12 @@ function check_leftover_dbg() {
         errors="true"
       fi
     done
-    
+
     if [ -n "$errors" ]; then
       >&2 echo "Fix the problems above or use --no-verify" 1>&2
       return 1
     fi
-    
+
 }
 export -f check_leftover_dbg
 
@@ -82,20 +82,20 @@ function check_semgrep() {
       >&2 echo "Skipping semgrep check: not available"
       return 0
     fi
-    
+
     if [ ! -f .config/semgrep.yaml ] ; then
       >&2 echo "Skipping semgrep check: .config/semgrep.yaml doesn't exist"
       return 0
     fi
-    
+
     if [ ! -s .config/semgrep.yaml ] ; then
       >&2 echo "Skipping semgrep check: .config/semgrep.yaml empty"
       return 0
     fi
-    
+
     env SEMGREP_ENABLE_VERSION_CHECK=0 \
       semgrep -q --error --config .config/semgrep.yaml
-    
+
 }
 export -f check_semgrep
 

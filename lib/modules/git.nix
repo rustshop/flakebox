@@ -68,7 +68,7 @@ in
           let
             spaces = lib.strings.fixedWidthString numSpaces " " "";
             lines = lib.strings.splitString "\n" str;
-            indentedLines = builtins.map (line: spaces + line) lines;
+            indentedLines = builtins.map (line: if line == "" then "" else spaces + line) lines;
           in
           builtins.concatStringsSep "\n" indentedLines;
 
