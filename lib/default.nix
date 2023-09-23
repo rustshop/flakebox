@@ -113,5 +113,4 @@ in
   flakeboxBin = callPackage ./flakeboxBin.nix { };
 
   filter = callPackage ./filter { };
-  ci = callPackage ./ci { };
 })

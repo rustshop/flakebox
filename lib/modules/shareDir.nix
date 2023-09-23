@@ -79,7 +79,7 @@ in
               type = types.bool;
               default = true;
               description = lib.mdDoc ''
-                Whether this share dir file should be generated.  This
+                Whether this share dir file should be generated. This
                 option allows specific share dir files to be disabled.
               '';
             };
@@ -87,7 +87,7 @@ in
             target = mkOption {
               type = types.str;
               description = lib.mdDoc ''
-                Name of symlink (relative to share dir).  Defaults to the attribute name.
+                Name of symlink (relative to share dir). Defaults to the attribute name.
               '';
             };
 
@@ -122,6 +122,7 @@ in
           };
         }
       ));
+      apply = value: lib.filterAttrs (n: v: v.enable == true) value;
     };
   };
 
