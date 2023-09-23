@@ -18,7 +18,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/cargo\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/cargo.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/cargo\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/cargo.nix)
 
 
 
@@ -44,7 +44,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/cargo\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/cargo.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/cargo\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/cargo.nix)
 
 
 
@@ -70,7 +70,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/convco\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/convco.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/convco\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/convco.nix)
 
 
 
@@ -96,7 +96,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/convco\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/convco.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/convco\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/convco.nix)
 
 
 
@@ -124,7 +124,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane.nix)
 
 
 
@@ -152,7 +152,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane.nix)
 
 
 
@@ -180,7 +180,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/crane.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/crane.nix)
 
 
 
@@ -206,7 +206,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/env\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/env.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/env\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/env.nix)
 
 
 
@@ -227,7 +227,7 @@ list of package
 ` [ ] `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/env\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/env.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/env\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/env.nix)
 
 
 
@@ -253,7 +253,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -274,7 +274,7 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -300,7 +300,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -326,7 +326,7 @@ string or path
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -347,7 +347,7 @@ string or path
 ` "" `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -373,7 +373,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
 
 
 
@@ -394,7 +394,97 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/git.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/git.nix)
+
+
+
+## config\.github\.ci\.enable
+
+
+
+Whether to enable just integration\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github.nix)
+
+
+
+## config\.github\.ci\.workflows
+
+
+
+Set of workflows to generate in ` .github/workflows/ `"\.
+
+
+
+*Type:*
+attribute set of (submodule)
+
+
+
+*Default:*
+` { } `
+
+*Declared by:*
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github.nix)
+
+
+
+## config\.github\.ci\.workflows\.\<name>\.enable
+
+
+
+Whether this workflow file should be generated\. This
+option allows specific workflow files to be disabled\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+*Declared by:*
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github.nix)
+
+
+
+## config\.github\.ci\.workflows\.\<name>\.content
+
+
+
+Content of the workflow
+
+
+
+*Type:*
+attribute set of anything
+
+
+
+*Default:*
+` null `
+
+*Declared by:*
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/github.nix)
 
 
 
@@ -420,7 +510,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just.nix)
 
 
 
@@ -444,7 +534,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just.nix)
 
 
 
@@ -466,7 +556,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just.nix)
 
 
 
@@ -489,7 +579,7 @@ string or path
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just.nix)
 
 
 
@@ -512,7 +602,7 @@ signed integer
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/just.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/just.nix)
 
 
 
@@ -538,7 +628,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/rust\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/rust.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/rust\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/rust.nix)
 
 
 
@@ -564,7 +654,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/rust\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/rust.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/rust\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/rust.nix)
 
 
 
@@ -590,7 +680,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/semgrep\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/semgrep.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/semgrep\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/semgrep.nix)
 
 
 
@@ -616,7 +706,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/semgrep\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/semgrep.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/semgrep\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/semgrep.nix)
 
 
 
@@ -637,7 +727,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -645,7 +735,7 @@ attribute set of (submodule)
 
 
 
-Whether this share dir file should be generated\.  This
+Whether this share dir file should be generated\. This
 option allows specific share dir files to be disabled\.
 
 
@@ -659,7 +749,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -682,7 +772,7 @@ string
 ` "symlink" `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -698,7 +788,7 @@ Path of the source file\.
 path
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -706,7 +796,7 @@ path
 
 
 
-Name of symlink (relative to share dir)\.  Defaults to the attribute name\.
+Name of symlink (relative to share dir)\. Defaults to the attribute name\.
 
 
 
@@ -714,7 +804,7 @@ Name of symlink (relative to share dir)\.  Defaults to the attribute name\.
 string
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -735,7 +825,7 @@ null or strings concatenated with “\\n”
 ` null `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -751,7 +841,7 @@ Derivation containing all shareDir files/symlinks
 package
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shareDir.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shareDir.nix)
 
 
 
@@ -777,7 +867,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shellcheck\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shellcheck.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shellcheck\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shellcheck.nix)
 
 
 
@@ -803,7 +893,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shellcheck\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/shellcheck.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shellcheck\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/shellcheck.nix)
 
 
 
@@ -826,7 +916,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -847,7 +937,7 @@ string
 ` "complete" `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -868,7 +958,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -898,7 +988,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -919,7 +1009,7 @@ package
 ` <derivation rust-stable-with-components-2023-08-24> `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -940,7 +1030,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-09-19> `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -965,7 +1055,7 @@ package
 ` <derivation rust-analyzer-2023-09-11> `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -991,7 +1081,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-09-19> `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -1014,7 +1104,7 @@ package
 ` <derivation rust-stable-with-components-2023-08-24> `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/toolchain.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/toolchain.nix)
 
 
 
@@ -1040,7 +1130,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/typos\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/typos.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/typos\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/typos.nix)
 
 
 
@@ -1066,6 +1156,6 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/typos\.nix](file:///nix/store/riqm9khd9xf4wdpmh6p28v2xpz8g60l2-source/lib/modules/typos.nix)
+ - [/nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/typos\.nix](file:///nix/store/49lkpyiw3p53yqfscaf71xsnp9z6iq2s-source/lib/modules/typos.nix)
 
 
