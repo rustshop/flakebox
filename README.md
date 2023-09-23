@@ -41,9 +41,17 @@ to start.
 See [Technical Introduction](./docs/technical-details.md) to read more about
 how Flakebox works.
 
+
 ## Join the Community
 
 [Our Github Discussions page](https://github.com/rustshop/flakebox/discussions) is the
 place to ask questions and participate in building Flakebox. Don't be shy.
+# Full Flakebox Book ToC
+
+[Introduction](./docs/README.md)
+
+- [Setting up Flakebox](./docs/getting-started.md)
+- [Technical Introduction](./docs/technical-details.md) 
+- [Config Options](./docs/nixos-options.md)
 
 <!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->
