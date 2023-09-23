@@ -1,7 +1,7 @@
 # Rustshop Flakebox - Rust dev experience we can share and love.
 
-Flakebox is to your Rust project DX (RDX!), what NixOS is to your OS, or
-home-manager to your home directory. 
+Flakebox is to your Rust project dev environment, what NixOS is to your OS, or
+home-manager to your home directory.
 
 This means, you can:
 
@@ -10,7 +10,7 @@ This means, you can:
 * keep up to date with the evolving ecosystem with ease.
 
 Rustshop is a vision of how working with Rust could and should be like.
-Flakebox is all you need to bring that vision into your Rust project.
+Flakebox how you bring that vision into your Rust project.
 
 Just because you're a lone Open Source developer working on a spare
 time project doesn't mean you don't deserve a DX of a mature team
@@ -18,8 +18,8 @@ with dedicated tooling team. Just because you're a part of dedicated
 tooling system in a mature team, doesn't mean you shouldn't benefit
 from all the best ideas wider community has to offer.
 
-You don't have to copy, paste and keep updating the same set of
-scripts between all your projects. There's a better way: Flakebox.
+You don't have to keep copying and updating the same set of
+scripts and configs between all your projects. There's a better way: Flakebox.
 
 **Warning:** Rustshop Flakebox is currently very immature. Expect
 rought edges and some amount of churn before we figure out the
