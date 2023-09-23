@@ -80,3 +80,9 @@ typos-fix-all:
 format:
   cargo fmt --all
   nixpkgs-fmt $(echo **.nix)
+
+
+# run `semgrep`
+semgrep:
+  env SEMGREP_ENABLE_VERSION_CHECK=0 \
+    semgrep --error --config .config/semgrep.yaml

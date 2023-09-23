@@ -34,7 +34,7 @@ pkgs.mkShell (cleanedArgs // {
       # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
       (pkgs.hiPrio pkgs.bashInteractive)
 
-    ] ++ (builtins.attrValues {
+    ] ++ config.env.shellPackages ++ (builtins.attrValues {
       # Core & generic
       inherit (pkgs) git coreutils parallel shellcheck;
       # Nix
