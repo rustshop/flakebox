@@ -40,7 +40,7 @@ pkgs.mkShell (cleanedArgs // {
       # Nix
       inherit (pkgs) nixpkgs-fmt nil;
       # Rust tools
-      inherit (pkgs) cargo-watch convco typos just;
+      inherit (pkgs) cargo-watch;
       # Linkers
       inherit (pkgs) lld;
     })
