@@ -39,6 +39,7 @@ to start.
 See [Technical Introduction](./technical-details.md) to read more about
 how Flakebox works.
 
+
 ## Join the Community
 
 [Our Github Discussions page](https://github.com/rustshop/flakebox/discussions) is the
