@@ -18,4 +18,6 @@ fi
 
 >&2 echo "💡 Run 'just' for a list of available 'just ...' helper recipes"
 
+source "$FLAKEBOX_SHARE_DIR/shellHook.sh"
+
 flakebox init

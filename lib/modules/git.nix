@@ -15,6 +15,7 @@ in
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
         description = "Attrset of hooks to to execute during git pre-commit hook";
         default = { };
+        apply = value: lib.filterAttrs (n: v: v != null) value;
       };
     };
     commit-msg = {
@@ -26,6 +27,7 @@ in
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
         description = "Attrset of hooks to to execute during git commit-msg hook";
         default = { };
+        apply = value: lib.filterAttrs (n: v: v != null) value;
       };
     };
 
@@ -58,14 +60,6 @@ in
           (lib.mapAttrsToList
             (rawName: value: value)
             config.git.commit-msg.hooks));
-    };
-
-    shareDir."overlay/misc/git-hooks/commit-template" = lib.mkIf config.git.commit-template.enable {
-      source = pkgs.writeText "commit-template"
-        ''
-          ${config.git.commit-template.head}
-          ${config.git.commit-template.body}
-        '';
     };
 
     shareDir."overlay/misc/git-hooks/pre-commit" =
@@ -118,5 +112,20 @@ in
                 # newline for the last \ to work
           '';
         };
+
+    shareDir."overlay/misc/git-hooks/commit-template.txt" = lib.mkIf config.git.commit-template.enable {
+      source = pkgs.writeText "commit-template"
+        ''
+          ${config.git.commit-template.head}
+          ${config.git.commit-template.body}
+        '';
+    };
+
+    env.shellHooks = [
+      ''
+        ${pkgs.git}/bin/git config commit.template misc/git-hooks/commit-template.txt
+      ''
+    ];
+
   };
 }
