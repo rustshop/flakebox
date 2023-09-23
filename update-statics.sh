@@ -8,7 +8,7 @@ printf '<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead
   sed -e 's#(\.#(./docs#g' < docs/README.md >> README.md
   echo "# Full Flakebox Book ToC"
   echo ""
-  echo "Note: Documentation for the exact version of Flakebox used is available via 'flakebox docs' command."
+  echo "Note: Documentation for the exact version of Flakebox used is available via \`flakebox docs\` command."
   echo ""
   sed -e 's#(\.#(./docs#g' < docs/SUMMARY.md 
 } >> README.md
