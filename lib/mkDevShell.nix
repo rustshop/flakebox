@@ -53,6 +53,5 @@ pkgs.mkShell (cleanedArgs // {
     export PATH=${pkgs.git}/bin/:''${PATH}
 
     source ${./mkDevShellHook.sh}
-
   '';
 })  

@@ -15,6 +15,7 @@ in
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
         description = "Attrset of hooks to to execute during git pre-commit hook";
         default = { };
+        apply = value: lib.filterAttrs (n: v: v != null) value;
       };
     };
     commit-msg = {
@@ -24,8 +25,29 @@ in
 
       hooks = lib.mkOption {
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
-        description = "Attrset of hooks to to execute during git pre-commit hook";
+        description = "Attrset of hooks to to execute during git commit-msg hook";
         default = { };
+        apply = value: lib.filterAttrs (n: v: v != null) value;
+      };
+    };
+
+    commit-template = {
+      enable = lib.mkEnableOption "git commit message template" // {
+        default = true;
+      };
+
+      head = lib.mkOption {
+        type = types.either types.str types.path;
+        description = "The head of the template content";
+        default = "";
+      };
+
+      body = lib.mkOption {
+        type = types.either types.str types.path;
+        description = "The body of the template content";
+        default = ''
+          # Explain *why* this change is being made                width limit ->|
+        '';
       };
     };
   };
@@ -90,5 +112,20 @@ in
                 # newline for the last \ to work
           '';
         };
+
+    shareDir."overlay/misc/git-hooks/commit-template.txt" = lib.mkIf config.git.commit-template.enable {
+      source = pkgs.writeText "commit-template"
+        ''
+          ${config.git.commit-template.head}
+          ${config.git.commit-template.body}
+        '';
+    };
+
+    env.shellHooks = [
+      ''
+        ${pkgs.git}/bin/git config commit.template misc/git-hooks/commit-template.txt
+      ''
+    ];
+
   };
 }
