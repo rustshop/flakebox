@@ -1,12 +1,3 @@
-# run `cargo clippy` on everything
-clippy:
-  cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
-
-# run `cargo clippy --fix` on everything
-clippy-fix:
-  cargo clippy --workspace --all-targets --fix
-
-
 alias b := build
 alias c := check
 alias t := test
@@ -44,6 +35,15 @@ final-check: lint
 format:
   cargo fmt --all
   nixpkgs-fmt $(echo **.nix)
+
+
+# run `cargo clippy` on everything
+clippy:
+  cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
+
+# run `cargo clippy --fix` on everything
+clippy-fix:
+  cargo clippy --workspace --all-targets --fix
 
 
 # run `semgrep`
