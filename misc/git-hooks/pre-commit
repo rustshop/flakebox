@@ -99,11 +99,23 @@ function check_semgrep() {
 }
 export -f check_semgrep
 
+function check_typos() {
+    set -euo pipefail
+
+    if ! echo "$git_ls_nonbinary_files" | typos --stdin-paths ; then
+      >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+      return 1
+    fi
+
+}
+export -f check_typos
+
 parallel \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \
     check_leftover_dbg \
     check_semgrep \
+    check_typos \
     # newline for the last \ to work
 

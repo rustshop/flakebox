@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 {
 
   options.convco = {
@@ -15,6 +15,9 @@
 
 
   config = lib.mkIf config.convco.enable {
+    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
+      pkgs.convco
+    ];
     git.commit-msg.hooks = {
       convco = ''
         # Sanitize file first, by removing leading lines that are empty or start with a hash,
