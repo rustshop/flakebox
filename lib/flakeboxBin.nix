@@ -12,12 +12,14 @@ let
       "flakebox-bin"
     ];
   };
+
   craneArgs = (cranePrivateCommonArgs // {
     inherit src;
 
     name = "flakebox";
     cargoExtraArgs = "--locked -p flakebox";
   });
+
   deps =
     craneLib.buildDepsOnly craneArgs;
 in
