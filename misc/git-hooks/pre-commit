@@ -74,10 +74,36 @@ function check_leftover_dbg() {
 }
 export -f check_leftover_dbg
 
+function check_semgrep() {
+    set -euo pipefail
+
+    # semgrep is not available on MacOS
+    if ! command -v semgrep > /dev/null ; then
+      >&2 echo "Skipping semgrep check: not available"
+      return 0
+    fi
+    
+    if [ ! -f .config/semgrep.yaml ] ; then
+      >&2 echo "Skipping semgrep check: .config/semgrep.yaml doesn't exist"
+      return 0
+    fi
+    
+    if [ ! -s .config/semgrep.yaml ] ; then
+      >&2 echo "Skipping semgrep check: .config/semgrep.yaml empty"
+      return 0
+    fi
+    
+    env SEMGREP_ENABLE_VERSION_CHECK=0 \
+      semgrep -q --error --config .config/semgrep.yaml
+    
+}
+export -f check_semgrep
+
 parallel \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \
     check_leftover_dbg \
+    check_semgrep \
     # newline for the last \ to work
 

@@ -16,17 +16,18 @@ in
         Notably the name is used only for config identification (e.g. disabling) and actual
         justfile rule name must be used in the value (content of the file).
       '';
-      default = {
-        # TODO: this is a huge ball of rules, some of which should be conditional on the
-        # respective features
-        core = ./just/justfile;
-      };
+      default = { };
       apply = value: lib.filterAttrs (n: v: v != null) value;
     };
   };
 
 
   config = lib.mkIf config.just.enable {
+    just.rules = {
+      # TODO: this is a huge ball of rules, some of which should be conditional on the
+      # respective features
+      core = ./just/justfile;
+    };
     shareDir."overlay/justfile" = {
       source = pkgs.writeText "flakebox-justfile"
         (builtins.concatStringsSep "\n\n"

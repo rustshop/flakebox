@@ -2,6 +2,7 @@
 , flakeboxBin
 , config
 , share
+, docs
 }:
 let
   defaultToolchain = config.toolchain.default;
@@ -33,7 +34,7 @@ pkgs.mkShell (cleanedArgs // {
       # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
       (pkgs.hiPrio pkgs.bashInteractive)
 
-    ] ++ (builtins.attrValues {
+    ] ++ config.env.shellPackages ++ (builtins.attrValues {
       # Core & generic
       inherit (pkgs) git coreutils parallel shellcheck;
       # Nix
@@ -48,6 +49,7 @@ pkgs.mkShell (cleanedArgs // {
   shellHook = ''
     # set the share dir
     export FLAKEBOX_SHARE_DIR=${share}
+    export FLAKEBOX_DOCS_DIR=${docs}
     export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
     # make sure we have git in the PATH
     export PATH=${pkgs.git}/bin/:''${PATH}
