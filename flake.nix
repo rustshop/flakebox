@@ -6,7 +6,7 @@
     flake-utils.url = "github:numtide/flake-utils";
 
     crane = {
-      url = "github:dpc/crane?rev=afdf9ab92ed2880c4e39aba5106677e3385717f4";
+      url = "github:dpc/crane?rev=60dcbcab46446bb852473a995fb0008d74c8b78d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

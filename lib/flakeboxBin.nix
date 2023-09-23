@@ -16,7 +16,7 @@ let
   craneArgs = (cranePrivateCommonArgs // {
     inherit src;
 
-    name = "flakebox";
+    pname = "flakebox";
     cargoExtraArgs = "--locked -p flakebox";
   });
 

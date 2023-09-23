@@ -17,7 +17,7 @@ keywords = ["nix", "tool", "dx"]
 #             https://github.com/ipetkov/crane/issues/370
 [profile.dev.build-override]
 debug = false
-[profile.ci.build-override]
+[profile.release.build-override]
 debug = false
 
 [profile.dev]
