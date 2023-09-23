@@ -48,6 +48,8 @@ how Flakebox works.
 place to ask questions and participate in building Flakebox. Don't be shy.
 # Full Flakebox Book ToC
 
+Note: Documentation for the exact version of Flakebox used is available via 'flakebox docs'.
+
 [Introduction](./docs/README.md)
 
 - [Setting up Flakebox](./docs/getting-started.md)

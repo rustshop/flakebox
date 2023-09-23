@@ -33,6 +33,13 @@ fn main() -> AppResult<()> {
     match opts.command {
         Commands::Init => init(&opts)?,
         Commands::Install => install(&opts).change_context(AppError::General)?,
+        Commands::Docs { docs_dir } => {
+            let docs_index = docs_dir.join("index.html");
+            eprintln!("Opening docs available at {}", docs_index.display());
+            cmd!("xdg-open", docs_index)
+                .run()
+                .change_context(AppError::General)?;
+        }
     }
 
     Ok(())

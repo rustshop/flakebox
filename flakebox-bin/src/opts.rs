@@ -19,4 +19,8 @@ pub struct Opts {
 pub enum Commands {
     Init,
     Install,
+    Docs {
+        #[arg(long, env = "FLAKEBOX_DOCS_DIR")]
+        docs_dir: PathBuf,
+    },
 }
