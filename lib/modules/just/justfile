@@ -18,28 +18,13 @@ build:
 check:
   cargo check --workspace --all-targets
 
-# run `cargo clippy` on everything
-clippy:
-  cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
-
-# run `cargo clippy --fix` on everything
-clippy-fix:
-  cargo clippy --workspace --all-targets --fix
-
 # run tests
 test: build
   cargo test
 
-# run lints (quick)
+# run lints (git pre-commit hook)
 lint:
   env NO_STASH=true $(git rev-parse --git-common-dir)/hooks/pre-commit
-  just clippy
-  env cargo doc --profile dev --no-deps --document-private-items
-
-# fix some lint failures
-lint-fix:
-  just format
-  just clippy-fix
 
 # run all checks recommended before opening a PR
 final-check: lint

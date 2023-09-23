@@ -29,27 +29,29 @@
     ];
 
     just.rules = {
-      typos = ''
-        # check typos
-        [no-exit-message]
-        typos *PARAMS:
-          #!/usr/bin/env bash
-          set -eo pipefail
+      typos = {
+        content = ''
+          # check typos
+          [no-exit-message]
+          typos *PARAMS:
+            #!/usr/bin/env bash
+            set -eo pipefail
 
-          git_ls_files="$(git ls-files)"
-          git_ls_nonbinary_files="$(echo "$git_ls_files" |  grep -v -E "^db/|\.png\$|\.ods\$")"
+            git_ls_files="$(git ls-files)"
+            git_ls_nonbinary_files="$(echo "$git_ls_files" |  grep -v -E "^db/|\.png\$|\.ods\$")"
 
 
-          if ! echo "$git_ls_nonbinary_files" | typos {{PARAMS}} --stdin-paths; then
-            >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
-            return 1
-          fi
+            if ! echo "$git_ls_nonbinary_files" | typos {{PARAMS}} --stdin-paths; then
+              >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+              return 1
+            fi
 
-        # fix all typos
-        [no-exit-message]
-        typos-fix-all:
-          just typos -w
-      '';
+          # fix all typos
+          [no-exit-message]
+          typos-fix-all:
+            just typos -w
+        '';
+      };
     };
   };
 }

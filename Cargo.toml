@@ -17,5 +17,21 @@ keywords = ["nix", "tool", "dx"]
 debug = "line-tables-only"
 lto = "off"
 
+[profile.ci]
+inherits = "dev"
+incremental = false
+
 [profile.release]
 debug = "line-tables-only"
+
+
+
+# Workaround: https://github.com/rust-lang/cargo/issues/12457 which causes
+#             https://github.com/ipetkov/crane/issues/370
+[profile.dev.build-override]
+debug = false
+[profile.ci.build-override]
+debug = false
+[profile.release.build-override]
+debug = false
+

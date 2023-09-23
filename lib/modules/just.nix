@@ -9,7 +9,40 @@ in
     };
 
     rules = lib.mkOption {
-      type = types.attrsOf (types.nullOr (types.either types.str types.path));
+      type = types.attrsOf (types.submodule
+        ({ config, options, ... }: {
+          options = {
+            enable = lib.mkOption {
+              type = types.bool;
+              default = true;
+              description = lib.mdDoc ''
+                Whether this rule should be generated. This
+                option allows specific rules to be disabled.
+              '';
+            };
+
+            content = lib.mkOption {
+              type = types.either types.str types.path;
+              default = 1000;
+              description = lib.mdDoc ''
+                Order of this rule in relation to the others ones.
+                The semantics are the same as with `lib.mkOrder`. Smaller values have
+                a greater priority.
+              '';
+            };
+
+            priority = lib.mkOption {
+              type = types.int;
+              default = 1000;
+              description = lib.mdDoc ''
+                Order of this rule in relation to the others ones.
+                The semantics are the same as with `lib.mkOrder`. Smaller values have
+                a greater priority.
+              '';
+            };
+          };
+        }));
+
       description = ''
         Attrset of section of justfile (possibly with multiple rules)
 
@@ -17,23 +50,35 @@ in
         justfile rule name must be used in the value (content of the file).
       '';
       default = { };
-      apply = value: lib.filterAttrs (n: v: v != null) value;
+      apply = value: lib.filterAttrs (n: v: v.enable == true) value;
     };
   };
 
 
-  config = lib.mkIf config.just.enable {
-    just.rules = {
-      # TODO: this is a huge ball of rules, some of which should be conditional on the
-      # respective features
-      core = ./just/justfile;
+  config =
+    let
+      pathDeref = pathOrStr: if builtins.typeOf pathOrStr == "path" then builtins.readFile pathOrStr else pathOrStr;
+    in
+    lib.mkIf config.just.enable {
+      just.rules = {
+        core = {
+          priority = 10;
+          content = ./just/justfile;
+        };
+      };
+
+      shareDir."overlay/justfile" = {
+        source = pkgs.writeText "flakebox-justfile"
+          (builtins.concatStringsSep "\n\n"
+            (builtins.map (v: v.content)
+              (lib.sort (a: b: if a.priority == b.priority then (a.k < b.k) else a.priority < b.priority)
+                (lib.mapAttrsToList
+                  (k: v: {
+                    inherit k;
+                    priority = v.priority;
+                    content = pathDeref v.content;
+                  })
+                  config.just.rules))));
+      };
     };
-    shareDir."overlay/justfile" = {
-      source = pkgs.writeText "flakebox-justfile"
-        (builtins.concatStringsSep "\n\n"
-          (lib.mapAttrsToList
-            (k: v: if builtins.typeOf v == "path" then builtins.readFile v else v)
-            config.just.rules));
-    };
-  };
 }
