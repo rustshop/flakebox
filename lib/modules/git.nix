@@ -11,6 +11,14 @@ in
         default = true;
       };
 
+      trailing_newline = lib.mkEnableOption "git pre-commit trailing newline check " // {
+        default = true;
+      };
+
+      trailing_whitespace = lib.mkEnableOption "git pre-commit trailing whitespace check " // {
+        default = true;
+      };
+
       hooks = lib.mkOption {
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
         description = "Attrset of hooks to to execute during git pre-commit hook";
@@ -52,8 +60,47 @@ in
     };
   };
 
-
   config = {
+    git.pre-commit.hooks = lib.mkMerge [
+      (lib.mkIf
+        config.git.pre-commit.trailing_whitespace
+        {
+          trailing_whitespace = ''
+            if ! git diff --check ; then
+              echo "Trailing whitespace detected. Please remove them before committing."
+              return 1
+            fi
+          '';
+        })
+      (lib.mkIf
+        config.git.pre-commit.trailing_newline
+        {
+          trailing_newline = ''
+            errors=""
+            for path in $(echo "$git_ls_nonbinary_files" | grep -v -E '.*\.(ods|jpg|png|log)' | grep -v -E '^db/'); do
+
+              # extra branches for clarity
+              if [ ! -s "$path" ]; then
+                 # echo "$path is empty"
+                 true
+              elif [ -z "$(tail -c 1 < "$path")" ]; then
+                 # echo "$path ends with a newline or with a null byte"
+                 true
+              else
+                >&2 echo "$path doesn't end with a newline" 1>&2
+                errors="true"
+              fi
+            done
+
+            if [ -n "$errors" ]; then
+              >&2 echo "Fix the problems above or use --no-verify" 1>&2
+              return 1
+            fi
+          '';
+        })
+    ];
+
+
     shareDir."overlay/misc/git-hooks/commit-msg" = lib.mkIf config.git.commit-msg.enable {
       source = pkgs.writeShellScript "commit-msg"
         (builtins.concatStringsSep "\n\n"
