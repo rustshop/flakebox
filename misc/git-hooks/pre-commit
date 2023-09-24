@@ -117,6 +117,44 @@ function check_shellcheck() {
 }
 export -f check_shellcheck
 
+function check_trailing_newline() {
+    set -euo pipefail
+
+    errors=""
+    for path in $(echo "$git_ls_nonbinary_files" | grep -v -E '.*\.(ods|jpg|png|log)' | grep -v -E '^db/'); do
+
+      # extra branches for clarity
+      if [ ! -s "$path" ]; then
+         # echo "$path is empty"
+         true
+      elif [ -z "$(tail -c 1 < "$path")" ]; then
+         # echo "$path ends with a newline or with a null byte"
+         true
+      else
+        >&2 echo "$path doesn't end with a newline" 1>&2
+        errors="true"
+      fi
+    done
+
+    if [ -n "$errors" ]; then
+      >&2 echo "Fix the problems above or use --no-verify" 1>&2
+      return 1
+    fi
+
+}
+export -f check_trailing_newline
+
+function check_trailing_whitespace() {
+    set -euo pipefail
+
+    if ! git diff --check ; then
+      echo "Trailing whitespace detected. Please remove them before committing."
+      return 1
+    fi
+
+}
+export -f check_trailing_whitespace
+
 function check_typos() {
     set -euo pipefail
 
@@ -136,6 +174,8 @@ parallel \
     check_leftover_dbg \
     check_semgrep \
     check_shellcheck \
+    check_trailing_newline \
+    check_trailing_whitespace \
     check_typos \
     # newline for the last \ to work
 
