@@ -1,5 +1,8 @@
 mod opts;
 
+use std::fs::{set_permissions, Permissions};
+use std::os::unix::fs::PermissionsExt;
+
 use std::env;
 use std::fs;
 use std::io;
@@ -116,6 +119,8 @@ fn install(opts: &Opts) -> InstallResult<()> {
                 dst: dst_path.to_owned(),
             })?;
             let _ = cmd!("git", "add", &relative_path).run();
+
+            chmod_non_writeable(relative_path)?;
         }
     }
 
@@ -136,6 +141,19 @@ fn install(opts: &Opts) -> InstallResult<()> {
     )
     .run();
 
+    Ok(())
+}
+
+fn chmod_non_writeable(relative_path: &Path) -> Result<(), error_stack::Report<InstallError>> {
+    let current_permissions = fs::metadata(relative_path)
+        .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?
+        .permissions()
+        .mode();
+    set_permissions(
+        relative_path,
+        Permissions::from_mode(current_permissions & !(0o222)),
+    )
+    .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?;
     Ok(())
 }
 
