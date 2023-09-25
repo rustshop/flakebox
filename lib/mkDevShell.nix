@@ -56,6 +56,10 @@ pkgs.mkShell (cleanedArgs // {
     # make sure we have git in the PATH
     export PATH=${pkgs.git}/bin/:''${PATH}
 
-    source ${./mkDevShellHook.sh}
+    if [ -e "''${FLAKEBOX_PROJECT_ROOT_DIR}/last_share" ]; then
+      source "{FLAKEBOX_PROJECT_ROOT_DIR}/last_share/shellHook.sh"
+    fi
+
+    flakebox init
   '';
 })  

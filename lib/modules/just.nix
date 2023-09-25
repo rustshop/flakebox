@@ -67,6 +67,12 @@ in
         };
       };
 
+      env.shellHooks = lib.mkAfter [
+        ''
+          >&2 echo "💡 Run 'just' for a list of available 'just ...' helper recipes"
+        ''
+      ];
+
       shareDir."overlay/justfile" = {
         source = pkgs.writeText "flakebox-justfile"
           (builtins.concatStringsSep "\n\n"
