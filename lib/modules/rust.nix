@@ -1,4 +1,7 @@
 { lib, config, ... }:
+let
+  inherit (lib) types;
+in
 {
 
   options.rust = {
@@ -8,6 +11,17 @@
       };
       clippy.enable = lib.mkEnableOption "clippy check in pre-commit hook" // {
         default = true;
+      };
+    };
+
+    rustfmt = {
+      enable = lib.mkEnableOption "generation of .rustfmt.toml" // {
+        default = true;
+      };
+
+      content = lib.mkOption {
+        description = "The content of the file";
+        type = types.str;
       };
     };
   };
@@ -39,6 +53,19 @@
         '';
       };
 
+    })
+
+    (lib.mkIf config.rust.rustfmt.enable {
+      shareDir."overlay/.rustfmt.toml" = {
+        text = config.rust.rustfmt.content;
+      };
+
+      rust.rustfmt.content = lib.mkDefault ''
+        group_imports = "StdExternalCrate"
+        wrap_comments = true
+        format_code_in_doc_comments = true
+        imports_granularity = "Module"
+      '';
     })
 
     {
