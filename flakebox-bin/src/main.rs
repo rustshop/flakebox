@@ -1,20 +1,15 @@
 mod opts;
 
 use std::fs::{set_permissions, Permissions};
-use std::os::unix::fs::PermissionsExt;
-
-use std::env;
-use std::fs;
-use std::io;
 use std::os::unix;
-use std::path::Path;
-use std::path::PathBuf;
+use std::os::unix::fs::PermissionsExt;
+use std::path::{Path, PathBuf};
+use std::{env, fs, io};
 
 use clap::Parser;
 use duct::cmd;
 use error_stack::ResultExt;
-use opts::Commands;
-use opts::Opts;
+use opts::{Commands, Opts};
 use thiserror::Error;
 use tracing_subscriber::EnvFilter;
 use walkdir::WalkDir;
