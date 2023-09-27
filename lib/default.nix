@@ -43,6 +43,7 @@ let
     pkgs.runCommand "options-doc.md" { } ''
       cat ${optionsDoc.optionsCommonMark} >> $out
     '';
+  enhanceCrane = import ./crane/enhance.nix { inherit lib; };
 in
 lib.makeScope pkgs.newScope (self:
 let
@@ -101,10 +102,9 @@ in
 
   share = self.config.shareDirPackage;
 
-  craneLib = self.config.craneLib.default;
-  craneLibNightly = self.config.craneLib.nightly;
-  craneLibStable = self.config.craneLib.stable;
-
+  craneLib = enhanceCrane self.config.craneLib.default;
+  craneLibNightly = enhanceCrane self.config.craneLib.nightly;
+  craneLibStable = enhanceCrane self.config.craneLib.stable;
 
 
   # wrapper over `mkShell` setting up flakebox env

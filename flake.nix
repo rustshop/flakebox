@@ -49,6 +49,7 @@
           ];
         };
         flakeboxLib = mkLib pkgs { };
+        craneLib = flakeboxLib.craneLib;
       in
       {
         lib = mkLib pkgs;
@@ -58,7 +59,42 @@
           share = flakeboxLib.share;
           default = flakeboxLib.flakeboxBin;
           docs = flakeboxLib.docs;
+          x = (craneLib.overrideScope' (self: prev: { })).buildDepsOnly
+            {
+              nativeBuildInputs = [ pkgs.mold ];
+              src = builtins.path {
+                name = "flakebox";
+                path = ./.;
+              };
+            };
         };
+
+        legacyPackages =
+          (craneLib.overrideScope' (self: prev: {
+            args = prev.args // {
+              pname = "flexbox";
+              nativeBuildInputs = [ pkgs.mold ];
+              src = flakeboxLib.filter.filterSubdirs {
+                root = builtins.path {
+                  name = "flakebox";
+                  path = ./.;
+                };
+                dirs = [
+                  "Cargo.toml"
+                  "Cargo.lock"
+                  ".cargo"
+                  "flakebox-bin"
+                ];
+              };
+            };
+          })).mapWithProfiles
+            (craneLib: rec {
+              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+              workspaceBuild = craneLib.buildWorkspace {
+                cargoArtifacts = workspaceDeps;
+              };
+            }) [ "dev" "ci" "release" ]
+        ;
 
         devShells = {
           default = flakeboxLib.mkDevShell {
