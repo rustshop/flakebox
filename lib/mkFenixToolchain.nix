@@ -2,6 +2,8 @@
 , config
 , system
 , pkgs
+, crane
+, enhanceCrane
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
 { toolchain ? null
@@ -14,19 +16,22 @@ let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default
     "rust-src"
     "llvm-tools-preview"
   ]
-, envs ? ""
 , args ? { }
 , crossTargetsChannelName ? "stable"
 , crossTargets ? [ ]
 }:
 let
-  toolchain' = if toolchain != null then toolchain else
-  (fenix.packages.${system}.combine (
-    (map (component: channel.${component}) components)
-    ++ (map (target: fenix.packages.${system}.targets.${target}.${crossTargetsChannelName}.rust-std) crossTargets)
-  ));
+  toolchain' =
+    if toolchain != null then
+      toolchain
+    else
+      (fenix.packages.${system}.combine (
+        (map (component: channel.${component}) components)
+        ++ (map (target: fenix.packages.${system}.targets.${target}.${crossTargetsChannelName}.rust-std) crossTargets)
+      ));
+  craneLib' = enhanceCrane (crane.lib.${system}.overrideToolchain toolchain');
 in
 {
-  inherit envs args;
   toolchain = toolchain';
+  craneLib = craneLib'.overrideArgs args;
 }

@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let lib = pkgs.lib; in craneLib:
-craneLib.overrideScope' (self: prev: {
+craneLib.overrideScope (self: prev: {
   cargoProfile = "release";
   args = {
     # https://github.com/ipetkov/crane/issues/76#issuecomment-1296025495
@@ -19,6 +19,7 @@ craneLib.overrideScope' (self: prev: {
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
   mkDummySrc = args: prev.mkDummySrc (self.args // args);
   vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
+  buildPackage = args: prev.buildPackage (self.args // args);
 
   buildWorkspaceDepsOnly = origArgs:
     let
@@ -57,5 +58,7 @@ craneLib.overrideScope' (self: prev: {
     } // args)
   );
 
-  mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideScope' (self: prev: { inherit cargoProfile; })); }) profiles);
+  overrideArgs = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
+  overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
+  mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
 })

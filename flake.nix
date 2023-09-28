@@ -59,14 +59,6 @@
           share = flakeboxLib.share;
           default = flakeboxLib.flakeboxBin;
           docs = flakeboxLib.docs;
-          x = (craneLib.overrideScope' (self: prev: { })).buildDepsOnly
-            {
-              nativeBuildInputs = [ pkgs.mold ];
-              src = builtins.path {
-                name = "flakebox";
-                path = ./.;
-              };
-            };
         };
 
         legacyPackages =
@@ -86,13 +78,12 @@
 
             packagesFn = craneLib':
               let
-                craneLib = (craneLib'.overrideScope' (self: prev: {
-                  args = prev.args // {
-                    pname = "flexbox";
-                    nativeBuildInputs = (prev.args.nativeBuildInputs or [ ]) ++ [ pkgs.mold ];
-                    buildInputs = (prev.args.buildInputs or [ ]) ++ [ pkgs.mold ];
-                    inherit src;
-                  };
+                craneLib = (craneLib'.overrideArgs (prev: {
+                  pname = "flexbox";
+                  nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
+                    pkgs.mold
+                  ];
+                  inherit src;
                 }));
               in
               rec {
