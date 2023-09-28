@@ -89,7 +89,6 @@ let
           {
             name = "Build Flake";
             run = ''
-              # run the same check that git `pre-commit` hook does
               nix flake check .#
             '';
           }
