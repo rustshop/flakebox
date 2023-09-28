@@ -44,14 +44,15 @@ fn main() -> AppResult<()> {
 }
 
 impl Opts {
-    fn share_dir(&self) -> &Path {
-        &self.share_dir
+    fn share_dir_candidate(&self) -> &Path {
+        &self.share_dir_candidate
     }
 
     fn project_root_dir(&self) -> &Path {
         &self.project_root_dir
     }
 
+    #[allow(dead_code)]
     fn project_root_dir_cwd_rel(&self) -> AppResult<&Path> {
         let current_dir = env::current_dir().expect("Failed to get current directory");
 
@@ -60,23 +61,24 @@ impl Opts {
             .change_context(AppError::CwdOutside)
     }
 
+    fn project_fakebox_share_dir(&self) -> &Path {
+        &self.project_share_dir
+    }
+
+    fn project_fakebox_share_dir_cwd_rel(&self) -> AppResult<&Path> {
+        let current_dir = env::current_dir().expect("Failed to get current directory");
+
+        self.project_fakebox_share_dir()
+            .strip_prefix(&current_dir)
+            .change_context(AppError::CwdOutside)
+    }
+
     fn project_root_overlay_src(&self) -> PathBuf {
-        self.share_dir().join("overlay")
+        self.share_dir_candidate().join("overlay")
     }
 
     fn project_dot_config_dir(&self) -> PathBuf {
         self.project_root_dir().join(".config")
-    }
-
-    fn project_dot_config_dir_cwd_rel(&self) -> AppResult<PathBuf> {
-        Ok(self.project_root_dir_cwd_rel()?.join(".config"))
-    }
-
-    fn project_fakebox_share_stamp(&self) -> PathBuf {
-        self.project_dot_config_dir().join("last-share")
-    }
-    fn project_fakebox_share_stamp_cwd_rel(&self) -> AppResult<PathBuf> {
-        Ok(self.project_dot_config_dir_cwd_rel()?.join("last-share"))
     }
 }
 
@@ -119,19 +121,25 @@ fn install(opts: &Opts) -> InstallResult<()> {
         }
     }
 
-    fs::create_dir_all(opts.project_dot_config_dir())
-        .change_context_lazy(|| InstallError::CreateDir(opts.project_dot_config_dir()))?;
-
-    remove_symlink(&opts.project_fakebox_share_stamp())
-        .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
-    unix::fs::symlink(opts.share_dir(), opts.project_fakebox_share_stamp())
-        .change_context_lazy(|| InstallError::PathIo(opts.project_fakebox_share_stamp()))?;
+    remove_symlink(opts.project_fakebox_share_dir()).change_context_lazy(|| {
+        InstallError::PathIo(opts.project_fakebox_share_dir().to_owned())
+    })?;
+    fs::create_dir_all(
+        opts.project_fakebox_share_dir()
+            .parent()
+            .ok_or_else(|| InstallError::CreateDir(opts.project_fakebox_share_dir().to_owned()))?,
+    )
+    .change_context_lazy(|| InstallError::CreateDir(opts.project_dot_config_dir()))?;
+    unix::fs::symlink(opts.share_dir_candidate(), opts.project_fakebox_share_dir())
+        .change_context_lazy(|| {
+            InstallError::PathIo(opts.project_fakebox_share_dir().to_owned())
+        })?;
 
     let _ = cmd!(
         "git",
         "add",
         &opts
-            .project_fakebox_share_stamp_cwd_rel()
+            .project_fakebox_share_dir_cwd_rel()
             .change_context(InstallError::Usage)?
     )
     .run();
@@ -152,7 +160,7 @@ fn chmod_non_writeable(relative_path: &Path) -> Result<(), error_stack::Report<I
     Ok(())
 }
 
-fn remove_symlink(path: &PathBuf) -> io::Result<()> {
+fn remove_symlink(path: &Path) -> io::Result<()> {
     if path.symlink_metadata().is_ok() {
         fs::remove_file(path)?;
     }
@@ -161,15 +169,16 @@ fn remove_symlink(path: &PathBuf) -> io::Result<()> {
 }
 
 fn init(opts: &Opts) -> AppResult<()> {
-    let stamp_path = opts.project_fakebox_share_stamp();
-    if !stamp_path.exists() {
+    let project_fakebox_share_dir = opts.project_fakebox_share_dir();
+    if !project_fakebox_share_dir.exists() {
         eprintln!("⚠️  Flakebox files not installed. Call `flakebox install`.");
         return Ok(());
     }
 
-    let stamp = fs::read_link(&stamp_path).change_context_lazy(|| AppError::General)?;
+    let current_share_dir =
+        fs::read_link(project_fakebox_share_dir).change_context_lazy(|| AppError::General)?;
 
-    if stamp != opts.share_dir {
+    if current_share_dir != opts.share_dir_candidate {
         eprintln!("ℹ️  Flakebox files not up to date. Call `flakebox install`.");
         return Ok(());
     }
