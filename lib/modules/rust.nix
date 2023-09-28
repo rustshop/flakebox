@@ -10,7 +10,7 @@ in
         default = true;
       };
       clippy.enable = lib.mkEnableOption "clippy check in pre-commit hook" // {
-        default = true;
+        default = false;
       };
     };
 
