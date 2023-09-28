@@ -48,16 +48,17 @@ pkgs.mkShell (cleanedArgs // {
 
   shellHook = ''
     # set the share dir
-    export FLAKEBOX_SHARE_DIR=${share}
+    export FLAKEBOX_SHARE_DIR_CANDIDATE=${share}
     export FLAKEBOX_DOCS_DIR=${docs}
     export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
+    export FLAKEBOX_PROJECT_SHARE_DIR="''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/share"
     export PATH=${share}/bin/:''${PATH}
 
     # make sure we have git in the PATH
     export PATH=${pkgs.git}/bin/:''${PATH}
 
-    if [ -e "''${FLAKEBOX_PROJECT_ROOT_DIR}/last_share" ]; then
-      source "{FLAKEBOX_PROJECT_ROOT_DIR}/last_share/shellHook.sh"
+    if [ -e "''${FLAKEBOX_PROJECT_SHARE_DIR}" ]; then
+      source "''${FLAKEBOX_PROJECT_SHARE_DIR}/shellHook.sh"
     fi
 
     flakebox init
