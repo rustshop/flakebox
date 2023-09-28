@@ -43,13 +43,13 @@ let
     pkgs.runCommand "options-doc.md" { } ''
       cat ${optionsDoc.optionsCommonMark} >> $out
     '';
-  enhanceCrane = import ./crane/enhance.nix { inherit lib; };
 in
 lib.makeScope pkgs.newScope (self:
 let
   inherit (self) callPackage;
 in
 {
+  inherit pkgs;
   system = pkgs.system;
 
   config = finalConfig;
@@ -102,9 +102,10 @@ in
 
   share = self.config.shareDirPackage;
 
-  craneLib = enhanceCrane self.config.craneLib.default;
-  craneLibNightly = enhanceCrane self.config.craneLib.nightly;
-  craneLibStable = enhanceCrane self.config.craneLib.stable;
+  inherit crane fenix;
+  craneLib = self.enhanceCrane self.config.craneLib.default;
+  craneLibNightly = self.enhanceCrane self.config.craneLib.nightly;
+  craneLibStable = self.enhanceCrane self.config.craneLib.stable;
 
 
   # wrapper over `mkShell` setting up flakebox env
@@ -113,4 +114,8 @@ in
   flakeboxBin = callPackage ./flakeboxBin.nix { };
 
   filter = callPackage ./filter { };
+
+  enhanceCrane = callPackage ./crane/enhance.nix { };
+  mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
+  mapWithToolchains = callPackage ./mapWithToolchains.nix { };
 })

@@ -1,4 +1,5 @@
-{ lib, ... }: craneLib:
+{ pkgs, ... }:
+let lib = pkgs.lib; in craneLib:
 craneLib.overrideScope' (self: prev: {
   cargoProfile = "release";
   args = {
@@ -11,6 +12,12 @@ craneLib.overrideScope' (self: prev: {
       { CARGO_PROFILE = self.cargoProfile; }
       // self.args // args
     );
+
+  # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
+  buildDepsOnly = args: prev.buildDepsOnly (self.args // args);
+  crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
+  mkDummySrc = args: prev.mkDummySrc (self.args // args);
+  vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
 
   buildWorkspaceDepsOnly = origArgs:
     let
