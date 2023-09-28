@@ -49,7 +49,38 @@
           ];
         };
         flakeboxLib = mkLib pkgs { };
-        craneLib = flakeboxLib.craneLib;
+
+        src = flakeboxLib.filter.filterSubdirs {
+          root = builtins.path {
+            name = "flakebox";
+            path = ./.;
+          };
+          dirs = [
+            "Cargo.toml"
+            "Cargo.lock"
+            ".cargo"
+            "flakebox-bin"
+          ];
+        };
+
+        outputs =
+          (flakeboxLib.buildOutputs { }) (craneLib':
+            let
+              craneLib = (craneLib'.overrideArgs (prev: {
+                pname = "flexbox";
+                nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
+                  pkgs.mold
+                ];
+                inherit src;
+              }));
+            in
+            rec {
+              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+              workspaceBuild = craneLib.buildWorkspace {
+                cargoArtifacts = workspaceDeps;
+              };
+              flakebox = craneLib.buildPackage { };
+            });
       in
       {
         lib = mkLib pkgs;
@@ -59,48 +90,15 @@
           share = flakeboxLib.share;
           default = flakeboxLib.flakeboxBin;
           docs = flakeboxLib.docs;
+
         };
 
-        legacyPackages =
-          let
-            src = flakeboxLib.filter.filterSubdirs {
-              root = builtins.path {
-                name = "flakebox";
-                path = ./.;
-              };
-              dirs = [
-                "Cargo.toml"
-                "Cargo.lock"
-                ".cargo"
-                "flakebox-bin"
-              ];
-            };
+        checks = {
+          workspaceBuild = outputs.ci.workspaceBuild;
+          aarch64-linux-workspaceBuild = outputs.aarch64-linux.ci.workspaceBuild;
+        };
 
-            packagesFn = craneLib':
-              let
-                craneLib = (craneLib'.overrideArgs (prev: {
-                  pname = "flexbox";
-                  nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
-                    pkgs.mold
-                  ];
-                  inherit src;
-                }));
-              in
-              rec {
-                workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
-                workspaceBuild = craneLib.buildWorkspace {
-                  cargoArtifacts = workspaceDeps;
-                };
-                flakebox = craneLib.buildPackage { };
-              };
-            profilesFn = craneLib: craneLib.mapWithProfiles packagesFn [ "dev" "ci" "release" ];
-          in
-          (
-            (profilesFn craneLib)
-            // (flakeboxLib.mapWithToolchains
-              (toolchainName: craneLib: profilesFn craneLib)
-              flakeboxLib.stdCrossToolchains)
-          );
+        legacyPackages = outputs;
 
         devShells = {
           default = flakeboxLib.mkDevShell {
