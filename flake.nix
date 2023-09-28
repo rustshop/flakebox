@@ -70,31 +70,57 @@
         };
 
         legacyPackages =
-          (craneLib.overrideScope' (self: prev: {
-            args = prev.args // {
-              pname = "flexbox";
-              nativeBuildInputs = [ pkgs.mold ];
-              src = flakeboxLib.filter.filterSubdirs {
-                root = builtins.path {
-                  name = "flakebox";
-                  path = ./.;
-                };
-                dirs = [
-                  "Cargo.toml"
-                  "Cargo.lock"
-                  ".cargo"
-                  "flakebox-bin"
-                ];
+          let
+            src = flakeboxLib.filter.filterSubdirs {
+              root = builtins.path {
+                name = "flakebox";
+                path = ./.;
               };
+              dirs = [
+                "Cargo.toml"
+                "Cargo.lock"
+                ".cargo"
+                "flakebox-bin"
+              ];
             };
-          })).mapWithProfiles
-            (craneLib: rec {
+
+            packagesFn = craneLib: rec {
               workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
               workspaceBuild = craneLib.buildWorkspace {
                 cargoArtifacts = workspaceDeps;
               };
-            }) [ "dev" "ci" "release" ]
-        ;
+              flakebox = craneLib.buildPackage {
+                pname = "flakebox";
+                doCheck = false;
+              };
+            };
+            profilesFn = craneLib: (craneLib.overrideScope' (self: prev: {
+              args = prev.args // {
+                pname = "flexbox";
+                nativeBuildInputs = [ pkgs.mold ];
+                inherit src;
+              };
+            })).mapWithProfiles
+              packagesFn [ "dev" "ci" "release" ];
+          in
+          (
+            (profilesFn craneLib)
+            // (flakeboxLib.mapWithToolchains
+              (toolchainName: craneLib: profilesFn craneLib)
+              {
+                aarch64-linux = flakeboxLib.mkFenixToolchain {
+                  crossTargets = [ "aarch64-unknown-linux-gnu" ];
+                  args = {
+                    CARGO_BUILD_TARGET = "aarch64-unknown-linux-gnu";
+                    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER =
+                      let
+                        inherit (pkgs.pkgsCross.aarch64-multiplatform.stdenv) cc;
+                      in
+                      "${cc}/bin/${cc.targetPrefix}cc";
+                  };
+                };
+              })
+          );
 
         devShells = {
           default = flakeboxLib.mkDevShell {
