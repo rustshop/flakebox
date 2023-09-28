@@ -8,6 +8,8 @@ craneLib.overrideScope (self: prev: {
     doCheck = false;
   };
 
+  argsDepsOnly = { };
+
   mkCargoDerivation = args: prev.mkCargoDerivation
     (
       { CARGO_PROFILE = self.cargoProfile; }
@@ -15,7 +17,7 @@ craneLib.overrideScope (self: prev: {
     );
 
   # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
-  buildDepsOnly = args: prev.buildDepsOnly (self.args // args);
+  buildDepsOnly = args: prev.buildDepsOnly (self.args // self.argsDepsOnly // args);
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
   mkDummySrc = args: prev.mkDummySrc (self.args // args);
   vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
@@ -59,6 +61,7 @@ craneLib.overrideScope (self: prev: {
   );
 
   overrideArgs = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
+  overrideArgsDepsOnly = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
 })
