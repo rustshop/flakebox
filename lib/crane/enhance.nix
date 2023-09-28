@@ -60,6 +60,26 @@ craneLib.overrideScope (self: prev: {
     } // args)
   );
 
+
+  # Compile a group of packages together
+  #
+  # This unifies their cargo features and avoids building common dependencies multiple
+  # times, but will produce a derivation with all listed packages.
+  buildPackageGroup = { pname ? null, packages, mainProgram ? null }@origArgs:
+    let
+      args = builtins.removeAttrs origArgs [ "defaultBin" "pname" ];
+      pname = if builtins.hasAttr "pname" origArgs then "${origArgs.pname}-group" else if builtins.hasAttr "pname" self.args then "${self.args.pname}-group" else null;
+      # "--package x --package y" args passed to cargo
+      pkgsArgs = lib.strings.concatStringsSep " " (builtins.map (name: "--package ${name}") packages);
+    in
+    self.buildPackage (args // (lib.optionalAttrs (pname != null) {
+      inherit pname;
+    }) // {
+      meta = { inherit mainProgram; };
+      cargoExtraArgs = "${pkgsArgs}";
+    });
+
+
   overrideArgs = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
   overrideArgsDepsOnly = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
