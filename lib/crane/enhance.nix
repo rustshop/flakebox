@@ -5,6 +5,7 @@ craneLib.overrideScope' (self: prev: {
   args = {
     # https://github.com/ipetkov/crane/issues/76#issuecomment-1296025495
     installCargoArtifactsMode = "use-zstd";
+    doCheck = false;
   };
 
   mkCargoDerivation = args: prev.mkCargoDerivation
@@ -25,11 +26,10 @@ craneLib.overrideScope' (self: prev: {
       pname = if builtins.hasAttr "pname" origArgs then "${origArgs.pname}-workspace" else if builtins.hasAttr "pname" self.args then "${self.args.pname}-workspace" else null;
     in
     self.buildDepsOnly
-      (self.args // (lib.optionalAttrs (pname != null) {
+      ((lib.optionalAttrs (pname != null) {
         inherit pname;
       }) // {
         buildPhaseCargoCommand = "cargoWithProfile doc --workspace --locked ; cargoWithProfile check --workspace --all-targets --locked ; cargoWithProfile build --locked --workspace --all-targets";
-        doCheck = false;
       } // args);
 
   buildWorkspace = origArgs:
@@ -38,7 +38,7 @@ craneLib.overrideScope' (self: prev: {
       pname = if builtins.hasAttr "pname" origArgs then "${origArgs.pname}-workspace" else if builtins.hasAttr "pname" self.args then "${self.args.pname}-workspace" else null;
     in
     self.mkCargoDerivation (
-      (self.args // (lib.optionalAttrs (pname != null) {
+      ((lib.optionalAttrs (pname != null) {
         inherit pname;
       }) // {
         buildPhaseCargoCommand = "cargoWithProfile doc --workspace --locked ; cargoWithProfile check --workspace --all-targets --locked ; cargoWithProfile build --locked --workspace --all-targets";

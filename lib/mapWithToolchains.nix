@@ -13,7 +13,7 @@ builtins.mapAttrs
     (craneLib.overrideScope'
       (self: prev: {
         args = prev.args // (toolchain.args or { }) // {
-          preBuild = toolchain.envs + (prev.preBuild or "");
+          preBuild = toolchain.envs + (prev.args.preBuild or "");
           toolchain = toolchainName;
         };
       })))

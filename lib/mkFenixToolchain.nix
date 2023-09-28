@@ -4,7 +4,8 @@
 , pkgs
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
-{ channel ? defaultChannel
+{ toolchain ? null
+, channel ? defaultChannel
 , components ? [
     "rustc"
     "cargo"
@@ -19,11 +20,13 @@ let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default
 , crossTargets ? [ ]
 }:
 let
-  toolchain = fenix.packages.${system}.combine (
-    (map (component: channel.${component}) components) ++
-    (map (target: fenix.packages.${system}.targets.${target}.${crossTargetsChannelName}.rust-std) crossTargets)
-  );
+  toolchain' = if toolchain != null then toolchain else
+  (fenix.packages.${system}.combine (
+    (map (component: channel.${component}) components)
+    ++ (map (target: fenix.packages.${system}.targets.${target}.${crossTargetsChannelName}.rust-std) crossTargets)
+  ));
 in
 {
-  inherit envs args toolchain;
+  inherit envs args;
+  toolchain = toolchain';
 }
