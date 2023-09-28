@@ -11,9 +11,7 @@ jobs:
     - name: Magic Nix Cache
       uses: DeterminateSystems/magic-nix-cache-action@v2
     - name: Build Flake
-      run: '# run the same check that git `pre-commit` hook does
-
-        nix flake check .#
+      run: 'nix flake check .#
 
         '
   flake:
