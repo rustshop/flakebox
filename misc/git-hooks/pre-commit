@@ -1,15 +1,7 @@
-#!/nix/store/vqvj60h076bhqj6977caz0pfxs6543nb-bash-5.2-p15/bin/bash
+#!/nix/store/8fv91097mbh5049i9rglc73dx6kjg3qk-bash-5.2-p15/bin/bash
 #!/usr/bin/env bash
 
 set -eo pipefail
-
-# https://stackoverflow.com/a/72183258/134409
-# this hangs in CI (no tty?)
-# yes 'will cite' | parallel --citation 2>/dev/null 1>/dev/null || true
-if [ -n "${HOME:-}" ] && [ -d "$HOME" ]; then
-  mkdir -p "$HOME/.parallel"
-  touch "$HOME/.parallel/will-cite"
-fi
 
 set +e
 git diff-files --quiet
@@ -159,6 +151,7 @@ function check_typos() {
 export -f check_typos
 
 parallel \
+  --nonotice \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \

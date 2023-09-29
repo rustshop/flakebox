@@ -61,7 +61,7 @@ in
   options = {
     shareDirPackage = mkOption {
       type = types.package;
-      description = "Derivation containing all shareDir files/symlinks";
+      description = lib.mdDoc "Derivation containing all shareDir files/symlinks";
     };
 
     shareDir = mkOption {

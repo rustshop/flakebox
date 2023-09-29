@@ -2,12 +2,12 @@
 {
 
   options.convco = {
-    enable = lib.mkEnableOption "convco integration" // {
+    enable = lib.mkEnableOption (lib.mdDoc "convco integration") // {
       default = true;
     };
 
     commit-msg = {
-      enable = lib.mkEnableOption "convco git commit-msg hook" // {
+      enable = lib.mkEnableOption (lib.mdDoc "convco git commit-msg hook") // {
         default = true;
       };
     };

@@ -2,14 +2,6 @@
 
 set -eo pipefail
 
-# https://stackoverflow.com/a/72183258/134409
-# this hangs in CI (no tty?)
-# yes 'will cite' | parallel --citation 2>/dev/null 1>/dev/null || true
-if [ -n "${HOME:-}" ] && [ -d "$HOME" ]; then
-  mkdir -p "$HOME/.parallel"
-  touch "$HOME/.parallel/will-cite"
-fi
-
 set +e
 git diff-files --quiet
 is_unclean=$?

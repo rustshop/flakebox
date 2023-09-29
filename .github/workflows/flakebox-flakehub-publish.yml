@@ -26,7 +26,9 @@ name: Publish to Flakehub
   workflow_dispatch:
     inputs:
       tags:
-        description: The existing tag to publish to FlakeHub
+        description:
+          _type: mdDoc
+          text: The existing tag to publish to FlakeHub
         required: true
         type: string
 

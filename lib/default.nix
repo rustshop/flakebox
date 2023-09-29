@@ -1,4 +1,4 @@
-{ pkgs, crane, fenix }:
+{ pkgs, crane, fenix, android-nixpkgs }:
 { modules ? [ ]
 , config ? { }
 ,
@@ -50,6 +50,8 @@ let
 in
 {
   inherit pkgs;
+  inherit crane fenix android-nixpkgs;
+
   system = pkgs.system;
 
   config = finalConfig;
@@ -102,7 +104,6 @@ in
 
   share = self.config.shareDirPackage;
 
-  inherit crane fenix;
   craneLib = self.enhanceCrane self.config.craneLib.default;
   craneLibNightly = self.enhanceCrane self.config.craneLib.nightly;
   craneLibStable = self.enhanceCrane self.config.craneLib.stable;
@@ -117,7 +118,8 @@ in
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
+  mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
-  stdToolchains = callPackage ./stdToolchains.nix { };
+  mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   buildOutputs = callPackage ./buildOutputs.nix { };
 })

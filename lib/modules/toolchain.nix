@@ -11,7 +11,7 @@ in
 
       components = mkOption {
         type = types.listOf types.str;
-        description = ''
+        description = lib.mdDoc ''
           Components to include in the default toolchains
         '';
 
@@ -26,7 +26,7 @@ in
 
       channel = {
         default = mkOption {
-          description = ''
+          description = lib.mdDoc ''
             The channel to source the default toolchain from
 
             Defaults to the the value of the stable channel.
@@ -36,13 +36,13 @@ in
         };
 
         stable = mkOption {
-          description = "The channel to source the stable toolchain from";
+          description = lib.mdDoc "The channel to source the stable toolchain from";
           type = types.str;
           default = "stable";
         };
 
         nightly = mkOption {
-          description = ''
+          description = lib.mdDoc ''
             The channel to source the nightly toolchain from
           '';
           type = types.str;
@@ -52,13 +52,13 @@ in
 
       default = mkOption {
         type = lib.types.package;
-        description = "Default toolchain to use";
+        description = lib.mdDoc "Default toolchain to use";
         default = fenix.packages.${system}.${config.toolchain.channel.default}.withComponents config.toolchain.components;
       };
 
       stable = mkOption {
         type = lib.types.package;
-        description = ''
+        description = lib.mdDoc ''
           Stable channel toolchain
 
           Toolchain to use in situations that require stable toolchain. 
@@ -69,7 +69,7 @@ in
 
       nightly = mkOption {
         type = lib.types.package;
-        description = "Nightly channel toolchain";
+        description = lib.mdDoc "Nightly channel toolchain";
         default =
           fenix.packages.${system}.${config.toolchain.channel.nightly}.withComponents config.toolchain.components;
       };
@@ -77,7 +77,7 @@ in
 
       rustfmt = mkOption {
         type = lib.types.package;
-        description = ''
+        description = lib.mdDoc ''
           rustfmt package to use in the shell and lints
 
           Separate from the toolchain as it's common to want a custom (nightly) version,
@@ -90,7 +90,7 @@ in
 
       rust-analyzer = mkOption {
         type = lib.types.package;
-        description = ''
+        description = lib.mdDoc ''
           rust-analyzer package to use in the shell and lints
 
           Separate from the toolchain as it's common to want a custom version.

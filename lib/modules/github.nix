@@ -2,7 +2,7 @@
 let
   inherit (lib) types;
   writeYaml = name: body: (pkgs.formats.yaml { }).generate "flakebox-${name}-yaml-gen" body;
-  flakebox-ci = {
+  flakebox-ci = { buildCmd }: {
     name = "CI";
 
     on = {
@@ -87,10 +87,8 @@ let
           }
 
           {
-            name = "Build Flake";
-            run = ''
-              nix flake check .#
-            '';
+            name = "Build";
+            run = buildCmd;
           }
         ];
       };
@@ -106,7 +104,7 @@ let
       workflow_dispatch = {
         inputs = {
           tags = {
-            description = "The existing tag to publish to FlakeHub";
+            description = lib.mdDoc "The existing tag to publish to FlakeHub";
             type = "string";
             required = true;
           };
@@ -154,8 +152,14 @@ in
 {
   options.github = {
     ci = {
-      enable = lib.mkEnableOption "just integration" // {
+      enable = lib.mkEnableOption (lib.mdDoc "just integration") // {
         default = true;
+      };
+
+      outputs = lib.mkOption {
+        type = types.listOf types.str;
+        description = lib.mdDoc "List of outputs to build";
+        default = [ ];
       };
 
       workflows = lib.mkOption {
@@ -182,7 +186,7 @@ in
               content = lib.mkOption {
                 default = null;
                 type = types.attrsOf types.anything;
-                description = "Content of the workflow";
+                description = lib.mdDoc "Content of the workflow";
               };
             };
           }
@@ -197,7 +201,15 @@ in
 
     github.ci.workflows = {
       flakebox-ci = {
-        content = flakebox-ci;
+        content = flakebox-ci {
+          buildCmd =
+            if builtins.length config.github.ci.outputs == 0 then
+              ''
+                nix flake check .#
+              '' else
+              lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build .#${output}") config.github.ci.outputs)
+          ;
+        };
       };
       flakebox-flakehub-publish = {
         content = flakebox-flakehub-publish;

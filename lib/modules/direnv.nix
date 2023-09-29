@@ -3,7 +3,7 @@
 {
 
   options.direnv = {
-    enable = lib.mkEnableOption "direnv integration" // {
+    enable = lib.mkEnableOption (lib.mdDoc "direnv integration") // {
       default = true;
     };
   };

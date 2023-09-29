@@ -3,6 +3,8 @@
 , config
 , share
 , docs
+, mkFenixToolchain
+, lib
 }:
 let
   defaultToolchain = config.toolchain.default;
@@ -12,55 +14,62 @@ let
 in
 
 { packages ? [ ]
-, toolchain ? defaultToolchain
+, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; }
 } @ args:
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
+    "packages"
   ];
 in
-pkgs.mkShell (cleanedArgs // {
-  packages =
-    packages ++ [
-      flakeboxBin
+let
+  args = cleanedArgs // {
+    packages =
+      packages ++ [
+        flakeboxBin
 
-      toolchain
-      rustfmt
-      rust-analyzer
+        toolchain.toolchain
 
-      pkgs.nodePackages.bash-language-server
+        rustfmt
+        rust-analyzer
 
-      # This is required to prevent a mangled bash shell in nix develop
-      # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
-      (pkgs.hiPrio pkgs.bashInteractive)
 
-    ] ++ config.env.shellPackages ++ (builtins.attrValues {
-      # Core & generic
-      inherit (pkgs) git coreutils parallel shellcheck;
-      # Nix
-      inherit (pkgs) nixpkgs-fmt nil;
-      # Rust tools
-      inherit (pkgs) cargo-watch;
-      # Linkers
-      inherit (pkgs) lld;
-    })
-  ;
+        pkgs.nodePackages.bash-language-server
 
-  shellHook = ''
-    # set the share dir
-    export FLAKEBOX_SHARE_DIR_CANDIDATE=${share}
-    export FLAKEBOX_DOCS_DIR=${docs}
-    export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
-    export FLAKEBOX_PROJECT_SHARE_DIR="''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/share"
-    export PATH=${share}/bin/:''${PATH}
+        # This is required to prevent a mangled bash shell in nix develop
+        # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
+        (pkgs.hiPrio pkgs.bashInteractive)
 
-    # make sure we have git in the PATH
-    export PATH=${pkgs.git}/bin/:''${PATH}
+      ] ++ config.env.shellPackages ++ (builtins.attrValues {
+        # Core & generic
+        inherit (pkgs) git coreutils parallel shellcheck;
+        # Nix
+        inherit (pkgs) nixpkgs-fmt nil;
+        # Rust tools
+        inherit (pkgs) cargo-watch;
+        # Linkers
+        inherit (pkgs) lld;
+      });
 
-    if [ -e "''${FLAKEBOX_PROJECT_SHARE_DIR}" ]; then
-      source "''${FLAKEBOX_PROJECT_SHARE_DIR}/shellHook.sh"
-    fi
+    shellHook = ''
+      # set the share dir
+      export FLAKEBOX_SHARE_DIR_CANDIDATE=${ share}
+      export FLAKEBOX_DOCS_DIR=${ docs}
+      export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
+      export FLAKEBOX_PROJECT_SHARE_DIR="''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/share"
+      export PATH=${share}/bin/:''${PATH}
 
-    flakebox init
-  '';
-})  
+      # make sure we have git in the PATH
+      export PATH=${pkgs.git}/bin/:''${PATH}
+
+      if [ -e "''${FLAKEBOX_PROJECT_SHARE_DIR}" ]; then
+        source "''${FLAKEBOX_PROJECT_SHARE_DIR}/shellHook.sh"
+      fi
+
+      flakebox init
+    '';
+  };
+in
+pkgs.mkShell (
+  args // (toolchain.shellArgs args)
+)

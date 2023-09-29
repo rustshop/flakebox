@@ -1,11 +1,14 @@
 { pkgs, ... }:
 let lib = pkgs.lib; in craneLib:
-craneLib.overrideScope (self: prev: {
+craneLib.overrideScope' (self: prev: {
   cargoProfile = "release";
   args = {
     # https://github.com/ipetkov/crane/issues/76#issuecomment-1296025495
     installCargoArtifactsMode = "use-zstd";
     doCheck = false;
+
+    # without this any buildInputs and nativeBuildInputs can cause cargo's ./target invalidations
+    strictDeps = true;
   };
 
   argsDepsOnly = { };
@@ -92,10 +95,10 @@ craneLib.overrideScope (self: prev: {
     });
 
 
-  overrideArgs = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
-  overrideArgs' = f: self.overrideScope (self: prev: { args = prev.args // f self prev.args; });
-  overrideArgsDepsOnly = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
-  overrideArgsDepsOnly' = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
-  overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
+  overrideArgs = f: self.overrideScope' (self: prev: { args = prev.args // f prev.args; });
+  overrideArgs' = f: self.overrideScope' (self: prev: { args = prev.args // f self prev.args; });
+  overrideArgsDepsOnly = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
+  overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
+  overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
 })
