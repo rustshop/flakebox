@@ -2,12 +2,12 @@
 {
 
   options.semgrep = {
-    enable = lib.mkEnableOption "semgrep integration" // {
+    enable = lib.mkEnableOption (lib.mdDoc "semgrep integration") // {
       default = true;
     };
 
     pre-commit = {
-      enable = lib.mkEnableOption "semgrep git pre-commit hook" // {
+      enable = lib.mkEnableOption (lib.mdDoc "semgrep git pre-commit hook") // {
         default = true;
       };
     };

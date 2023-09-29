@@ -3,10 +3,10 @@
 
   options.cargo = {
     pre-commit = {
-      cargo-lock.enable = lib.mkEnableOption "cargo lock check in pre-commit hook" // {
+      cargo-lock.enable = lib.mkEnableOption (lib.mdDoc "cargo lock check in pre-commit hook") // {
         default = true;
       };
-      cargo-fmt.enable = lib.mkEnableOption "cargo fmt check in pre-commit hook" // {
+      cargo-fmt.enable = lib.mkEnableOption (lib.mdDoc "cargo fmt check in pre-commit hook") // {
         default = true;
       };
     };

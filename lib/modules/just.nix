@@ -4,7 +4,7 @@ let
 in
 {
   options.just = {
-    enable = lib.mkEnableOption "just integration" // {
+    enable = lib.mkEnableOption (lib.mdDoc "just integration") // {
       default = true;
     };
 
@@ -43,7 +43,7 @@ in
           };
         }));
 
-      description = ''
+      description = lib.mdDoc ''
         Attrset of section of justfile (possibly with multiple rules)
 
         Notably the name is used only for config identification (e.g. disabling) and actual

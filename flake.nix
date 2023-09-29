@@ -2,7 +2,8 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    # nixpkgs.url = "github:nixos/nixpkgs/?rev=8f40f2f90b9c9032d1b824442cfbbe0dbabd0dbd";
     flake-utils.url = "github:numtide/flake-utils";
 
     crane = {
@@ -104,6 +105,18 @@
         devShells = {
           default = flakeboxLib.mkDevShell {
             packages = [ pkgs.mold pkgs.mdbook ];
+          };
+
+          cross = flakeboxLib.mkDevShell {
+            packages = [ pkgs.mold pkgs.mdbook ];
+            # toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = { default = flakeboxLib.mkFenixToolchain { }; }; };
+            toolchain = flakeboxLib.mkFenixMultiToolchain { };
+          };
+
+          crossFast = flakeboxLib.mkDevShell {
+            packages = [ pkgs.mold pkgs.mdbook ];
+            # toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = { default = flakeboxLib.mkFenixToolchain { }; }; };
+            toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = pkgs.lib.getAttrs [ "x86_64-linux" ] (flakeboxLib.mkStdFenixToolchains { }); };
           };
         };
       });

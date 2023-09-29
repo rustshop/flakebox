@@ -106,7 +106,7 @@ let
       workflow_dispatch = {
         inputs = {
           tags = {
-            description = "The existing tag to publish to FlakeHub";
+            description = lib.mdDoc "The existing tag to publish to FlakeHub";
             type = "string";
             required = true;
           };
@@ -154,7 +154,7 @@ in
 {
   options.github = {
     ci = {
-      enable = lib.mkEnableOption "just integration" // {
+      enable = lib.mkEnableOption (lib.mdDoc "just integration") // {
         default = true;
       };
 
@@ -182,7 +182,7 @@ in
               content = lib.mkOption {
                 default = null;
                 type = types.attrsOf types.anything;
-                description = "Content of the workflow";
+                description = lib.mdDoc "Content of the workflow";
               };
             };
           }

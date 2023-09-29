@@ -16,9 +16,10 @@ let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default
     "rust-src"
     "llvm-tools-preview"
   ]
-, args ? { }
-, crossTargetsChannelName ? "stable"
-, crossTargets ? [ ]
+, defaultCargoBuildTarget ? null
+, args ? (prev: prev)
+, componentTargetsChannelName ? "stable"
+, componentTargets ? [ ]
 }:
 let
   toolchain' =
@@ -27,11 +28,19 @@ let
     else
       (fenix.packages.${system}.combine (
         (map (component: channel.${component}) components)
-        ++ (map (target: fenix.packages.${system}.targets.${target}.${crossTargetsChannelName}.rust-std) crossTargets)
+        ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
   craneLib' = enhanceCrane (crane.lib.${system}.overrideToolchain toolchain');
+  args' =
+    if defaultCargoBuildTarget != null then
+      (prev: (prev // (args prev) // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }))
+    else
+      args;
 in
 {
   toolchain = toolchain';
+  inherit components componentTargets;
+  args = args';
+  shellArgs = args;
   craneLib = craneLib'.overrideArgs args;
 }

@@ -7,52 +7,52 @@ in
 
   options.git = {
     pre-commit = {
-      enable = lib.mkEnableOption "git pre-commit hook" // {
+      enable = lib.mkEnableOption (lib.mdDoc "git pre-commit hook") // {
         default = true;
       };
 
-      trailing_newline = lib.mkEnableOption "git pre-commit trailing newline check " // {
+      trailing_newline = lib.mkEnableOption (lib.mdDoc "git pre-commit trailing newline check ") // {
         default = true;
       };
 
-      trailing_whitespace = lib.mkEnableOption "git pre-commit trailing whitespace check " // {
+      trailing_whitespace = lib.mkEnableOption (lib.mdDoc "git pre-commit trailing whitespace check ") // {
         default = true;
       };
 
       hooks = lib.mkOption {
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
-        description = "Attrset of hooks to to execute during git pre-commit hook";
+        description = lib.mdDoc "Attrset of hooks to to execute during git pre-commit hook";
         default = { };
         apply = value: lib.filterAttrs (n: v: v != null) value;
       };
     };
     commit-msg = {
-      enable = lib.mkEnableOption "git pre-commit hook" // {
+      enable = lib.mkEnableOption (lib.mdDoc "git pre-commit hook") // {
         default = true;
       };
 
       hooks = lib.mkOption {
         type = types.attrsOf (types.nullOr (types.either types.str types.path));
-        description = "Attrset of hooks to to execute during git commit-msg hook";
+        description = lib.mdDoc "Attrset of hooks to to execute during git commit-msg hook";
         default = { };
         apply = value: lib.filterAttrs (n: v: v != null) value;
       };
     };
 
     commit-template = {
-      enable = lib.mkEnableOption "git commit message template" // {
+      enable = lib.mkEnableOption (lib.mdDoc "git commit message template") // {
         default = true;
       };
 
       head = lib.mkOption {
         type = types.either types.str types.path;
-        description = "The head of the template content";
+        description = lib.mdDoc "The head of the template content";
         default = "";
       };
 
       body = lib.mkOption {
         type = types.either types.str types.path;
-        description = "The body of the template content";
+        description = lib.mdDoc "The body of the template content";
         default = ''
           # Explain *why* this change is being made                width limit ->|
         '';

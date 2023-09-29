@@ -117,7 +117,8 @@ in
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
+  mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
-  stdToolchains = callPackage ./stdToolchains.nix { };
+  mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   buildOutputs = callPackage ./buildOutputs.nix { };
 })
