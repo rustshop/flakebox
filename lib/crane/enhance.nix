@@ -6,6 +6,9 @@ craneLib.overrideScope (self: prev: {
     # https://github.com/ipetkov/crane/issues/76#issuecomment-1296025495
     installCargoArtifactsMode = "use-zstd";
     doCheck = false;
+
+    # without this any buildInputs and nativeBuildInputs can cause cargo's ./target invalidations
+    strictDeps = true;
   };
 
   argsDepsOnly = { };
