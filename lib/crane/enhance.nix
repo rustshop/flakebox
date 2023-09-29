@@ -8,18 +8,25 @@ craneLib.overrideScope (self: prev: {
     doCheck = false;
   };
 
-  mkCargoDerivation = args: prev.mkCargoDerivation
-    (
-      { CARGO_PROFILE = self.cargoProfile; }
-      // self.args // args
-    );
+  argsDepsOnly = { };
+
+  mkCargoDerivation = args: prev.mkCargoDerivation (
+    { CARGO_PROFILE = self.cargoProfile; }
+    // self.args // args
+  );
 
   # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
-  buildDepsOnly = args: prev.buildDepsOnly (self.args // args);
+  buildDepsOnly = args: prev.buildDepsOnly (
+    { CARGO_PROFILE = self.cargoProfile; }
+    // self.args // self.argsDepsOnly // args
+  );
+
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
   mkDummySrc = args: prev.mkDummySrc (self.args // args);
-  vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
   buildPackage = args: prev.buildPackage (self.args // args);
+  buildTrunkPackage = args: prev.buildTrunkPackage (self.args // args);
+  # causes issues
+  vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
 
   buildWorkspaceDepsOnly = origArgs:
     let
@@ -58,7 +65,37 @@ craneLib.overrideScope (self: prev: {
     } // args)
   );
 
+
+  # Compile a group of packages together
+  #
+  # This unifies their cargo features and avoids building common dependencies multiple
+  # times, but will produce a derivation with all listed packages.
+  buildPackageGroup = { pname ? null, packages, mainProgram ? null, ... }@origArgs:
+    let
+      args = builtins.removeAttrs origArgs [ "mainProgram" "pname" "packages" ];
+      pname = if builtins.hasAttr "pname" origArgs then "${origArgs.pname}-group" else if builtins.hasAttr "pname" self.args then "${self.args.pname}-group" else null;
+      # "--package x --package y" args passed to cargo
+      pkgsArgs = lib.strings.concatStringsSep " " (builtins.map (name: "--package ${name}") packages);
+
+      deps = self.buildDepsOnly (args // (lib.optionalAttrs (pname != null) {
+        inherit pname;
+      }) // {
+        buildPhaseCargoCommand = "cargoWithProfile build ${pkgsArgs}";
+      });
+    in
+    self.buildPackage (args // (lib.optionalAttrs (pname != null) {
+      inherit pname;
+    }) // {
+      cargoArtifacts = deps;
+      meta = { inherit mainProgram; };
+      cargoExtraArgs = "${pkgsArgs}";
+    });
+
+
   overrideArgs = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
+  overrideArgs' = f: self.overrideScope (self: prev: { args = prev.args // f self prev.args; });
+  overrideArgsDepsOnly = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
+  overrideArgsDepsOnly' = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
 })
