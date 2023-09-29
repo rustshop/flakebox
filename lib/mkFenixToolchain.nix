@@ -30,17 +30,17 @@ let
         (map (component: channel.${component}) components)
         ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
-  craneLib' = enhanceCrane (crane.lib.${system}.overrideToolchain toolchain');
   args' =
     if defaultCargoBuildTarget != null then
       (prev: (prev // (args prev) // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }))
     else
       args;
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
 in
 {
   toolchain = toolchain';
   inherit components componentTargets;
   args = args';
   shellArgs = args;
-  craneLib = craneLib'.overrideArgs args;
+  craneLib = craneLib';
 }

@@ -15,13 +15,19 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    android-nixpkgs = {
+      url = "github:dpc/android-nixpkgs?rev=2e42268a196375ce9b010a10ec5250d2f91a09b4"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
-  outputs = { self, nixpkgs, flake-utils, crane, fenix }:
+  outputs = { self, nixpkgs, flake-utils, crane, fenix, android-nixpkgs }:
 
     let
       mkLib = pkgs: import ./lib
         {
-          inherit pkgs crane fenix;
+          inherit pkgs crane fenix android-nixpkgs;
         };
     in
     { } //
@@ -115,8 +121,7 @@
 
           crossFast = flakeboxLib.mkDevShell {
             packages = [ pkgs.mold pkgs.mdbook ];
-            # toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = { default = flakeboxLib.mkFenixToolchain { }; }; };
-            toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = pkgs.lib.getAttrs [ "x86_64-linux" ] (flakeboxLib.mkStdFenixToolchains { }); };
+            toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = pkgs.lib.getAttrs [ "aarch64-android" ] (flakeboxLib.mkStdFenixToolchains { }); };
           };
         };
       });
