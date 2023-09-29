@@ -55,7 +55,11 @@
             })
           ];
         };
-        flakeboxLib = mkLib pkgs { };
+        flakeboxLib = mkLib pkgs {
+          config = {
+            github.ci.outputs = [ "ci.flakebox" "aarch64-android.ci.flakebox" ];
+          };
+        };
 
         src = flakeboxLib.filter.filterSubdirs {
           root = builtins.path {

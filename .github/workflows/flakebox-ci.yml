@@ -10,10 +10,10 @@ jobs:
       uses: DeterminateSystems/nix-installer-action@v4
     - name: Magic Nix Cache
       uses: DeterminateSystems/magic-nix-cache-action@v2
-    - name: Build Flake
-      run: 'nix flake check .#
+    - name: Build
+      run: 'nix build .#ci.flakebox
 
-        '
+        nix build .#aarch64-android.ci.flakebox'
   flake:
     name: Flake self-check
     runs-on: ubuntu-latest
