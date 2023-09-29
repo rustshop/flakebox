@@ -57,10 +57,10 @@ let
       export FLAKEBOX_DOCS_DIR=${ docs}
       export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
       export FLAKEBOX_PROJECT_SHARE_DIR="''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/share"
-      export PATH=${ share}/bin/:''${PATH}
+      export PATH=${share}/bin/:''${PATH}
 
       # make sure we have git in the PATH
-      export PATH=${ pkgs. git}/bin/:''${PATH}
+      export PATH=${pkgs.git}/bin/:''${PATH}
 
       if [ -e "''${FLAKEBOX_PROJECT_SHARE_DIR}" ]; then
         source "''${FLAKEBOX_PROJECT_SHARE_DIR}/shellHook.sh"

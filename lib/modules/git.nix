@@ -164,6 +164,7 @@ in
             ${builtins.readFile ./git/pre-commit.head.sh}
             ${hooksFns}
             parallel \
+              --nonotice \
             ::: \
             ${hookNames}
                 # newline for the last \ to work
