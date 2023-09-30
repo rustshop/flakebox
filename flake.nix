@@ -79,7 +79,7 @@
             let
               craneLib = (craneLib'.overrideArgs (prev: {
                 pname = "flexbox";
-                nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
+                nativeBuildInputs = prev.nativeBuildInputs or [ ] ++ [
                   pkgs.mold
                 ];
                 inherit src;
@@ -100,7 +100,7 @@
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
           share = flakeboxLib.share;
-          default = flakeboxLib.flakeboxBin;
+          default = outputs.flakebox;
           docs = flakeboxLib.docs;
 
         };
