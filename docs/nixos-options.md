@@ -18,7 +18,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/cargo\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/cargo.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/cargo\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/cargo.nix)
 
 
 
@@ -44,7 +44,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/cargo\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/cargo.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/cargo\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/cargo.nix)
 
 
 
@@ -70,7 +70,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/convco\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/convco.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/convco\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/convco.nix)
 
 
 
@@ -96,7 +96,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/convco\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/convco.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/convco\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/convco.nix)
 
 
 
@@ -118,13 +118,69 @@ attribute set
 *Default:*
 
 ```
-''
-  crane.lib.x86_64-linux.overrideToolchain config.toolchain.default
-''
+{
+  appendCrateRegistries = <function>;
+  buildDepsOnly = <function, args: {cargoBuildCommand?, cargoCheckCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildPackage = <function, args: {cargoBuildCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildTrunkPackage = <function, args: {trunkExtraArgs?, trunkExtraBuildArgs?, trunkIndexPath?}>;
+  callPackage = <function>;
+  cargo = <derivation rust-stable-with-components-2023-08-24>;
+  cargoAudit = <function, args: {advisory-db, cargoAuditExtraArgs?, cargoExtraArgs?, src}>;
+  cargoBuild = <function, args: {cargoArtifacts, cargoExtraArgs?}>;
+  cargoClippy = <function, args: {cargoArtifacts, cargoClippyExtraArgs?, cargoExtraArgs?}>;
+  cargoDoc = <function, args: {cargoDocExtraArgs?, cargoExtraArgs?}>;
+  cargoFmt = <function, args: {cargoExtraArgs?, rustFmtExtraArgs?}>;
+  cargoHelperFunctionsHook = <derivation cargoHelperFunctionsHook>;
+  cargoLlvmCov = <function, args: {cargoExtraArgs?, cargoLlvmCovCommand?, cargoLlvmCovExtraArgs?}>;
+  cargoNextest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoNextestExtraArgs?, doInstallCargoArtifacts?, partitionType?, partitions?}>;
+  cargoTarpaulin = <function, args: {cargoExtraArgs?, cargoTarpaulinExtraArgs?}>;
+  cargoTest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoTestExtraArgs?}>;
+  cleanCargoSource = <function>;
+  cleanCargoToml = <function, args: {cargoToml?, cargoTomlContents?}>;
+  clippy = <derivation rust-stable-with-components-2023-08-24>;
+  configureCargoCommonVarsHook = <derivation configureCargoCommonVarsHook>;
+  configureCargoVendoredDepsHook = <derivation configureCargoVendoredDepsHook>;
+  craneUtils = <derivation crane-utils-0.1.0>;
+  crateNameFromCargoToml = <function>;
+  crateRegistries = {
+    "registry+https://github.com/rust-lang/crates.io-index" = {
+      downloadUrl = "https://crates.io/api/v1/crates/{crate}/{version}/download";
+      fetchurlExtraArgs = { };
+    };
+  };
+  devShell = <function, args: {checks?, inputsFrom?, packages?}>;
+  downloadCargoPackage = <function, args: {checksum, name, version}>;
+  downloadCargoPackageFromGit = <function, args: {allRefs?, git, ref?, rev}>;
+  filterCargoSources = <function>;
+  findCargoFiles = <function>;
+  inheritCargoArtifactsHook = <derivation inheritCargoArtifactsHook>;
+  installCargoArtifactsHook = <derivation installCargoArtifactsHook>;
+  installFromCargoBuildLogHook = <derivation installFromCargoBuildLogHook>;
+  mkCargoDerivation = <function, args: {buildPhaseCargoCommand, cargoArtifacts, checkPhaseCargoCommand?, installPhaseCommand?}>;
+  mkDummySrc = <function, args: {cargoLock?, extraDummyScript?, src}>;
+  newScope = <function>;
+  overrideScope = <function>;
+  overrideScope' = <function>;
+  overrideToolchain = <function>;
+  packages = <function>;
+  path = <function>;
+  registryFromDownloadUrl = <function, args: {dl, fetchurlExtraArgs?, indexUrl, registryPrefix?}>;
+  registryFromGitIndex = <function, args: {fetchurlExtraArgs?, indexUrl, rev}>;
+  registryFromSparse = <function, args: {configSha256, fetchurlExtraArgs?, indexUrl}>;
+  removeReferencesToVendoredSourcesHook = <derivation removeReferencesToVendoredSourcesHook>;
+  rustc = <derivation rust-stable-with-components-2023-08-24>;
+  rustfmt = <derivation rust-stable-with-components-2023-08-24>;
+  urlForCargoPackage = <function, args: {checksum, name, source, version}>;
+  vendorCargoDeps = <function>;
+  vendorCargoRegistries = <function, args: {cargoConfigs?, lockPackages}>;
+  vendorGitDeps = <function, args: {lockPackages}>;
+  vendorMultipleCargoDeps = <function, args: {cargoConfigs?, cargoLockContentsList?, cargoLockList?, cargoLockParsedList?}>;
+  writeTOML = <function>;
+}
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane.nix)
 
 
 
@@ -146,13 +202,69 @@ attribute set
 *Default:*
 
 ```
-''
-  crane.lib.x86_64-linux.overrideToolchain config.toolchain.nightly
-''
+{
+  appendCrateRegistries = <function>;
+  buildDepsOnly = <function, args: {cargoBuildCommand?, cargoCheckCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildPackage = <function, args: {cargoBuildCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildTrunkPackage = <function, args: {trunkExtraArgs?, trunkExtraBuildArgs?, trunkIndexPath?}>;
+  callPackage = <function>;
+  cargo = <derivation rust-nightly-complete-with-components-2023-09-19>;
+  cargoAudit = <function, args: {advisory-db, cargoAuditExtraArgs?, cargoExtraArgs?, src}>;
+  cargoBuild = <function, args: {cargoArtifacts, cargoExtraArgs?}>;
+  cargoClippy = <function, args: {cargoArtifacts, cargoClippyExtraArgs?, cargoExtraArgs?}>;
+  cargoDoc = <function, args: {cargoDocExtraArgs?, cargoExtraArgs?}>;
+  cargoFmt = <function, args: {cargoExtraArgs?, rustFmtExtraArgs?}>;
+  cargoHelperFunctionsHook = <derivation cargoHelperFunctionsHook>;
+  cargoLlvmCov = <function, args: {cargoExtraArgs?, cargoLlvmCovCommand?, cargoLlvmCovExtraArgs?}>;
+  cargoNextest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoNextestExtraArgs?, doInstallCargoArtifacts?, partitionType?, partitions?}>;
+  cargoTarpaulin = <function, args: {cargoExtraArgs?, cargoTarpaulinExtraArgs?}>;
+  cargoTest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoTestExtraArgs?}>;
+  cleanCargoSource = <function>;
+  cleanCargoToml = <function, args: {cargoToml?, cargoTomlContents?}>;
+  clippy = <derivation rust-nightly-complete-with-components-2023-09-19>;
+  configureCargoCommonVarsHook = <derivation configureCargoCommonVarsHook>;
+  configureCargoVendoredDepsHook = <derivation configureCargoVendoredDepsHook>;
+  craneUtils = <derivation crane-utils-0.1.0>;
+  crateNameFromCargoToml = <function>;
+  crateRegistries = {
+    "registry+https://github.com/rust-lang/crates.io-index" = {
+      downloadUrl = "https://crates.io/api/v1/crates/{crate}/{version}/download";
+      fetchurlExtraArgs = { };
+    };
+  };
+  devShell = <function, args: {checks?, inputsFrom?, packages?}>;
+  downloadCargoPackage = <function, args: {checksum, name, version}>;
+  downloadCargoPackageFromGit = <function, args: {allRefs?, git, ref?, rev}>;
+  filterCargoSources = <function>;
+  findCargoFiles = <function>;
+  inheritCargoArtifactsHook = <derivation inheritCargoArtifactsHook>;
+  installCargoArtifactsHook = <derivation installCargoArtifactsHook>;
+  installFromCargoBuildLogHook = <derivation installFromCargoBuildLogHook>;
+  mkCargoDerivation = <function, args: {buildPhaseCargoCommand, cargoArtifacts, checkPhaseCargoCommand?, installPhaseCommand?}>;
+  mkDummySrc = <function, args: {cargoLock?, extraDummyScript?, src}>;
+  newScope = <function>;
+  overrideScope = <function>;
+  overrideScope' = <function>;
+  overrideToolchain = <function>;
+  packages = <function>;
+  path = <function>;
+  registryFromDownloadUrl = <function, args: {dl, fetchurlExtraArgs?, indexUrl, registryPrefix?}>;
+  registryFromGitIndex = <function, args: {fetchurlExtraArgs?, indexUrl, rev}>;
+  registryFromSparse = <function, args: {configSha256, fetchurlExtraArgs?, indexUrl}>;
+  removeReferencesToVendoredSourcesHook = <derivation removeReferencesToVendoredSourcesHook>;
+  rustc = <derivation rust-nightly-complete-with-components-2023-09-19>;
+  rustfmt = <derivation rust-nightly-complete-with-components-2023-09-19>;
+  urlForCargoPackage = <function, args: {checksum, name, source, version}>;
+  vendorCargoDeps = <function>;
+  vendorCargoRegistries = <function, args: {cargoConfigs?, lockPackages}>;
+  vendorGitDeps = <function, args: {lockPackages}>;
+  vendorMultipleCargoDeps = <function, args: {cargoConfigs?, cargoLockContentsList?, cargoLockList?, cargoLockParsedList?}>;
+  writeTOML = <function>;
+}
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane.nix)
 
 
 
@@ -174,13 +286,95 @@ attribute set
 *Default:*
 
 ```
-''
-  crane.lib.x86_64-linux.overrideToolchain config.toolchain.stable
-''
+{
+  appendCrateRegistries = <function>;
+  buildDepsOnly = <function, args: {cargoBuildCommand?, cargoCheckCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildPackage = <function, args: {cargoBuildCommand?, cargoExtraArgs?, cargoTestCommand?, cargoTestExtraArgs?}>;
+  buildTrunkPackage = <function, args: {trunkExtraArgs?, trunkExtraBuildArgs?, trunkIndexPath?}>;
+  callPackage = <function>;
+  cargo = <derivation rust-stable-with-components-2023-08-24>;
+  cargoAudit = <function, args: {advisory-db, cargoAuditExtraArgs?, cargoExtraArgs?, src}>;
+  cargoBuild = <function, args: {cargoArtifacts, cargoExtraArgs?}>;
+  cargoClippy = <function, args: {cargoArtifacts, cargoClippyExtraArgs?, cargoExtraArgs?}>;
+  cargoDoc = <function, args: {cargoDocExtraArgs?, cargoExtraArgs?}>;
+  cargoFmt = <function, args: {cargoExtraArgs?, rustFmtExtraArgs?}>;
+  cargoHelperFunctionsHook = <derivation cargoHelperFunctionsHook>;
+  cargoLlvmCov = <function, args: {cargoExtraArgs?, cargoLlvmCovCommand?, cargoLlvmCovExtraArgs?}>;
+  cargoNextest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoNextestExtraArgs?, doInstallCargoArtifacts?, partitionType?, partitions?}>;
+  cargoTarpaulin = <function, args: {cargoExtraArgs?, cargoTarpaulinExtraArgs?}>;
+  cargoTest = <function, args: {cargoArtifacts, cargoExtraArgs?, cargoTestExtraArgs?}>;
+  cleanCargoSource = <function>;
+  cleanCargoToml = <function, args: {cargoToml?, cargoTomlContents?}>;
+  clippy = <derivation rust-stable-with-components-2023-08-24>;
+  configureCargoCommonVarsHook = <derivation configureCargoCommonVarsHook>;
+  configureCargoVendoredDepsHook = <derivation configureCargoVendoredDepsHook>;
+  craneUtils = <derivation crane-utils-0.1.0>;
+  crateNameFromCargoToml = <function>;
+  crateRegistries = {
+    "registry+https://github.com/rust-lang/crates.io-index" = {
+      downloadUrl = "https://crates.io/api/v1/crates/{crate}/{version}/download";
+      fetchurlExtraArgs = { };
+    };
+  };
+  devShell = <function, args: {checks?, inputsFrom?, packages?}>;
+  downloadCargoPackage = <function, args: {checksum, name, version}>;
+  downloadCargoPackageFromGit = <function, args: {allRefs?, git, ref?, rev}>;
+  filterCargoSources = <function>;
+  findCargoFiles = <function>;
+  inheritCargoArtifactsHook = <derivation inheritCargoArtifactsHook>;
+  installCargoArtifactsHook = <derivation installCargoArtifactsHook>;
+  installFromCargoBuildLogHook = <derivation installFromCargoBuildLogHook>;
+  mkCargoDerivation = <function, args: {buildPhaseCargoCommand, cargoArtifacts, checkPhaseCargoCommand?, installPhaseCommand?}>;
+  mkDummySrc = <function, args: {cargoLock?, extraDummyScript?, src}>;
+  newScope = <function>;
+  overrideScope = <function>;
+  overrideScope' = <function>;
+  overrideToolchain = <function>;
+  packages = <function>;
+  path = <function>;
+  registryFromDownloadUrl = <function, args: {dl, fetchurlExtraArgs?, indexUrl, registryPrefix?}>;
+  registryFromGitIndex = <function, args: {fetchurlExtraArgs?, indexUrl, rev}>;
+  registryFromSparse = <function, args: {configSha256, fetchurlExtraArgs?, indexUrl}>;
+  removeReferencesToVendoredSourcesHook = <derivation removeReferencesToVendoredSourcesHook>;
+  rustc = <derivation rust-stable-with-components-2023-08-24>;
+  rustfmt = <derivation rust-stable-with-components-2023-08-24>;
+  urlForCargoPackage = <function, args: {checksum, name, source, version}>;
+  vendorCargoDeps = <function>;
+  vendorCargoRegistries = <function, args: {cargoConfigs?, lockPackages}>;
+  vendorGitDeps = <function, args: {lockPackages}>;
+  vendorMultipleCargoDeps = <function, args: {cargoConfigs?, cargoLockContentsList?, cargoLockList?, cargoLockParsedList?}>;
+  writeTOML = <function>;
+}
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/crane.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/crane.nix)
+
+
+
+## config\.direnv\.enable
+
+
+
+Whether to enable direnv integration\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/direnv\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/direnv.nix)
 
 
 
@@ -206,7 +400,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/env\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/env.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/env\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/env.nix)
 
 
 
@@ -227,7 +421,7 @@ list of package
 ` [ ] `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/env\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/env.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/env\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/env.nix)
 
 
 
@@ -253,7 +447,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -274,7 +468,7 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -300,7 +494,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -326,7 +520,7 @@ string or path
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -347,7 +541,7 @@ string or path
 ` "" `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -373,7 +567,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -394,7 +588,7 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -420,7 +614,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -446,7 +640,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/git.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/git.nix)
 
 
 
@@ -472,7 +666,28 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github.nix)
+
+
+
+## config\.github\.ci\.outputs
+
+
+
+List of outputs to build
+
+
+
+*Type:*
+list of string
+
+
+
+*Default:*
+` [ ] `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github.nix)
 
 
 
@@ -493,7 +708,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github.nix)
 
 
 
@@ -515,7 +730,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github.nix)
 
 
 
@@ -536,7 +751,7 @@ attribute set of anything
 ` null `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/github.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/github.nix)
 
 
 
@@ -562,7 +777,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just.nix)
 
 
 
@@ -586,7 +801,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just.nix)
 
 
 
@@ -608,7 +823,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just.nix)
 
 
 
@@ -631,7 +846,7 @@ string or path
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just.nix)
 
 
 
@@ -654,7 +869,142 @@ signed integer
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/just.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/just.nix)
+
+
+
+## config\.rootDir
+
+
+
+Set of files that will be generated as as “Flakebox Root Dir”\.
+
+
+
+*Type:*
+attribute set of (submodule)
+
+
+
+*Default:*
+` { } `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDir\.\<name>\.enable
+
+
+
+Whether this root dir file should be generated\. This
+option allows specific root dir files to be disabled\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDir\.\<name>\.mode
+
+
+
+If set to something else than ` symlink `,
+the file is copied instead of symlinked, with the given
+file mode\.
+
+
+
+*Type:*
+string
+
+
+
+*Default:*
+` "symlink" `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDir\.\<name>\.source
+
+
+
+Path of the source file\.
+
+
+
+*Type:*
+path
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDir\.\<name>\.target
+
+
+
+Name of symlink (relative to root dir)\. Defaults to the attribute name\.
+
+
+
+*Type:*
+string
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDir\.\<name>\.text
+
+
+
+Text of the file\.
+
+
+
+*Type:*
+null or strings concatenated with “\\n”
+
+
+
+*Default:*
+` null `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
+
+
+
+## config\.rootDirPackage
+
+
+
+Derivation containing all rootDir files/symlinks
+
+
+
+*Type:*
+package
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rootDir.nix)
 
 
 
@@ -672,7 +1022,7 @@ boolean
 
 
 *Default:*
-` true `
+` false `
 
 
 
@@ -680,7 +1030,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/rust\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/rust.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust.nix)
 
 
 
@@ -706,7 +1056,49 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/rust\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/rust.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust.nix)
+
+
+
+## config\.rust\.rustfmt\.enable
+
+
+
+Whether to enable generation of \.rustfmt\.toml\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust.nix)
+
+
+
+## config\.rust\.rustfmt\.content
+
+
+
+The content of the file
+
+
+
+*Type:*
+string
+
+*Declared by:*
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/rust.nix)
 
 
 
@@ -732,7 +1124,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/semgrep\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/semgrep.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/semgrep\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/semgrep.nix)
 
 
 
@@ -758,142 +1150,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/semgrep\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/semgrep.nix)
-
-
-
-## config\.shareDir
-
-
-
-Set of files that will be generated as as “Flakebox Share Dir”\.
-
-
-
-*Type:*
-attribute set of (submodule)
-
-
-
-*Default:*
-` { } `
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDir\.\<name>\.enable
-
-
-
-Whether this share dir file should be generated\. This
-option allows specific share dir files to be disabled\.
-
-
-
-*Type:*
-boolean
-
-
-
-*Default:*
-` true `
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDir\.\<name>\.mode
-
-
-
-If set to something else than ` symlink `,
-the file is copied instead of symlinked, with the given
-file mode\.
-
-
-
-*Type:*
-string
-
-
-
-*Default:*
-` "symlink" `
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDir\.\<name>\.source
-
-
-
-Path of the source file\.
-
-
-
-*Type:*
-path
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDir\.\<name>\.target
-
-
-
-Name of symlink (relative to share dir)\. Defaults to the attribute name\.
-
-
-
-*Type:*
-string
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDir\.\<name>\.text
-
-
-
-Text of the file\.
-
-
-
-*Type:*
-null or strings concatenated with “\\n”
-
-
-
-*Default:*
-` null `
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
-
-
-
-## config\.shareDirPackage
-
-
-
-Derivation containing all shareDir files/symlinks
-
-
-
-*Type:*
-package
-
-*Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shareDir.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/semgrep\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/semgrep.nix)
 
 
 
@@ -919,7 +1176,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shellcheck\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shellcheck.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/shellcheck\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/shellcheck.nix)
 
 
 
@@ -945,7 +1202,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shellcheck\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/shellcheck.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/shellcheck\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/shellcheck.nix)
 
 
 
@@ -968,7 +1225,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -989,7 +1246,7 @@ string
 ` "complete" `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1010,7 +1267,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1040,7 +1297,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1061,7 +1318,7 @@ package
 ` <derivation rust-stable-with-components-2023-08-24> `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1082,7 +1339,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-09-19> `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1104,10 +1361,10 @@ package
 
 
 *Default:*
-` <derivation rust-analyzer-2023-09-11> `
+` <derivation rust-analyzer-2023-05-15> `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1133,7 +1390,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-09-19> `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1156,7 +1413,7 @@ package
 ` <derivation rust-stable-with-components-2023-08-24> `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/toolchain.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/toolchain.nix)
 
 
 
@@ -1182,7 +1439,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/typos\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/typos.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/typos\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/typos.nix)
 
 
 
@@ -1208,6 +1465,6 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/typos\.nix](file:///nix/store/sc915nnhggg1lvh8kfq6w1a9ds192xb4-source/lib/modules/typos.nix)
+ - [/nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/typos\.nix](file:///nix/store/1qbmlkch98y5j62bsz4wdniwabpz4iaf-source/lib/modules/typos.nix)
 
 
