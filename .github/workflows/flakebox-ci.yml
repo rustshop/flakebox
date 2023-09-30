@@ -13,7 +13,11 @@ jobs:
     - name: Build
       run: 'nix build .#ci.flakebox
 
-        nix build .#aarch64-android.ci.flakebox'
+        nix build .#aarch64-android.ci.flakebox
+
+        nix build .#x86_64-android.ci.flakebox
+
+        nix build .#arm-android.ci.flakebox'
   flake:
     name: Flake self-check
     runs-on: ubuntu-latest

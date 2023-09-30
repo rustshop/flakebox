@@ -17,7 +17,7 @@
   config = lib.mkIf config.shellcheck.enable {
     git.pre-commit.hooks = {
       shellcheck = ''
-        for path in $(echo "$git_ls_nonbinary_files" | grep -E '.*\.sh$')  ; do
+        for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep -E '.*\.sh$'); do
           shellcheck --severity=warning "$path"
         done
       '';

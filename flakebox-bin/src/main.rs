@@ -44,41 +44,28 @@ fn main() -> AppResult<()> {
 }
 
 impl Opts {
-    fn share_dir_candidate(&self) -> &Path {
-        &self.share_dir_candidate
+    fn root_dir_candidate(&self) -> &Path {
+        &self.root_dir_candidate
     }
 
     fn project_root_dir(&self) -> &Path {
         &self.project_root_dir
     }
 
-    #[allow(dead_code)]
-    fn project_root_dir_cwd_rel(&self) -> AppResult<&Path> {
+    fn current_root_dir_path(&self) -> PathBuf {
+        self.project_root_dir
+            .join(".config")
+            .join("fakeroot")
+            .join("current")
+    }
+    fn current_root_dir_path_cwd_rel(&self) -> AppResult<PathBuf> {
         let current_dir = env::current_dir().expect("Failed to get current directory");
 
-        self.project_root_dir()
+        Ok(self
+            .current_root_dir_path()
             .strip_prefix(&current_dir)
-            .change_context(AppError::CwdOutside)
-    }
-
-    fn project_fakebox_share_dir(&self) -> &Path {
-        &self.project_share_dir
-    }
-
-    fn project_fakebox_share_dir_cwd_rel(&self) -> AppResult<&Path> {
-        let current_dir = env::current_dir().expect("Failed to get current directory");
-
-        self.project_fakebox_share_dir()
-            .strip_prefix(&current_dir)
-            .change_context(AppError::CwdOutside)
-    }
-
-    fn project_root_overlay_src(&self) -> PathBuf {
-        self.share_dir_candidate().join("overlay")
-    }
-
-    fn project_dot_config_dir(&self) -> PathBuf {
-        self.project_root_dir().join(".config")
+            .change_context(AppError::CwdOutside)?
+            .to_owned())
     }
 }
 
@@ -97,14 +84,40 @@ enum InstallError {
 type InstallResult<T> = error_stack::Result<T, InstallError>;
 
 fn install(opts: &Opts) -> InstallResult<()> {
-    let root = opts.project_root_overlay_src();
-    for entry in WalkDir::new(&root) {
-        let entry = entry.change_context_lazy(|| InstallError::PathIo(root.clone()))?;
+    install_files(opts.root_dir_candidate(), opts.project_root_dir())?;
+
+    let current = opts.current_root_dir_path();
+    remove_symlink(&current)
+        .change_context_lazy(|| InstallError::PathIo(opts.current_root_dir_path()))?;
+    fs::create_dir_all(
+        current
+            .parent()
+            .ok_or_else(|| InstallError::CreateDir(current.to_owned()))?,
+    )
+    .change_context_lazy(|| InstallError::CreateDir(current.to_owned()))?;
+    unix::fs::symlink(opts.root_dir_candidate(), &current)
+        .change_context_lazy(|| InstallError::PathIo(current.to_owned()))?;
+
+    let _ = cmd!(
+        "git",
+        "add",
+        &opts
+            .current_root_dir_path_cwd_rel()
+            .change_context(InstallError::Usage)?
+    )
+    .run();
+
+    Ok(())
+}
+
+fn install_files(src: &Path, dst: &Path) -> InstallResult<()> {
+    for entry in WalkDir::new(src) {
+        let entry = entry.change_context_lazy(|| InstallError::PathIo(src.to_owned()))?;
         let source_path = entry.path();
         let metadata = fs::metadata(source_path)
             .change_context_lazy(|| InstallError::PathIo(source_path.to_owned()))?;
-        let relative_path = source_path.strip_prefix(&root).expect("Prefixed with root");
-        let dst_path = opts.project_root_dir().join(relative_path);
+        let relative_path = source_path.strip_prefix(src).expect("Prefixed with root");
+        let dst_path = dst.join(relative_path);
         if metadata.is_dir() {
             fs::create_dir_all(dst_path)
                 .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?;
@@ -120,29 +133,6 @@ fn install(opts: &Opts) -> InstallResult<()> {
             chmod_non_writeable(relative_path)?;
         }
     }
-
-    remove_symlink(opts.project_fakebox_share_dir()).change_context_lazy(|| {
-        InstallError::PathIo(opts.project_fakebox_share_dir().to_owned())
-    })?;
-    fs::create_dir_all(
-        opts.project_fakebox_share_dir()
-            .parent()
-            .ok_or_else(|| InstallError::CreateDir(opts.project_fakebox_share_dir().to_owned()))?,
-    )
-    .change_context_lazy(|| InstallError::CreateDir(opts.project_dot_config_dir()))?;
-    unix::fs::symlink(opts.share_dir_candidate(), opts.project_fakebox_share_dir())
-        .change_context_lazy(|| {
-            InstallError::PathIo(opts.project_fakebox_share_dir().to_owned())
-        })?;
-
-    let _ = cmd!(
-        "git",
-        "add",
-        &opts
-            .project_fakebox_share_dir_cwd_rel()
-            .change_context(InstallError::Usage)?
-    )
-    .run();
 
     Ok(())
 }
@@ -169,7 +159,7 @@ fn remove_symlink(path: &Path) -> io::Result<()> {
 }
 
 fn init(opts: &Opts) -> AppResult<()> {
-    let project_fakebox_share_dir = opts.project_fakebox_share_dir();
+    let project_fakebox_share_dir = opts.current_root_dir_path();
     if !project_fakebox_share_dir.exists() {
         eprintln!("⚠️  Flakebox files not installed. Call `flakebox install`.");
         return Ok(());
@@ -178,7 +168,7 @@ fn init(opts: &Opts) -> AppResult<()> {
     let current_share_dir =
         fs::read_link(project_fakebox_share_dir).change_context_lazy(|| AppError::General)?;
 
-    if current_share_dir != opts.share_dir_candidate {
+    if current_share_dir != opts.root_dir_candidate() {
         eprintln!("ℹ️  Flakebox files not up to date. Call `flakebox install`.");
         return Ok(());
     }

@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ lib, config, ... }:
 let
   inherit (lib) types;
 in
@@ -23,8 +23,10 @@ in
   };
 
   config = {
-    shareDir."shellHook.sh" = {
-      text = builtins.concatStringsSep "\n" config.env.shellHooks;
+    rootDir.".config/flakebox/shellHook.sh" = {
+      text = ''
+        #!/usr/bin/env bash
+      '' + builtins.concatStringsSep "\n" config.env.shellHooks;
     };
   };
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euo pipefail
 
 set +e
 git diff-files --quiet
@@ -20,11 +20,7 @@ if [ -z "${NO_STASH:-}" ] && [ $is_unclean -ne 0 ]; then
   trap revert_git_stash EXIT
 fi
 
-export git_ls_files
-git_ls_files="$(git ls-files)"
-export git_ls_nonbinary_files
-git_ls_nonbinary_files="$(echo "$git_ls_files" | xargs file --mime | grep -v "; charset=binary" | cut -d: -f1)"
-
-export git_ls_nonbinary_files
-git_ls_nonbinary_files="$(echo "$git_ls_files" | xargs file --mime | grep -v "; charset=binary" | cut -d: -f1)"
-
+export FLAKEBOX_GIT_LS
+FLAKEBOX_GIT_LS="$(git ls-files)"
+export FLAKEBOX_GIT_LS_TEXT
+FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "^db/|\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico)\$")"

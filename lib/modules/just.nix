@@ -73,7 +73,7 @@ in
         ''
       ];
 
-      shareDir."overlay/justfile" = {
+      rootDir."justfile" = {
         source = pkgs.writeText "flakebox-justfile"
           (builtins.concatStringsSep "\n\n"
             (builtins.map (v: v.content)
@@ -88,3 +88,4 @@ in
       };
     };
 }
+

@@ -57,7 +57,16 @@
         };
         flakeboxLib = mkLib pkgs {
           config = {
-            github.ci.outputs = [ "ci.flakebox" "aarch64-android.ci.flakebox" ];
+            github.ci.outputs = [
+              ".#ci.flakebox"
+              ".#aarch64-android.ci.flakebox"
+              ".#x86_64-android.ci.flakebox"
+              ".#arm-android.ci.flakebox"
+
+              # too slow
+              # ".#aarch64-linux.ci.flakebox"
+              # ".#x86_64-linux.ci.flakebox"
+            ];
           };
         };
 
@@ -75,11 +84,11 @@
         };
 
         outputs =
-          (flakeboxLib.buildOutputs { }) (craneLib':
+          (flakeboxLib.craneMultiBuild { }) (craneLib':
             let
               craneLib = (craneLib'.overrideArgs (prev: {
                 pname = "flexbox";
-                nativeBuildInputs = (prev.nativeBuildInputs or [ ]) ++ [
+                nativeBuildInputs = prev.nativeBuildInputs or [ ] ++ [
                   pkgs.mold
                 ];
                 inherit src;
@@ -100,9 +109,8 @@
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
           share = flakeboxLib.share;
-          default = flakeboxLib.flakeboxBin;
+          default = outputs.flakebox;
           docs = flakeboxLib.docs;
-
         };
 
         checks = {
@@ -125,7 +133,15 @@
 
           crossFast = flakeboxLib.mkDevShell {
             packages = [ pkgs.mold pkgs.mdbook ];
-            toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = pkgs.lib.getAttrs [ "aarch64-android" ] (flakeboxLib.mkStdFenixToolchains { }); };
+            toolchain = flakeboxLib.mkFenixMultiToolchain {
+              toolchains = pkgs.lib.getAttrs [
+                "aarch64-android"
+                "i686-android"
+                "x86_64-android"
+                "arm-android"
+              ]
+                (flakeboxLib.mkStdFenixToolchains { });
+            };
           };
         };
       });

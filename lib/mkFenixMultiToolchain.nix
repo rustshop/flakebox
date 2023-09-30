@@ -6,6 +6,7 @@
 , crane
 , enhanceCrane
 , mkStdFenixToolchains
+, mergeArgs
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
 
@@ -14,7 +15,7 @@ in
 , componentTargetsChannelName ? "stable"
 , channel ? defaultChannel
 , defaultCargoBuildTarget ? null
-, args ? (prev: prev)
+, args ? { }
 , componentTargets ? [ ]
 }:
 let
@@ -23,14 +24,7 @@ let
   allComponents = uniqueList (builtins.concatLists (map (toolchain: toolchain.components) toolchains'));
   allComponentTargets = uniqueList (builtins.concatLists (map (toolchain: toolchain.componentTargets) toolchains'));
   allArgs = lib.foldl
-    (accShellArgs: toolchainShellArgs:
-      prev:
-      let
-        accRes = prev // (accShellArgs prev);
-        toolchainShell = accRes // (toolchainShellArgs accRes);
-      in
-      toolchainShell
-    )
+    (accShellArgs: toolchainShellArgs: mergeArgs accShellArgs toolchainShellArgs)
     args
     (map (toolchain: toolchain.shellArgs) toolchains');
   toolchain' =
@@ -38,10 +32,10 @@ let
       (map (component: channel.${component}) allComponents)
       ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) allComponentTargets)
     ));
-  craneLib' = enhanceCrane (crane.lib.${system}.overrideToolchain toolchain');
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs (prev: mergeArgs prev args');
   args' =
     if defaultCargoBuildTarget != null then
-      (prev: ((allArgs prev) // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }))
+      allArgs // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
     else
       allArgs;
 in
@@ -51,5 +45,5 @@ in
   componentsTargets = allComponentTargets;
   args = args';
   shellArgs = allArgs;
-  craneLib = craneLib'.overrideArgs args';
+  craneLib = craneLib';
 }

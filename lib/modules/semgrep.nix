@@ -38,7 +38,7 @@
       '';
     };
 
-    shareDir."overlay/.config/semgrep.yaml" = lib.mkIf config.git.commit-template.enable {
+    rootDir.".config/semgrep.yaml" = lib.mkIf config.git.commit-template.enable {
       text = ''
         '';
     };

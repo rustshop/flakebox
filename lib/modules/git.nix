@@ -74,7 +74,7 @@ in
     (lib.mkIf config.git.pre-commit.trailing_newline {
       git.pre-commit.hooks.trailing_newline = ''
         errors=""
-        for path in $(echo "$git_ls_nonbinary_files" | grep -v -E '.*\.(ods|jpg|png|log)' | grep -v -E '^db/'); do
+        for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
 
           # extra branches for clarity
           if [ ! -s "$path" ]; then
@@ -98,7 +98,7 @@ in
 
 
     (lib.mkIf config.git.commit-msg.enable {
-      shareDir."overlay/misc/git-hooks/commit-msg" = {
+      rootDir."misc/git-hooks/commit-msg" = {
         source = pkgs.writeShellScript "commit-msg"
           (builtins.concatStringsSep "\n\n"
             (lib.mapAttrsToList
@@ -120,7 +120,7 @@ in
     })
 
     (lib.mkIf config.git.commit-msg.enable {
-      shareDir."overlay/misc/git-hooks/pre-commit" =
+      rootDir."misc/git-hooks/pre-commit" =
         let
           indentString = str: numSpaces:
             let
@@ -184,7 +184,7 @@ in
     })
 
     (lib.mkIf config.git.commit-template.enable {
-      shareDir."overlay/misc/git-hooks/commit-template.txt" = {
+      rootDir."misc/git-hooks/commit-template.txt" = {
         source = pkgs.writeText "commit-template"
           ''
             ${config.git.commit-template.head}
