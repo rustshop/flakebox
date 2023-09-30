@@ -62,7 +62,10 @@
               ".#aarch64-android.ci.flakebox"
               ".#x86_64-android.ci.flakebox"
               ".#arm-android.ci.flakebox"
-              ".#aarch64-linux.ci.flakebox"
+
+              # too slow
+              # ".#aarch64-linux.ci.flakebox"
+              # ".#x86_64-linux.ci.flakebox"
             ];
           };
         };
@@ -108,7 +111,6 @@
           share = flakeboxLib.share;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
-
         };
 
         checks = {
