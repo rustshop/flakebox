@@ -104,7 +104,7 @@ let
       workflow_dispatch = {
         inputs = {
           tags = {
-            description = lib.mdDoc "The existing tag to publish to FlakeHub";
+            description = "The existing tag to publish to FlakeHub";
             type = "string";
             required = true;
           };
