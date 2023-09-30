@@ -75,7 +75,7 @@
         };
 
         outputs =
-          (flakeboxLib.buildOutputs { }) (craneLib':
+          (flakeboxLib.craneMultiBuild { }) (craneLib':
             let
               craneLib = (craneLib'.overrideArgs (prev: {
                 pname = "flexbox";

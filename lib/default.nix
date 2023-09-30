@@ -121,5 +121,5 @@ in
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
-  buildOutputs = callPackage ./buildOutputs.nix { };
+  craneMultiBuild = callPackage ./craneMultiBuild.nix { };
 })
