@@ -26,7 +26,19 @@ craneLib.overrideScope' (self: prev: {
 
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
   mkDummySrc = args: prev.mkDummySrc (self.args // args);
-  buildPackage = args: prev.buildPackage (self.args // args);
+  buildPackage = args: prev.buildPackage (
+    let mergedArgs = self.args // args; in (mergedArgs // {
+      # implicit deps building is breaking caching somehow, so we need to do it ourselves here
+      cargoArtifacts = mergedArgs.cargoArtifacts or (
+        self.buildDepsOnly (mergedArgs // {
+          installCargoArtifactsMode = mergedArgs.installCargoArtifactsMode or "use-zstd";
+          # NB: we intentionally don't run any caller-provided hooks here since they might fail
+          # if they require any files that have been omitted by the source dummification.
+          # However, we still _do_ want to run the installation hook with the actual artifacts
+          installPhase = "prepareAndInstallCargoArtifactsDir";
+        }));
+    })
+  );
   buildTrunkPackage = args: prev.buildTrunkPackage (self.args // args);
   # causes issues
   vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
