@@ -156,7 +156,7 @@ in
         default = true;
       };
 
-      outputs = lib.mkOption {
+      buildOutputs = lib.mkOption {
         type = types.listOf types.str;
         description = lib.mdDoc "List of outputs to build";
         default = [ ];
@@ -203,11 +203,11 @@ in
       flakebox-ci = {
         content = flakebox-ci {
           buildCmd =
-            if builtins.length config.github.ci.outputs == 0 then
+            if builtins.length config.github.ci.buildOutputs == 0 then
               ''
                 nix flake check .#
               '' else
-              lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.outputs)
+              lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.buildOutputs)
           ;
         };
       };

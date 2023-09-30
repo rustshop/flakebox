@@ -21,6 +21,6 @@ pub enum Commands {
     Install,
     Docs {
         #[arg(long, env = "FLAKEBOX_DOCS_DIR")]
-        docs_dir: PathBuf,
+        docs_dir: Option<PathBuf>,
     },
 }
