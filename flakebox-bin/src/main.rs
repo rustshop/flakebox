@@ -32,11 +32,20 @@ fn main() -> AppResult<()> {
         Commands::Init => init(&opts)?,
         Commands::Install => install(&opts).change_context(AppError::General)?,
         Commands::Docs { docs_dir } => {
-            let docs_index = docs_dir.join("index.html");
-            eprintln!("Opening docs available at {}", docs_index.display());
-            cmd!("xdg-open", docs_index)
-                .run()
-                .change_context(AppError::General)?;
+            if let Some(docs_dir) = docs_dir {
+                let docs_index = docs_dir.join("index.html");
+                eprintln!("Opening docs available at {}", docs_index.display());
+                cmd!("xdg-open", docs_index)
+                    .run()
+                    .change_context(AppError::General)?;
+            } else {
+                cmd!("nix", "build", "github:rustshop/flakebox#docs")
+                    .run()
+                    .change_context(AppError::General)?;
+                cmd!("xdg-open", "result/index.html")
+                    .run()
+                    .change_context(AppError::General)?;
+            }
         }
     }
 

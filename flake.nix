@@ -57,11 +57,12 @@
         };
         flakeboxLib = mkLib pkgs {
           config = {
-            github.ci.outputs = [
+            github.ci.buildOutputs = [
               ".#ci.flakebox"
               ".#aarch64-android.ci.flakebox"
               ".#x86_64-android.ci.flakebox"
               ".#arm-android.ci.flakebox"
+              ".#docs"
 
               # too slow
               # ".#aarch64-linux.ci.flakebox"
@@ -108,7 +109,7 @@
 
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
-          share = flakeboxLib.share;
+          root = flakeboxLib.root;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
         };

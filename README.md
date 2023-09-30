@@ -1,33 +1,50 @@
 <!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->
 
-# Rustshop Flakebox - Rust dev experience we can share and love.
+# Rustshop Flakebox
 
-Flakebox is to your Rust project dev environment, what NixOS is to your OS, or
+## Rust dev experience we can share and love.
+
+Flakebox is to your Rust project, what NixOS is to your OS, and
 home-manager to your home directory.
 
-This means, you can:
+Flakebox is based on experiences building and maintaining sophisticated
+and demanding Rust projects using Nix. It it integrates many amazing
+tools and techniques into an easy to use yet powerful toolkit.
 
-* integrate best Rust dev tooling and practices into your project in seconds;
-* learn, customize, improve and share as a part of the DX-focused community;
-* keep up to date with the evolving ecosystem with ease.
+Notable features include:
+
+* multi-stage incremental build caching;
+* cross-compilation support, including non-Rust dependencies;
+* dev shells with integrated best practices and tooling;
+* CI flow integration;
+* seamless updates.
+
+With Flakebox you can start using Nix in your Rust project in seconds
+and share the same setup between all your projects.
+
+Built-in Nix Modules based configuration system allows the same level of
+customization and extensibility as NixOS itself.
+
+The documentation and tools will teach you how to start and then evolve
+your project to employ the power of Nix to handle complex CI requirements,
+cross-compilation, testing setups.
+
+The project is open for ideas and collaboration. Learn, customize, improve and share
+as a part of the DX-focused community and use seamless updates
+to stay up to date with the evolving ecosystem with ease.
 
 Rustshop is a vision of how working with Rust could and should be like.
 Flakebox how you bring that vision into your Rust project.
 
-Just because you're a lone Open Source developer working on a spare
-time project doesn't mean you don't deserve a DX of a mature team
-with dedicated tooling team. Just because you're a part of dedicated
-tooling system in a mature team, doesn't mean you shouldn't benefit
-from all the best ideas wider community has to offer.
-
-You don't have to keep copying and updating the same set of
-scripts and configs between all your projects. There's a better way: Flakebox.
-
 **Warning:** Rustshop Flakebox is currently very immature. Expect
-rought edges and some amount of churn before we figure out the
-core pieces. We're currently targeting developers already using
-Nix Flakes and Nix Development shells that are interested in
-more active partipation.
+rough edges and some amount of churn before we figure out the
+core pieces.
+
+
+## Join the Community
+
+[Our Github Discussions](https://github.com/rustshop/flakebox/discussions) is the
+place to ask questions and participate in building Flakebox. Don't be shy.
 
 
 ## Getting started
@@ -40,12 +57,6 @@ to start.
 
 See [Technical Introduction](./docs/technical-details.md) to read more about
 how Flakebox works.
-
-
-## Join the Community
-
-[Our Github Discussions page](https://github.com/rustshop/flakebox/discussions) is the
-place to ask questions and participate in building Flakebox. Don't be shy.
 # Full Flakebox Book ToC
 
 Note: Documentation for the exact version of Flakebox used is available via `flakebox docs` command.
