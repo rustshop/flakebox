@@ -57,10 +57,19 @@ nix build github:rustshop/flakebox#docs && xdg-open result/index.html
 
 In projects already using Flakebox, the documentation can be accessed using `flakebox docs` command.
 
+# ToC
+
 [Introduction](./docs/README.md)
 
 - [Setting up Flakebox](./docs/getting-started.md)
 - [Technical Introduction](./docs/technical-details.md) 
+
+# Building Rust with Nix
+
+- [Tutorial: Fresh Project](./docs/building-new-project.md)
+
+# API & configuration
+
 - [Config Options](./docs/nixos-options.md)
 
 <!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->
