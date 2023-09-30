@@ -8,33 +8,34 @@ Flakebox is to your Rust project, what NixOS is to your OS, and
 home-manager to your home directory.
 
 Flakebox is based on experiences building and maintaining sophisticated
-and demanding Rust projects using Nix. It it integrates many amazing
-tools and techniques into an easy to use yet powerful toolkit.
+and demanding Rust projects using Nix. It integrates wide range of
+ideas, tools and techniques into a powerful yet easy to use toolkit.
 
 Notable features include:
 
 * multi-stage incremental build caching;
 * cross-compilation support, including non-Rust dependencies;
 * dev shells with integrated best practices and tooling;
-* CI flow integration;
+* scalable and highly optimized build pipelines;
+* CI workflow generation;
 * seamless updates.
 
 With Flakebox you can start using Nix in your Rust project in seconds
-and share the same setup between all your projects.
+and share the experience and tools between all your projects.
 
 Built-in Nix Modules based configuration system allows the same level of
 customization and extensibility as NixOS itself.
 
 The documentation and tools will teach you how to start and then evolve
-your project to employ the power of Nix to handle complex CI requirements,
-cross-compilation, testing setups.
+your project to employ the power of Nix to handle complex build pipelines,
+CI requirements and testing setups.
 
 The project is open for ideas and collaboration. Learn, customize, improve and share
 as a part of the DX-focused community and use seamless updates
-to stay up to date with the evolving ecosystem with ease.
+to stay up to date with the evolving ecosystem.
 
 Rustshop is a vision of how working with Rust could and should be like.
-Flakebox how you bring that vision into your Rust project.
+Flakebox will bring that vision into your projects.
 
 **Warning:** Rustshop Flakebox is currently very immature. Expect
 rough edges and some amount of churn before we figure out the
