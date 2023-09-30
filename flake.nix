@@ -63,7 +63,6 @@
               ".#x86_64-android.ci.flakebox"
               ".#arm-android.ci.flakebox"
               ".#aarch64-linux.ci.flakebox"
-              ".#x86_64-linux.ci.flakebox"
             ];
           };
         };
