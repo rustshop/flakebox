@@ -207,7 +207,7 @@ in
               ''
                 nix flake check .#
               '' else
-              lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build .#${output}") config.github.ci.outputs)
+              lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.outputs)
           ;
         };
       };

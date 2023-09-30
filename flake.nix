@@ -57,7 +57,14 @@
         };
         flakeboxLib = mkLib pkgs {
           config = {
-            github.ci.outputs = [ "ci.flakebox" "aarch64-android.ci.flakebox" ];
+            github.ci.outputs = [
+              ".#ci.flakebox"
+              ".#aarch64-android.ci.flakebox"
+              ".#x86_64-android.ci.flakebox"
+              ".#arm-android.ci.flakebox"
+              ".#aarch64-linux.ci.flakebox"
+              ".#x86_64-linux.ci.flakebox"
+            ];
           };
         };
 
