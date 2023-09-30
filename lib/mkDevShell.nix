@@ -71,5 +71,5 @@ let
   };
 in
 pkgs.mkShell (
-  args // (toolchain.shellArgs args)
+  args // toolchain.shellArgs
 )

@@ -4,6 +4,7 @@
 , pkgs
 , crane
 , enhanceCrane
+, mergeArgs
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
 { toolchain ? null
@@ -17,7 +18,7 @@ let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default
     "llvm-tools-preview"
   ]
 , defaultCargoBuildTarget ? null
-, args ? (prev: prev)
+, args ? { }
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
 }:
@@ -32,10 +33,10 @@ let
       ));
   args' =
     if defaultCargoBuildTarget != null then
-      (prev: (prev // (args prev) // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }))
+      args // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
     else
       args;
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs (prev: mergeArgs prev args');
 in
 {
   toolchain = toolchain';

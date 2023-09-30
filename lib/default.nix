@@ -118,8 +118,15 @@ in
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
+  mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
+
+  mergeArgs = l: r: l // r // {
+    buildInputs = l.buildInputs or [ ] ++ r.buildInputs or [ ];
+    nativeBuildInputs = l.nativeBuildInputs or [ ] ++ r.nativeBuildInputs or [ ];
+    packages = l.packages or [ ] ++ r.packages or [ ];
+  };
 })

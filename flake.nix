@@ -125,7 +125,15 @@
 
           crossFast = flakeboxLib.mkDevShell {
             packages = [ pkgs.mold pkgs.mdbook ];
-            toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = pkgs.lib.getAttrs [ "aarch64-android" ] (flakeboxLib.mkStdFenixToolchains { }); };
+            toolchain = flakeboxLib.mkFenixMultiToolchain {
+              toolchains = pkgs.lib.getAttrs [
+                "aarch64-android"
+                "i686-android"
+                "x86_64-android"
+                "arm-android"
+              ]
+                (flakeboxLib.mkStdFenixToolchains { });
+            };
           };
         };
       });
