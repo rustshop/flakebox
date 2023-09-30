@@ -102,7 +102,7 @@ in
       '';
     };
 
-  share = self.config.shareDirPackage;
+  root = self.config.rootDirPackage;
 
   craneLib = self.enhanceCrane self.config.craneLib.default;
   craneLibNightly = self.enhanceCrane self.config.craneLib.nightly;

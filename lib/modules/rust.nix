@@ -56,7 +56,7 @@ in
     })
 
     (lib.mkIf config.rust.rustfmt.enable {
-      shareDir."overlay/.rustfmt.toml" = {
+      rootDir.".rustfmt.toml" = {
         text = config.rust.rustfmt.content;
       };
 

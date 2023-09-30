@@ -20,7 +20,7 @@
       ''
     ];
 
-    shareDir."overlay/.envrc" = {
+    rootDir.".envrc" = {
       text = ''
         use flake
       '';

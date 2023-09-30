@@ -98,7 +98,7 @@ in
 
 
     (lib.mkIf config.git.commit-msg.enable {
-      shareDir."overlay/misc/git-hooks/commit-msg" = {
+      rootDir."misc/git-hooks/commit-msg" = {
         source = pkgs.writeShellScript "commit-msg"
           (builtins.concatStringsSep "\n\n"
             (lib.mapAttrsToList
@@ -120,7 +120,7 @@ in
     })
 
     (lib.mkIf config.git.commit-msg.enable {
-      shareDir."overlay/misc/git-hooks/pre-commit" =
+      rootDir."misc/git-hooks/pre-commit" =
         let
           indentString = str: numSpaces:
             let
@@ -184,7 +184,7 @@ in
     })
 
     (lib.mkIf config.git.commit-template.enable {
-      shareDir."overlay/misc/git-hooks/commit-template.txt" = {
+      rootDir."misc/git-hooks/commit-template.txt" = {
         source = pkgs.writeText "commit-template"
           ''
             ${config.git.commit-template.head}

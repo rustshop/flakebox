@@ -3,12 +3,12 @@
 let
   inherit (lib) types mkOption;
 
-  shareDir' = lib.filter (f: f.enable) (lib.attrValues config.shareDir);
+  rootDir' = lib.filter (f: f.enable) (lib.attrValues config.rootDir);
 
-  shareDir = pkgs.runCommandLocal "mk-flakebox-share-dir" { } /* sh */ ''
+  rootDir = pkgs.runCommandLocal "mk-flakebox-root-dir" { } /* sh */ ''
     set -euo pipefail
 
-    makeShareDirEntry() {
+    makeRootDirEntry() {
       src="$1"
       target="$2"
       mode="$3"
@@ -47,27 +47,27 @@ let
     }
 
     mkdir -p "$out"
-    ${lib.concatMapStringsSep "\n" (shareDirEntry: lib.escapeShellArgs [
-      "makeShareDirEntry"
+    ${lib.concatMapStringsSep "\n" (rootDirEntry: lib.escapeShellArgs [
+      "makeRootDirEntry"
       # Force local source paths to be added to the store
-      "${shareDirEntry.source}"
-      shareDirEntry.target
-      shareDirEntry.mode
-    ]) shareDir'}
+      "${rootDirEntry.source}"
+      rootDirEntry.target
+      rootDirEntry.mode
+    ]) rootDir'}
   '';
 in
 {
 
   options = {
-    shareDirPackage = mkOption {
+    rootDirPackage = mkOption {
       type = types.package;
-      description = lib.mdDoc "Derivation containing all shareDir files/symlinks";
+      description = lib.mdDoc "Derivation containing all rootDir files/symlinks";
     };
 
-    shareDir = mkOption {
+    rootDir = mkOption {
       default = { };
       description = lib.mdDoc ''
-        Set of files that will be generated as as "Flakebox Share Dir".
+        Set of files that will be generated as as "Flakebox Root Dir".
       '';
 
       type = types.attrsOf (types.submodule (
@@ -79,15 +79,15 @@ in
               type = types.bool;
               default = true;
               description = lib.mdDoc ''
-                Whether this share dir file should be generated. This
-                option allows specific share dir files to be disabled.
+                Whether this root dir file should be generated. This
+                option allows specific root dir files to be disabled.
               '';
             };
 
             target = mkOption {
               type = types.str;
               description = lib.mdDoc ''
-                Name of symlink (relative to share dir). Defaults to the attribute name.
+                Name of symlink (relative to root dir). Defaults to the attribute name.
               '';
             };
 
@@ -116,7 +116,7 @@ in
           config = {
             target = lib.mkDefault name;
             source = lib.mkIf (config.text != null) (
-              let name' = "flakeroot-share-" + lib.replaceStrings [ "/" ] [ "-" ] name;
+              let name' = "flakeroot-root-" + lib.replaceStrings [ "/" ] [ "-" ] name;
               in lib.mkDerivedConfig options.text (pkgs.writeText name')
             );
           };
@@ -128,6 +128,6 @@ in
 
 
   config = {
-    shareDirPackage = shareDir;
+    rootDirPackage = rootDir;
   };
 }

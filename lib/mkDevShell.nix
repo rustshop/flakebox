@@ -1,7 +1,7 @@
 { pkgs
 , flakeboxBin
 , config
-, share
+, root
 , docs
 , mkFenixToolchain
 , lib
@@ -52,18 +52,16 @@ let
       });
 
     shellHook = ''
-      # set the share dir
-      export FLAKEBOX_SHARE_DIR_CANDIDATE=${ share}
-      export FLAKEBOX_DOCS_DIR=${ docs}
+      # set the root dir
+      export FLAKEBOX_ROOT_DIR_CANDIDATE=${root}
       export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
-      export FLAKEBOX_PROJECT_SHARE_DIR="''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/share"
-      export PATH=${share}/bin/:''${PATH}
+      export PATH=${root}/bin/:''${PATH}
 
       # make sure we have git in the PATH
       export PATH=${pkgs.git}/bin/:''${PATH}
 
-      if [ -e "''${FLAKEBOX_PROJECT_SHARE_DIR}" ]; then
-        source "''${FLAKEBOX_PROJECT_SHARE_DIR}/shellHook.sh"
+      if [ -e "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh" ]; then
+        source "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh"
       fi
 
       flakebox init
