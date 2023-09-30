@@ -47,20 +47,15 @@ core pieces.
 [Our Github Discussions](https://github.com/rustshop/flakebox/discussions) is the
 place to ask questions and participate in building Flakebox. Don't be shy.
 
+# Flakebox Book ToC
 
-## Getting started
+The best way to view the Flakebox documentation is by running:
 
-See [Setting up Flakebox in your Rust project](./docs/getting-started.md)
-to start.
+```
+nix build github:rustshop/flakebox#docs && xdg-open result/index.html
+```
 
-
-## How it works
-
-See [Technical Introduction](./docs/technical-details.md) to read more about
-how Flakebox works.
-# Full Flakebox Book ToC
-
-Note: Documentation for the exact version of Flakebox used is available via `flakebox docs` command.
+In projects already using Flakebox, the documentation can be accessed using `flakebox docs` command.
 
 [Introduction](./docs/README.md)
 

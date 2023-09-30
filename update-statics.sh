@@ -7,9 +7,15 @@ echo -n > README.md
 {
   printf '<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->\n\n'
   sed -e 's#(\.#(./docs#g' < docs/README.md
-  echo "# Full Flakebox Book ToC"
-  echo ""
-  echo "Note: Documentation for the exact version of Flakebox used is available via \`flakebox docs\` command."
+  echo "# Flakebox Book ToC"
+  echo
+  echo "The best way to view the Flakebox documentation is by running:"
+  echo
+  echo '```'
+  echo 'nix build github:rustshop/flakebox#docs && xdg-open result/index.html'
+  echo '```'
+  echo
+  echo "In projects already using Flakebox, the documentation can be accessed using \`flakebox docs\` command."
   echo ""
   sed -e 's#(\.#(./docs#g' < docs/SUMMARY.md 
   printf '\n<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->'

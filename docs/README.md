@@ -45,14 +45,3 @@ core pieces.
 [Our Github Discussions](https://github.com/rustshop/flakebox/discussions) is the
 place to ask questions and participate in building Flakebox. Don't be shy.
 
-
-## Getting started
-
-See [Setting up Flakebox in your Rust project](./getting-started.md)
-to start.
-
-
-## How it works
-
-See [Technical Introduction](./technical-details.md) to read more about
-how Flakebox works.
