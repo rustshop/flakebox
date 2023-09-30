@@ -31,8 +31,8 @@ in
       git.pre-commit.hooks = {
         leftover_dbg = ''
           errors=""
-          for path in $(echo "$git_ls_nonbinary_files" | grep  '.*\.rs'); do
-            if grep 'dbg!(' "$path"  > /dev/null; then
+          for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep  '.*\.rs'); do
+            if grep 'dbg!(' "$path" > /dev/null; then
               >&2 echo "$path contains dbg! macro"
               errors="true"
             fi

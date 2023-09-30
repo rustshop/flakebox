@@ -74,7 +74,7 @@ in
     (lib.mkIf config.git.pre-commit.trailing_newline {
       git.pre-commit.hooks.trailing_newline = ''
         errors=""
-        for path in $(echo "$git_ls_nonbinary_files" | grep -v -E '.*\.(ods|jpg|png|log)' | grep -v -E '^db/'); do
+        for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
 
           # extra branches for clarity
           if [ ! -s "$path" ]; then

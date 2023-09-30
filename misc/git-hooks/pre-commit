@@ -1,7 +1,7 @@
 #!/nix/store/8fv91097mbh5049i9rglc73dx6kjg3qk-bash-5.2-p15/bin/bash
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euo pipefail
 
 set +e
 git diff-files --quiet
@@ -21,14 +21,10 @@ if [ -z "${NO_STASH:-}" ] && [ $is_unclean -ne 0 ]; then
   trap revert_git_stash EXIT
 fi
 
-export git_ls_files
-git_ls_files="$(git ls-files)"
-export git_ls_nonbinary_files
-git_ls_nonbinary_files="$(echo "$git_ls_files" | xargs file --mime | grep -v "; charset=binary" | cut -d: -f1)"
-
-export git_ls_nonbinary_files
-git_ls_nonbinary_files="$(echo "$git_ls_files" | xargs file --mime | grep -v "; charset=binary" | cut -d: -f1)"
-
+export FLAKEBOX_GIT_LS
+FLAKEBOX_GIT_LS="$(git ls-files)"
+export FLAKEBOX_GIT_LS_TEXT
+FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "^db/|\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico)\$")"
 
 function check_cargo_fmt() {
     set -euo pipefail
@@ -51,8 +47,8 @@ function check_leftover_dbg() {
     set -euo pipefail
 
     errors=""
-    for path in $(echo "$git_ls_nonbinary_files" | grep  '.*\.rs'); do
-      if grep 'dbg!(' "$path"  > /dev/null; then
+    for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep  '.*\.rs'); do
+      if grep 'dbg!(' "$path" > /dev/null; then
         >&2 echo "$path contains dbg! macro"
         errors="true"
       fi
@@ -94,7 +90,7 @@ export -f check_semgrep
 function check_shellcheck() {
     set -euo pipefail
 
-    for path in $(echo "$git_ls_nonbinary_files" | grep -E '.*\.sh$')  ; do
+    for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep -E '.*\.sh$'); do
       shellcheck --severity=warning "$path"
     done
 
@@ -105,7 +101,7 @@ function check_trailing_newline() {
     set -euo pipefail
 
     errors=""
-    for path in $(echo "$git_ls_nonbinary_files" | grep -v -E '.*\.(ods|jpg|png|log)' | grep -v -E '^db/'); do
+    for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
 
       # extra branches for clarity
       if [ ! -s "$path" ]; then
@@ -142,7 +138,7 @@ export -f check_trailing_whitespace
 function check_typos() {
     set -euo pipefail
 
-    if ! echo "$git_ls_nonbinary_files" | typos --stdin-paths ; then
+    if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --stdin-paths ; then
       >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
       return 1
     fi
