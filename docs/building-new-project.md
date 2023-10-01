@@ -45,6 +45,9 @@ you like.
 ```
 > hx flake.nix
 > git diff HEAD
+```
+
+```diff
 diff --git a/flake.nix b/flake.nix
 index a96aa14..25ce16f 100644
 --- a/flake.nix
@@ -368,17 +371,231 @@ this new Nix code doing and what else you can do with it (spoiler: cross-compila
 
 
 ```
-> git add flake.nix❄️ ❄️ 
+> git add flake.nix
 > git commit -a -m "Add initial build system"
 Skipping semgrep check: .config/semgrep.yaml empty
 [master e681b24] Add initial build system
  1 file changed, 30 insertions(+)
- ```
- 
-## Building Rust code with Flakebox (explanation & advanced)
+```
+
+## Building Rust code with Flakebox - explanation
+
+Let's discuss each part of the code:
+
+```
+        flakeboxLib = flakebox.lib.${system} { };
+```
+
+`let ... in <expr>` in Nix is used to bind values
+to names, that can later be used in `<expr>` following
+in.
+
+Our first name binding is `flakeboxLib` which exposes all
+Flakebox APIs. `flakebox` is the name of the input
+defined in the flake, `flakebox.lib.${system}` is
+the library output it exposes for the current `system`.
+`flakebox.lib.${system} { }` is a function call, where
+`{ }` are the arguments (empty set, defaults).
+
+The next binding is:
+
+```nix
+        rustSrc = flakeboxLib.filter.filterSubdirs {
+          root = builtins.path {
+            name = "flakebox-tutorial";
+            path = ./.;
+          };
+          dirs = [
+            "Cargo.toml"
+            "Cargo.lock"
+            ".cargo"
+            "src"
+          ];
+        };
+```
+
+This `filter.filterSubdirs` is a function exposed by
+`flakeboxLib` and is used for easy source code filtering.
+This is useful to avoid having to rebuild our Rust project
+when only irrelevant files changed. It's not strictly
+necessary, but almost any project will benefit
+from avoiding redoing work when it's not necessary.
+As `Nix` doesn't understand the details of how
+`cargo` works, the only way to explain it which
+files can change the result of a build is by
+filtering them out. The details of source code filtering
+will be explained elsewhere in the documentation.
 
 
-WIP.
+The last name binding is:
+
+```nix
+        outputs =
+          (flakeboxLib.craneMultiBuild { }) (craneLib':
+            let
+              craneLib = (craneLib'.overrideArgs (prev: {
+                pname = "flexbox-multibuild";
+                src = rustSrc;
+              }));
+            in
+            rec {
+              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+              workspaceBuild = craneLib.buildWorkspace {
+                cargoArtifacts = workspaceDeps;
+              };
+              flakebox-tutorial = craneLib.buildPackage { };
+            });
+```
+
+
+`(flakeboxLib.craneMultiBuild { })` is a function call of `craneMultiBuild` function
+with an empty set `{ }` as an argument. This function is meant for conveniently
+building Rust across cargo build profiles and toolchains.
+
+It returns a function that must be called with ... another function as an argument.
+You can see why functional programming is called, well, functional.
+
+The rest of this code block `(craneLib': /* ... */ });` is the actual build
+function. The `craneLib'` is the the [crane](https://crane.dev/) library instance
+already pre-configured for the caller-requested environment.
+
+[crane](https://crane.dev/) is a Nix library for building `cargo` projects.
+It might feel a little bit intimidating at first, but I encourage you to
+read [crane's Introduction pages](https://crane.dev/introduction.html)
+(all of them).
+
+Notably `craneLib` is already pre-configured for you, so you might notice
+that in our example we don't need to pass as many examples. Also,
+Flakebox enhanced `crane` with certain extra functionality for
+even more convenient use.
+
+The following
+```nix
+            let
+              craneLib = (craneLib'.overrideArgs (prev: {
+                pname = "flexbox-multibuild";
+                src = rustSrc;
+              }));
+            in
+```
+
+defines a new name binding. The value of it is the original `craneLib'`
+with certain arguments overridden. `pname` sets the name of the derivation
+and `src` sets the source directory for `crane` to build.
+
+Finally:
+
+```nix
+            rec {
+              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+              workspaceBuild = craneLib.buildWorkspace {
+                cargoArtifacts = workspaceDeps;
+              };
+              flakebox-tutorial = craneLib.buildPackage { };
+            }
+```
+
+defines a set with 3 derivations.
+
+`flakebox-tutorial` corresponds to `cargo build` and taking all the
+resulting binaries as the result of the whole derivation.
+
+`workspaceBuild` corresponds to `cargo build --workspace`, but notably
+it's result (output) is the whole `./target` directory after `cargo`
+completed. It also uses `cargoArtifacts = workspaceDeps;` which means
+it doesn't start from scratch, but instead takes the result of `workspaceDeps`
+and uses it as starting point (`./target` content to be precise).
+
+`workspaceDeps` uses a crane's special sauce "deps only" build which
+compiles only the dependencies of the whole workspace. This way
+the resulting `./target/` doesn't need to get rebuild unless
+project dependencies changed, which improves the caching by a lot.
+
+
+The result of this whole call to `craneMultiBuild` is binded in `outputs` name
+and conceptually contains a matrix of all supported cargo build profiles and
+supported toolchains:
+
+* `<output>` - i.e. `workspaceDeps`, `workspaceBuild`, `flakebox-tutorial` are builds using default (`release`) building profile and `default` (native) toolchain
+* `<profile>.<output>` - e.g. `dev.workspaceDeps`, `release.workspaceBuild`, `ci.flakebox-tutorial` are builds using `<ci>` building profile and `default` (native) toolchain
+* `<toolchain>.<profile>.<output>` - e.g. `nightly.dev.workspaceDeps`, `aarch64-android.release.flakebox-tutorial` are builds using `<ci>` build profile and `<toolchain>`
+
+By default `dev`, `ci`, and `release` profiles are available, and `default`, `stable`, `nightly` are the native toolchains, and cross-compilation toolchains include:
+
+* `aarch64-android`
+* `arm-android`
+* `x86_64-android`
+* `i686-android`
+* `aarch64-darwin`
+* `x86_64-darwin`
+* `aarch64-linux`
+
+Please be aware that some of these toolchains will take a very long time to actually compile.
+
+Finally
+
+```nix
+        legacyPackages = outputs;
+```
+
+exposes all these outputs as a "legacy packages" in our Flake. It's a bit of a hack, but will work for now.
+
+## Building Rust code with Flakebox - advanced
+
+
+Try to build the cod now:
+
+```
+> nix build .#flakebox-tutorial
+20:18:37 ~/tmp/flakebox-tutorial  master [?] is 📦 v0.1.0 🦀v1.72.0 ❄️ 
+> file result/bin/flakebox-tutorial
+result/bin/flakebox-tutorial: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /nix/store/46m4xx889wlhsdj72j38fnlyyvvvvbyb-glibc-2.37-8/lib/ld-linux-x86-64.so.2, for GNU/Linux 3.10.0, not stripped
+```
+
+The above is the release build using the default (native `stable`) toolchain.
+
+Now build the whole workspace using `dev` mode of `nightly` toolchain and keep the whole output (`-L`):
+
+```
+> nix build -L .#dev.workspaceBuild
+flexbox-multibuild-workspace-deps> cargoArtifacts not set, will not reuse any cargo artifacts
+flexbox-multibuild-workspace-deps> unpacking sources
+flexbox-multibuild-workspace-deps> unpacking source archive /nix/store/axsvfwi3xjaw3vmd93bx0h2k55hdyzbx-source
+flexbox-multibuild-workspace-deps> source root is source
+flexbox-multibuild-workspace-deps> patching sources
+flexbox-multibuild-workspace-deps> Executing configureCargoCommonVars
+flexbox-multibuild-workspace-deps> configuring
+flexbox-multibuild-workspace-deps> will append /build/source/.cargo-home/config.toml with contents of /nix/store/5670gflg2yzqq7i7k1fygmydkphwwshz-vendor-cargo-deps/config.toml
+flexbox-multibuild-workspace-deps> default configurePhase, nothing to do
+flexbox-multibuild-workspace-deps> building
+flexbox-multibuild-workspace-deps> ++ command cargo --version
+flexbox-multibuild-workspace-deps> cargo 1.72.0 (103a7ff2e 2023-08-15)
+flexbox-multibuild-workspace-deps> ++ command cargo doc --profile dev --workspace --locked
+flexbox-multibuild-workspace-deps>    Compiling flakebox-tutorial v0.1.0 (/build/source)
+flexbox-multibuild-workspace-deps>  Documenting flakebox-tutorial v0.1.0 (/build/source)
+flexbox-multibuild-workspace-deps>     Finished dev [unoptimized + debuginfo] target(s) in 0.97s
+# ... skipped for brevity
+flexbox-multibuild-workspace> ++ command cargo build --profile dev --locked --workspace --all-targets
+flexbox-multibuild-workspace>    Compiling flakebox-tutorial v0.1.0 (/build/source)
+flexbox-multibuild-workspace>     Finished dev [unoptimized + debuginfo] target(s) in 0.23s
+flexbox-multibuild-workspace> installing
+flexbox-multibuild-workspace> compressing new content of target to /nix/store/pi6cww0zr4pp0rdl5n5v5yy3v11xf11y-flexbox-multibuild-workspace-0.1.0/target.tar.zst
+flexbox-multibuild-workspace> /*stdin*\            : 29.52%   (  12.5 MiB =>   3.69 MiB, /nix/store/pi6cww0zr4pp0rdl5n5v5yy3v11xf11y-flexbox-multibuild-workspace-0.1.0/target.tar.zst)
+flexbox-multibuild-workspace> post-installation fixup
+flexbox-multibuild-workspace> shrinking RPATHs of ELF executables and libraries in /nix/store/pi6cww0zr4pp0rdl5n5v5yy3v11xf11y-flexbox-multibuild-workspace-0.1.0
+flexbox-multibuild-workspace> checking for references to /build/ in /nix/store/pi6cww0zr4pp0rdl5n5v5yy3v11xf11y-flexbox-multibuild-workspace-0.1.0...
+flexbox-multibuild-workspace> patching script interpreter paths in /nix/store/pi6cww0zr4pp0rdl5n5v5yy3v11xf11y-flexbox-multibuild-workspace-0.1.0
+> ls -alh result/
+total 24M
+dr-xr-xr-x     2 root root   4.0K Dec 31  1969 .
+drwxrwxr-t 38042 root nixbld  20M Sep 30 20:24 ..
+-r--r--r--     2 root root   3.7M Dec 31  1969 target.tar.zst
+lrwxrwxrwx     2 root root     98 Dec 31  1969 target.tar.zst.prev -> /nix/store/a76dbichnyhgza5ilrv516kdqc29j59d-flexbox-multibuild-workspace-deps-0.1.0/target.tar.zst
+```
+
+As you can see the `result` contains the actual compressed `target.tar.zst`. Well, the incremental layer of new/changed files and a link to a previous layer, to be precise.
+
+Try cross-compiling:
 
 ```
 > nix build .#aarch64-android.dev.flakebox-tutorial
@@ -386,4 +603,6 @@ WIP.
 result/bin/flakebox-tutorial: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, with debug_info, not stripped
 ```
 
-Yes. This is our tutorial cross-compiled to aarch64 android. Just like that.
+Yes. This is our tutorial project cross-compiled to aarch64 android. Just like that.
+
+
