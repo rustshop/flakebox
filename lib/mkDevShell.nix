@@ -15,6 +15,7 @@ in
 
 { packages ? [ ]
 , toolchain ? mkFenixToolchain { toolchain = defaultToolchain; }
+, ...
 } @ args:
 let
   cleanedArgs = removeAttrs args [
