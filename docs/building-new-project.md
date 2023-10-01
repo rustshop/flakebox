@@ -651,3 +651,75 @@ warning: build failed, waiting for other jobs to finish...
 Note that you don't have to use `nix build` all the time when working on your project.
 When working locally, it's more convenient to rely on the tooling that you
 are familiar with running in a dev shell.
+
+Anyway - the compilation failed because it can't find native OpenSSL.
+
+Add the necessary build inputs and re-enter the dev shell:
+
+
+```
+> hx flake.nix
+> git diff
+diff --git a/flake.nix b/flake.nix
+index a65ba7a..f4c64d7 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -5,7 +5,7 @@
+     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+ 
+     flakebox = {
+-      url = "github:rustshop/flakebox";
++      url = "github:rustshop/flakebox?rev=9e45d2c0b330a170721ada3fe3a73c38dcff763b";
+       inputs.nixpkgs.follows = "nixpkgs";
+     };
+ 
+@@ -15,6 +15,11 @@
+   outputs = { self, nixpkgs, flakebox, flake-utils }:
+     flake-utils.lib.eachDefaultSystem (system:
+       let
++
++        pkgs = import nixpkgs {
++          inherit system;
++        };
++
+         flakeboxLib = flakebox.lib.${system} { };
+ 
+         rustSrc = flakeboxLib.filter.filterSubdirs {
+@@ -36,6 +41,10 @@
+               craneLib = (craneLib'.overrideArgs (prev: {
+                 pname = "flexbox-multibuild";
+                 src = rustSrc;
++                buildInputs = prev.buildInputs or [ ] ++ [
++                  pkgs.openssl
++                  pkgs.pkg-config
++                ];
+               }));
+             in
+             rec {
+@@ -50,6 +59,10 @@
+         legacyPackages = outputs;
+         devShells = {
+           default = flakeboxLib.mkDevShell {
++            buildInputs = [
++              pkgs.openssl
++              pkgs.pkg-config
++            ];
+             packages = [ ];
+           };
+         };
+> nix flake check
+# ...
+> exit
+> nix develop
+```
+
+And try again:
+
+```
+> cargo build
+# ...
+   Compiling openssl-sys v0.9.93
+   Compiling openssl v0.10.57
+   Compiling flakebox-tutorial v0.1.0 (/home/dpc/tmp/flakebox-tutorial)
+    Finished dev [unoptimized + debuginfo] target(s) in 4.25s
+```
