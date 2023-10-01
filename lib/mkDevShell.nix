@@ -5,6 +5,7 @@
 , docs
 , mkFenixToolchain
 , lib
+, mergeArgs
 }:
 let
   defaultToolchain = config.toolchain.default;
@@ -70,5 +71,5 @@ let
   };
 in
 pkgs.mkShell (
-  args // toolchain.shellArgs
+  mergeArgs toolchain.shellArgs args
 )
