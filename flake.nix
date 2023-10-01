@@ -87,13 +87,13 @@
         outputs =
           (flakeboxLib.craneMultiBuild { }) (craneLib':
             let
-              craneLib = (craneLib'.overrideArgs ({
+              craneLib = (craneLib'.overrideArgs {
                 pname = "flexbox";
                 nativeBuildInputs = [
                   pkgs.mold
                 ];
                 inherit src;
-              }));
+              });
             in
             rec {
               workspaceDeps = craneLib.buildWorkspaceDepsOnly { };

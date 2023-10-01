@@ -15,19 +15,19 @@ craneLib.overrideScope' (self: prev: {
 
   mkCargoDerivation = args: prev.mkCargoDerivation (
     { CARGO_PROFILE = self.cargoProfile; }
-    // self.args // args
+    // (mergeArgs self.args args)
   );
 
   # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
   buildDepsOnly = args: prev.buildDepsOnly (
     { CARGO_PROFILE = self.cargoProfile; }
-    // self.args // self.argsDepsOnly // args
+    // mergeArgs (mergeArgs self.args self.argsDepsOnly) args
   );
 
-  crateNameFromCargoToml = args: prev.crateNameFromCargoToml (self.args // args);
-  mkDummySrc = args: prev.mkDummySrc (self.args // args);
+  crateNameFromCargoToml = args: prev.crateNameFromCargoToml (mergeArgs self.args args);
+  mkDummySrc = args: prev.mkDummySrc (mergeArgs self.args args);
   buildPackage = args: prev.buildPackage (
-    let mergedArgs = self.args // args; in (mergedArgs // {
+    let mergedArgs = mergeArgs self.args args; in (mergedArgs // {
       # implicit deps building is breaking caching somehow, so we need to do it ourselves here
       cargoArtifacts = mergedArgs.cargoArtifacts or (
         self.buildDepsOnly (mergedArgs // {
@@ -39,9 +39,9 @@ craneLib.overrideScope' (self: prev: {
         }));
     })
   );
-  buildTrunkPackage = args: prev.buildTrunkPackage (self.args // args);
+  buildTrunkPackage = args: prev.buildTrunkPackage (mergeArgs self.args args);
   # causes issues
-  vendorCargoDeps = args: prev.vendorCargoDeps (self.args // args);
+  vendorCargoDeps = args: prev.vendorCargoDeps (mergeArgs self.args args);
 
   buildWorkspaceDepsOnly = origArgs:
     let
@@ -106,10 +106,10 @@ craneLib.overrideScope' (self: prev: {
       cargoExtraArgs = "${pkgsArgs}";
     });
 
-  overrideArgs = f: self.overrideScope' (self: prev: { args = mergeArgs prev.args f; });
+  overrideArgs = args: self.overrideScope' (self: prev: { args = mergeArgs prev.args args; });
   overrideArgs' = f: self.overrideScope' (self: prev: { args = prev.args // f prev.args; });
   overrideArgs'' = f: self.overrideScope' (self: prev: { args = prev.args // f self prev.args; });
-  overrideArgsDepsOnly = f: self.overrideScope' (self: prev: { argsDepsOnly = mergeArgs prev.argsDepsOnly f; });
+  overrideArgsDepsOnly = args: self.overrideScope' (self: prev: { argsDepsOnly = mergeArgs prev.argsDepsOnly args; });
   overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
   overrideArgsDepsOnly'' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
