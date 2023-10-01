@@ -806,3 +806,113 @@ the cross-shell is not a default shell is that - unlike `nix build .#<target>...
 downloads toolchains on demand - it requires bringing in all the supported cross-compiling
 toolchains upfront. This can cost gigabytes of downloaded data and storage,
 while most developers for most projects will not need it.
+
+Add the cross-compilation shell:
+
+```
+> hx flake.nix
+> git diff
+```
+
+```diff
+diff --git a/flake.nix b/flake.nix
+index a81e867..439fdb7 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -76,6 +76,25 @@
+             ];
+             packages = [ ];
+           };
++
++          cross = flakeboxLib.mkDevShell {
++            toolchain = flakeboxLib.mkFenixMultiToolchain {
++              toolchains = pkgs.lib.getAttrs [
++                "aarch64-android"
++                "i686-android"
++                "x86_64-android"
++                "arm-android"
++              ]
++                (flakeboxLib.mkStdFenixToolchains { });
++            };
++
++            buildInputs = [
++              pkgs.openssl
++            ];
++            nativeBuildInputs = [
++              pkgs.pkg-config
++            ];
++          };
+         };
+       });
+ }
+ ```
+ 
+ As you can see, we create another dev shell, this time passing a `toolchain =` argument to
+ `flakeboxLib.mkDevShell` call. We set it to a result of `flakeboxLib.mkFenixMultiToolchain`
+ which is used to compose multiple toolchains into one, and we use `pkgs.lib.getAttrs`
+ to pick only 4 specific toolchain from the result of `flakeboxLib.mkStdFenixToolchains { }`
+ which returns all the toolchains available in Flakebox.
+ 
+ The selected toolchains use pre-built binaries SDK toolchains of the Android project,
+ so should be relatively lightweight. At least you don't need to compile them from scratch.
+ 
+ Enter the new shell:
+ 
+ ```
+ > nix develop .#cross
+ ```
+ 
+ (this might take a moment).
+ 
+ And build the project:
+ 
+ ```
+ > cargo build --target aarch64-linux-android
+   Compiling vcpkg v0.2.15
+# ...
+   Compiling openssl-sys v0.9.93
+   Compiling openssl-macros v0.1.1
+   Compiling flakebox-tutorial v0.1.0 (/home/dpc/tmp/flakebox-tutorial)
+    Finished dev [unoptimized + debuginfo] target(s) in 5.77s
+> file target/aarch64-linux-android/debug/flakebox-tutorial
+target/aarch64-linux-android/debug/flakebox-tutorial: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, with debug_info, not stripped
+> cargo build --target x86_64-linux-android
+   Compiling libc v0.2.148
+# ...
+   Compiling openssl v0.10.57
+   Compiling foreign-types v0.3.2
+   Compiling flakebox-tutorial v0.1.0 (/home/dpc/tmp/flakebox-tutorial)
+    Finished dev [unoptimized + debuginfo] target(s) in 4.44s
+> file target/x86_64-linux-android/debug/flakebox-tutorial
+target/x86_64-linux-android/debug/flakebox-tutorial: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, with debug_info, not stripped
+```
+
+it just works.
+
+Please be aware that cross-compilation is notorious tricky.
+Certain combinations of host and target architectures might not work,
+some dependencies might require non-trivial custom settings
+and workarounds. But with Flakebox at very least you're starting
+from good defaults and you can share the work and the results
+with the community. And with Nix while it works, it will
+keep working.
+
+Flakebox does support building setting up custom toolchains from
+scratch, but it's outside of the scope of this tutorial.
+
+Project can define multiple (cross-) dev shells, that include
+different tools and toolchains for different tasks. It's common
+that web-developers would only be interested in wasm toolchain,
+and mobile developers in 
+
+## Summary
+
+This concludes this tutorial. If you feel adventurous and have
+CPU cycles to burn, try:
+
+```
+> nix build -L .#aarch64-linux.dev.flakebox-tutorial
+```
+
+and see how long does it take to build a `aarch64-linux` toolchain
+on your system.
