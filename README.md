@@ -72,7 +72,6 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 [Introduction](./docs/README.md)
 
-- [Setting up Flakebox](./docs/getting-started.md)
 - [Technical Introduction](./docs/technical-details.md) 
 
 # Building Rust with Nix
@@ -82,5 +81,9 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 # API & configuration
 
 - [Config Options](./docs/nixos-options.md)
+
+# Stale, might need a rework
+
+- [Setting up Flakebox](./docs/getting-started.md)
 
 <!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->

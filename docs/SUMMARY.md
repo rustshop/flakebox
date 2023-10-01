@@ -2,7 +2,6 @@
 
 [Introduction](./README.md)
 
-- [Setting up Flakebox](./getting-started.md)
 - [Technical Introduction](./technical-details.md) 
 
 # Building Rust with Nix
@@ -12,3 +11,7 @@
 # API & configuration
 
 - [Config Options](./nixos-options.md)
+
+# Stale, might need a rework
+
+- [Setting up Flakebox](./getting-started.md)
