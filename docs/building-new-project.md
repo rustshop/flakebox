@@ -6,7 +6,7 @@ In this tutorial we will:
 * set up Flakebox in it;
 * use it to compile our project;
 * then cross-compile it;
-* introduce some non-trivial C-dependencies;
+* introduce some nontrivial C dependencies;
 * then compile and cross-compile again;
 * and set up a cross-compiling dev shell.
 
@@ -19,7 +19,7 @@ Create a new project:
 > cd flakebox-tutorial/
 ```
 
-Since we don't have a dev shell yet, initialize new project with `cargo` from nixpkgs:
+Since we don't have a dev shell yet, initialize new project using `cargo` from nixpkgs:
 
 ```
 > nix run nixpkgs#cargo -- init
@@ -28,7 +28,7 @@ Since we don't have a dev shell yet, initialize new project with `cargo` from ni
 
 (If the above command doesn't work, probably you need to setup Nix with Flakes enabled).
 
-Init Nix Flake inside the project:
+Initialize Nix Flake inside the project:
 
 ```
 > nix flake init
@@ -97,12 +97,13 @@ Note: If you're getting errors like:
        error: a 'aarch64-darwin' with features {} is required to build '/nix/store/ag23kdyxy0is5w3jj8lplz749bhwgnhw-flakebox-flakebox-ci-yaml-gen.drv', but I am a 'x86_64-linux' with features {benchmark, big-parallel, kvm, nixos-test}
 ```
 
-it means your `nix` is too old. Use `nix run nixpkgs#nix flake check` instead to run a newest version. It's an awesome use of Nix Flakes, so get familiar with it.
+it means your `nix` is too old. Use `nix run nixpkgs#nix flake check` instead to run a newest version.
+With Nix even tools that are not currently installed are easy to use.
 
-OK. That's the basic setup. It would probably be faster to use a template,
-but doing it from scratch is a good learning experience.
+This is the basic setup. It would probably be faster to use a template,
+but doing it from scratch doesn't take long and is a steady start.
 
-Now let's do something actually interesting with it.
+Now let's bring in the tools we need.
 
 ## Setting up Flakebox dev shell
 
@@ -146,11 +147,10 @@ index 25ce16f..f09763b 100644
 +        };
 +      });
  }
- ```
+```
  
 Since that's a bit handful, let me paste the whole content:
- 
- 
+
 ```
 > cat flake.nix 
 ```
@@ -301,11 +301,10 @@ tail: error reading 'standard input': Is a directory
 That's better. There's more to Flakebox Dev Shells, but this will do for now.
 Let's move to the cool part - building your project with Nix.
 
-## Building Rust code with Flakebox
+## Building Rust code with Flakebox - setup
 
 The easiest and most versatile way to build Rust with Flakebox is using
 `flakeboxLib.
-
 
 
 ```
@@ -475,7 +474,7 @@ You can see why functional programming is called, well, functional.
 
 The rest of this code block `(craneLib': /* ... */ });` is the actual build
 function. The `craneLib'` is the the [crane](https://crane.dev/) library instance
-already pre-configured for the caller-requested environment.
+already pre-configured for the caller requested environment.
 
 [crane](https://crane.dev/) is a Nix library for building `cargo` projects.
 It might feel a little bit intimidating at first, but I encourage you to
@@ -530,7 +529,7 @@ the resulting `./target/` doesn't need to get rebuild unless
 project dependencies changed, which improves the caching by a lot.
 
 
-The result of this whole call to `craneMultiBuild` is binded in `outputs` name
+The result of this whole call to `craneMultiBuild` is bound in `outputs` name
 and conceptually contains a matrix of all supported cargo build profiles and
 supported toolchains:
 
@@ -558,7 +557,7 @@ Finally
 
 exposes all these outputs as a "legacy packages" in our Flake. It's a bit of a hack, but will work for now.
 
-## Building Rust code with Flakebox - advanced
+## Building Rust code with Flakebox - practice
 
 
 Try to build the cod now:
@@ -612,6 +611,9 @@ lrwxrwxrwx     2 root root     98 Dec 31  1969 target.tar.zst.prev -> /nix/store
 ```
 
 As you can see the `result` contains the actual compressed `target.tar.zst`. Well, the incremental layer of new/changed files and a link to a previous layer, to be precise.
+
+The cross-compilation parts assume you're using x86-64 Linux system. If that's not the case, especially if you
+are on MacOS, some things might require some tweaking or not work. Sorry.
 
 Try cross-compiling:
 
