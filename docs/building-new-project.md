@@ -1,5 +1,14 @@
 # Tutorial: Building Rust with Nix in a new project
 
+In this tutorial we will:
+
+* start a new Rust project from scratch;
+* set up Flakebox in it;
+* use it to compile our project;
+* then cross-compile it;
+* introduce some non-trivial C-dependencies;
+* then compile and cross-compile again;
+* and set up a cross-compiling dev shell.
 
 ## Creating new project
 
@@ -329,10 +338,10 @@ index f09763b..a65ba7a 100644
 +        outputs =
 +          (flakeboxLib.craneMultiBuild { }) (craneLib':
 +            let
-+              craneLib = (craneLib'.overrideArgs (prev: {
++              craneLib = (craneLib'.overrideArgs {
 +                pname = "flexbox-multibuild";
 +                src = rustSrc;
-+              }));
++              });
 +            in
 +            rec {
 +              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
@@ -366,12 +375,21 @@ Hello, world!
 
 Tada! It's working! `nix build` creates a `result/` symlink in the current directory pointing the result of the requested derivation (build output in non-Nix).
 
-Commit the current state and we I can explain in more details what is
+Good time to add `result/` to `.gitignore`:
+
+```
+> hx .gitignore
+> cat .gitignore 
+/target
+/result
+```
+
+Commit the current state and I can explain in more details what is
 this new Nix code doing and what else you can do with it (spoiler: cross-compilation and different cargo build profiles!).
 
 
 ```
-> git add flake.nix
+> git add *
 > git commit -a -m "Add initial build system"
 Skipping semgrep check: .config/semgrep.yaml empty
 [master e681b24] Add initial build system
@@ -433,10 +451,10 @@ The last name binding is:
         outputs =
           (flakeboxLib.craneMultiBuild { }) (craneLib':
             let
-              craneLib = (craneLib'.overrideArgs (prev: {
+              craneLib = (craneLib'.overrideArgs {
                 pname = "flexbox-multibuild";
                 src = rustSrc;
-              }));
+              });
             in
             rec {
               workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
@@ -472,10 +490,10 @@ even more convenient use.
 The following
 ```nix
             let
-              craneLib = (craneLib'.overrideArgs (prev: {
+              craneLib = (craneLib'.overrideArgs {
                 pname = "flexbox-multibuild";
                 src = rustSrc;
-              }));
+              });
             in
 ```
 
@@ -686,14 +704,17 @@ index a65ba7a..f4c64d7 100644
  
          rustSrc = flakeboxLib.filter.filterSubdirs {
 @@ -36,6 +41,10 @@
-               craneLib = (craneLib'.overrideArgs (prev: {
+               craneLib = (craneLib'.overrideArgs {
                  pname = "flexbox-multibuild";
                  src = rustSrc;
-+                buildInputs = prev.buildInputs or [ ] ++ [
++                buildInputs = [
 +                  pkgs.openssl
++                ];
++
++                nativeBuildInputs = [
 +                  pkgs.pkg-config
 +                ];
-               }));
+               });
              in
              rec {
 @@ -50,6 +59,10 @@
@@ -702,6 +723,8 @@ index a65ba7a..f4c64d7 100644
            default = flakeboxLib.mkDevShell {
 +            buildInputs = [
 +              pkgs.openssl
++            ];
++            nativeBuildInputs = [
 +              pkgs.pkg-config
 +            ];
              packages = [ ];
@@ -723,3 +746,63 @@ And try again:
    Compiling flakebox-tutorial v0.1.0 (/home/dpc/tmp/flakebox-tutorial)
     Finished dev [unoptimized + debuginfo] target(s) in 4.25s
 ```
+
+And as a Nix derivation:
+
+```
+> nix build -L .#dev.flakebox-tutorial
+flexbox-multibuild> shrinking RPATHs of ELF executables and libraries in /nix/store/yw7lfwmb664bns5xk3jg6196jj7zf3mw-flexbox-multibuild-0.1.0
+flexbox-multibuild> shrinking /nix/store/yw7lfwmb664bns5xk3jg6196jj7zf3mw-flexbox-multibuild-0.1.0/bin/flakebox-tutorial
+flexbox-multibuild> checking for references to /build/ in /nix/store/yw7lfwmb664bns5xk3jg6196jj7zf3mw-flexbox-multibuild-0.1.0...
+flexbox-multibuild> patching script interpreter paths in /nix/store/yw7lfwmb664bns5xk3jg6196jj7zf3mw-flexbox-multibuild-0.1.0
+flexbox-multibuild> stripping (with command strip and flags -S -p) in  /nix/store/yw7lfwmb664bns5xk3jg6196jj7zf3mw-flexbox-multibuild-0.1.0/bin
+```
+
+Does the Android build still works too?
+
+```
+> nix build -L .#aarch64-android.dev.flakebox-tutorial                        
+warning: Git tree '/home/dpc/tmp/flakebox-tutorial' is dirty                          
+flexbox-multibuild-deps> cargoArtifacts not set, will not reuse any cargo artifacts
+flexbox-multibuild-deps> unpacking sources  
+# ...
+flexbox-multibuild> ++ command cargo build --profile dev --message-format json-render-diagnostics --locked
+flexbox-multibuild>    Compiling flakebox-tutorial v0.1.0 (/build/source)
+flexbox-multibuild>     Finished dev [unoptimized + debuginfo] target(s) in 0.09s
+flexbox-multibuild> installing
+flexbox-multibuild> patching script interpreter paths in /nix/store/q6ci1lg2xbaqvczn1s2y6wiw845a5559-flexbox-multibuild-0.1.0
+flexbox-multibuild> stripping (with command strip and flags -S -p) in  /nix/store/q6ci1lg2xbaqvczn1s2y6wiw845a5559-flexbox-multibuild-0.1.0/bin
+> file result/bin/flakebox-tutorial
+result/bin/flakebox-tutorial: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, with debug_info, not stripped
+```
+
+Yes, it does!
+
+Commit:
+
+```
+> git ci -a -m "Add some some dependencies"
+```
+
+
+and let's try the "cross shell".
+
+## Cross-compilation dev shell
+
+Remember: **when working locally you should use dev shells to
+provide complete and reproducible development environment and
+NOT invoke `nix build` for everything.**
+
+While `nix build` and Nix derivations are great, they do introduce
+an overhead and can't reason about your project as well as
+`cargo` can.
+
+But as things are currently, we can only compile our project
+using native toolchain in dev shell, and we need to use `craneMultiBuild`
+and `nix build` to cross-compile.
+
+This is when so called "cross-shell" comes into play. The reason
+the cross-shell is not a default shell is that - unlike `nix build .#<target>...` which
+downloads toolchains on demand - it requires bringing in all the supported cross-compiling
+toolchains upfront. This can cost gigabytes of downloaded data and storage,
+while most developers for most projects will not need it.
