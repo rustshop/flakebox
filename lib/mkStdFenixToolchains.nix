@@ -42,7 +42,7 @@
         LD_aarch64-unknown-linux-gnu = "${clang}/bin/aarch64-unknown-linux-gnu-lld";
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = "${clang}/bin/aarch64-unknown-linux-gnu-clang";
 
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib -C link-arg=-fuse-ld=mold";
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib";
 
         buildInputs = [
           # pkgs.pkgsCross.aarch64-multiplatform.clangStdenv.cc
@@ -61,7 +61,7 @@
         AR_x86_64-unknown-linux-gnu = "${clang}/bin/clang";
         LD_x86_64-unknown-linux-gnu = "${clang}/bin/lld";
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${clang}/bin/clang";
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib -C link-arg=-fuse-ld=mold";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib";
 
         buildInputs = [
           # pkgs.pkgsCross.gnu64.gcc.cc.libgcc
