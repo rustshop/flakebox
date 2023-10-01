@@ -32,7 +32,7 @@ let
       (map (component: channel.${component}) allComponents)
       ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) allComponentTargets)
     ));
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs (prev: mergeArgs prev args');
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
   args' =
     if defaultCargoBuildTarget != null then
       allArgs // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }

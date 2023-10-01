@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, mergeArgs, ... }:
 let lib = pkgs.lib; in craneLib:
 craneLib.overrideScope' (self: prev: {
   cargoProfile = "release";
@@ -106,11 +106,12 @@ craneLib.overrideScope' (self: prev: {
       cargoExtraArgs = "${pkgsArgs}";
     });
 
-
-  overrideArgs = f: self.overrideScope' (self: prev: { args = prev.args // f prev.args; });
-  overrideArgs' = f: self.overrideScope' (self: prev: { args = prev.args // f self prev.args; });
-  overrideArgsDepsOnly = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
-  overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
+  overrideArgs = f: self.overrideScope' (self: prev: { args = mergeArgs prev.args f; });
+  overrideArgs' = f: self.overrideScope' (self: prev: { args = prev.args // f prev.args; });
+  overrideArgs'' = f: self.overrideScope' (self: prev: { args = prev.args // f self prev.args; });
+  overrideArgsDepsOnly = f: self.overrideScope' (self: prev: { argsDepsOnly = mergeArgs prev.argsDepsOnly f; });
+  overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
+  overrideArgsDepsOnly'' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
 })

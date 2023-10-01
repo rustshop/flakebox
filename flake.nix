@@ -87,9 +87,9 @@
         outputs =
           (flakeboxLib.craneMultiBuild { }) (craneLib':
             let
-              craneLib = (craneLib'.overrideArgs (prev: {
+              craneLib = (craneLib'.overrideArgs ({
                 pname = "flexbox";
-                nativeBuildInputs = prev.nativeBuildInputs or [ ] ++ [
+                nativeBuildInputs = [
                   pkgs.mold
                 ];
                 inherit src;

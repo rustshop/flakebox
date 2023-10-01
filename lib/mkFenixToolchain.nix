@@ -36,7 +36,7 @@ let
       args // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
     else
       args;
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs (prev: mergeArgs prev args');
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
 in
 {
   toolchain = toolchain';
