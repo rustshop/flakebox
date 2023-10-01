@@ -606,3 +606,48 @@ result/bin/flakebox-tutorial: ELF 64-bit LSB pie executable, ARM aarch64, versio
 Yes. This is our tutorial project cross-compiled to aarch64 android. Just like that.
 
 
+### Extra dependencies
+
+Compiling a "hello world" project might seem too easy, so pretend there
+are some nontrivial dependencies that need to be compiled as well:
+
+```
+> cargo add openssl
+# ...
+> cargo add libsqlite3-sys
+# ...
+```
+
+Both of these dependencies are rather non-trivial, as they use C bindings, etc.
+
+Try building them:
+
+```
+> cargo build
+  --- stderr
+  thread 'main' panicked at '
+
+  Could not find directory of OpenSSL installation, and this `-sys` crate cannot
+  proceed without this knowledge. If OpenSSL is installed and this crate had
+  trouble finding it,  you can set the `OPENSSL_DIR` environment variable for the
+  compilation process.
+
+  Make sure you also have the development packages of openssl installed.
+  For example, `libssl-dev` on Ubuntu or `openssl-devel` on Fedora.
+
+  If you're in a situation where you think the directory *should* be found
+  automatically, please open a bug at https://github.com/sfackler/rust-openssl
+  and include information about your system as well as this message.
+
+  $HOST = x86_64-unknown-linux-gnu
+  $TARGET = x86_64-unknown-linux-gnu
+  openssl-sys = 0.9.93
+
+  ', /home/dpc/.cargo/registry/src/index.crates.io-6f17d22bba15001f/openssl-sys-0.9.93/build/find_normal.rs:190:5
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...
+```
+
+Note that you don't have to use `nix build` all the time when working on your project.
+When working locally, it's more convenient to rely on the tooling that you
+are familiar with running in a dev shell.
