@@ -1,0 +1,9 @@
+[package]
+name = "flakebox-tutorial-bin"
+version = "0.1.0"
+edition = { workspace = true }
+
+
+[dependencies]
+libsqlite3-sys = "0.26.0"
+openssl = "0.10.57"
