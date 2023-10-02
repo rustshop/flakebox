@@ -13,16 +13,25 @@ craneLib.overrideScope' (self: prev: {
 
   argsDepsOnly = { };
 
-  mkCargoDerivation = args: prev.mkCargoDerivation (
-    { CARGO_PROFILE = self.cargoProfile; }
-    // (mergeArgs self.args args)
-  );
+  mkCargoDerivation = args:
+    let
+      mergedArgs = { CARGO_PROFILE = self.cargoProfile; }
+        // (mergeArgs self.args args);
+    in
+    prev.mkCargoDerivation mergedArgs;
 
   # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
-  buildDepsOnly = args: prev.buildDepsOnly (
-    { CARGO_PROFILE = self.cargoProfile; }
-    // mergeArgs (mergeArgs self.args self.argsDepsOnly) args
-  );
+  buildDepsOnly = args:
+    let
+      mergedArgs = {
+        CARGO_PROFILE = self.cargoProfile;
+      } // mergeArgs (mergeArgs self.args self.argsDepsOnly) args;
+    in
+    prev.buildDepsOnly (
+      # get rid of `warning: buildDepsOnly will ignore `src` when `dummySrc` is specified` warning,
+      # in particular when combining args and argsDepsOnly
+      lib.attrsets.removeAttrs mergedArgs (if mergedArgs ? dummySrc then [ "src" ] else [ ])
+    );
 
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (mergeArgs self.args args);
   mkDummySrc = args: prev.mkDummySrc (mergeArgs self.args args);
