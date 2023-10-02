@@ -57,17 +57,18 @@
         };
         flakeboxLib = mkLib pkgs {
           config = {
-            github.ci.buildOutputs = [
-              ".#ci.flakebox"
-              ".#aarch64-android.ci.flakebox"
-              ".#x86_64-android.ci.flakebox"
-              ".#arm-android.ci.flakebox"
-              ".#docs"
+            # we're going to do `check` from now on
+            # github.ci.buildOutputs = [
+            #   ".#ci.flakebox"
+            #   ".#aarch64-android.ci.flakebox"
+            #   ".#x86_64-android.ci.flakebox"
+            #   ".#arm-android.ci.flakebox"
+            #   ".#docs"
 
-              # too slow
-              # ".#aarch64-linux.ci.flakebox"
-              # ".#x86_64-linux.ci.flakebox"
-            ];
+            #   # too slow
+            #   # ".#aarch64-linux.ci.flakebox"
+            #   # ".#x86_64-linux.ci.flakebox"
+            # ];
           };
         };
 
@@ -103,8 +104,17 @@
               flakebox = craneLib.buildPackage { };
               flakeboxGroup = craneLib.buildPackageGroup { packages = [ "flakebox" ]; mainProgram = "flakebox"; };
             });
+
+
+        checks =
+          pkgs.callPackages ./checks {
+            inherit pkgs;
+            mkLib = mkLib;
+          };
       in
       {
+
+        inherit checks;
         lib = mkLib pkgs;
 
         packages = {
@@ -112,11 +122,6 @@
           root = flakeboxLib.root;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
-        };
-
-        checks = {
-          workspaceBuild = outputs.ci.workspaceBuild;
-          aarch64-linux-workspaceBuild = outputs.aarch64-linux.ci.workspaceBuild;
         };
 
         legacyPackages = outputs;
@@ -128,7 +133,6 @@
 
           cross = flakeboxLib.mkDevShell {
             packages = [ pkgs.mold pkgs.mdbook ];
-            # toolchain = flakeboxLib.mkFenixMultiToolchain { toolchains = { default = flakeboxLib.mkFenixToolchain { }; }; };
             toolchain = flakeboxLib.mkFenixMultiToolchain { };
           };
 

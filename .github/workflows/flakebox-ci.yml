@@ -11,15 +11,9 @@ jobs:
     - name: Magic Nix Cache
       uses: DeterminateSystems/magic-nix-cache-action@v2
     - name: Build
-      run: 'nix build .#ci.flakebox
+      run: 'nix flake check .#
 
-        nix build .#aarch64-android.ci.flakebox
-
-        nix build .#x86_64-android.ci.flakebox
-
-        nix build .#arm-android.ci.flakebox
-
-        nix build .#docs'
+        '
   flake:
     name: Flake self-check
     runs-on: ubuntu-latest
