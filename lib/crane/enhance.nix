@@ -73,7 +73,7 @@ craneLib.overrideScope' (self: prev: {
     let
       args = builtins.removeAttrs origArgs [ "cmd" "buildPhaseCargoCommand" ];
     in
-    ({
+    ({ doInstallCargoArtifacts = false; } // {
       pname = if builtins.hasAttr "pname" origArgs then "${origArgs.pname}-cmd" else if builtins.hasAttr "pname" self.args then "${self.args.pname}-cmd" else null;
       buildPhaseCargoCommand = origArgs.cmd;
       doCheck = false;
