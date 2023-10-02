@@ -69,7 +69,7 @@ craneLib.overrideScope' (self: prev: {
       } // args)
     );
 
-  runCommand = origArgs: self.mkCargoDerivation (
+  buildCommand = origArgs: self.mkCargoDerivation (
     let
       args = builtins.removeAttrs origArgs [ "cmd" "buildPhaseCargoCommand" ];
     in
