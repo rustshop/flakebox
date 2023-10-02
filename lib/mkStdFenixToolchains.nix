@@ -159,10 +159,8 @@
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
     args = ({
-
       CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_14.clang-unwrapped}/bin/clang-14";
       CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_14.libclang.lib}/lib/clang/14.0.6/include/";
-
     } // lib.optionalAttrs pkgs.stdenv.isDarwin {
       AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_14.llvm}/bin/llvm-ar";
     });
