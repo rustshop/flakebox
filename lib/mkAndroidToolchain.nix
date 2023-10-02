@@ -47,6 +47,8 @@ mkFenixToolchain {
     "LD_${target_underscores}" = "${androidSdkPrebuilt}/bin/ld";
     "LDFLAGS_${target_underscores}" = ld_flags;
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ld_flags}/bin/ld";
+    ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
+    ANDROID_HOME = "${androidSdk}/share/android-sdk/";
   };
 }
 
