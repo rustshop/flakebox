@@ -55,6 +55,7 @@
             })
           ];
         };
+        lib = pkgs.lib;
         flakeboxLib = mkLib pkgs {
           config = {
             # we're going to do `check` from now on
@@ -131,13 +132,10 @@
             packages = [ pkgs.mold pkgs.mdbook ];
           };
 
-          cross = flakeboxLib.mkDevShell {
-            packages = [ pkgs.mold pkgs.mdbook ];
-            toolchain = flakeboxLib.mkFenixMultiToolchain { };
-          };
+        } // (lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
 
-          crossFast = flakeboxLib.mkDevShell {
-            packages = [ pkgs.mold pkgs.mdbook ];
+          cross = flakeboxLib.mkDevShell {
+            packages = [ ];
             toolchain = flakeboxLib.mkFenixMultiToolchain {
               toolchains = pkgs.lib.getAttrs [
                 "aarch64-android"
@@ -148,6 +146,7 @@
                 (flakeboxLib.mkStdFenixToolchains { });
             };
           };
-        };
+        });
+
       });
 }

@@ -72,7 +72,25 @@ let
 
       build = {
         name = "Build";
-        runs-on = "ubuntu-latest";
+        strategy = {
+          matrix = {
+            host = [ "macos" "linux" ];
+            include = [
+              {
+                host = "linux";
+                runs-on = "ubuntu-latest";
+                timeout = 60;
+              }
+              {
+                host = "macos";
+                runs-on = "macos-12";
+                timeout = 60;
+              }
+            ];
+          };
+        };
+        runs-on = "\${{ matrix.runs-on }}";
+        timeout-minutes = "\${{ matrix.timeout }}";
         steps = [
           { uses = "actions/checkout@v4"; }
 
@@ -87,7 +105,7 @@ let
           }
 
           {
-            name = "Build";
+            name = "Build on \${{ matrix.host }}";
             run = buildCmd;
           }
         ];
