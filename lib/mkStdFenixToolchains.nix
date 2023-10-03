@@ -142,6 +142,7 @@
     arch = "arm";
     androidVer = 31;
     target = "armv7-linux-androideabi";
+    androidTarget = "arm-linux-androideabi";
   };
 
   x86_64-android = mkAndroidToolchain {
