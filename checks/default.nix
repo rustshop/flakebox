@@ -11,4 +11,5 @@ let
 in
 {
   workspaceSanity = callPackage ./workspace-sanity { };
+  workspaceCross = callPackage ./workspace-cross-compile { };
 }))
