@@ -161,6 +161,9 @@
   aarch64-ios = mkIOSToolchain {
     target = "aarch64-apple-ios";
   };
+  aarch64-ios-sim = mkIOSToolchain {
+    target = "aarch64-apple-ios-sim";
+  };
   x86_64-ios = mkIOSToolchain {
     target = "x86_64-apple-ios";
   };
