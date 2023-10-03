@@ -21,8 +21,15 @@ craneLib.overrideScope' (self: prev: {
     let
       mergedArgs = { CARGO_PROFILE = self.cargoProfile; }
         // (mergeArgs self.args args);
+
+      argsWithBuildTarget = mergedArgs // (lib.optionalAttrs (mergedArgs ? CARGO_BUILD_TARGET) {
+        pname = "${mergedArgs.pname}-${mergedArgs.CARGO_BUILD_TARGET}";
+      });
+      argsWithBuildProfile = argsWithBuildTarget // (lib.optionalAttrs (mergedArgs.CARGO_PROFILE or "release" != "release") {
+        pname = "${argsWithBuildTarget.pname}-${mergedArgs.CARGO_PROFILE}";
+      });
     in
-    prev.mkCargoDerivation mergedArgs;
+    prev.mkCargoDerivation argsWithBuildProfile;
 
   # functions that don't lower to `mkCargoDerivation` or lower too late it requires `args.src`
   buildDepsOnly = args:

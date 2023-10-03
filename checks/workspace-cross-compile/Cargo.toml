@@ -1,0 +1,14 @@
+[workspace]
+members = [
+  "lib",
+  "bin"
+]
+resolver = "2"
+
+[workspace.metadata]
+name = "flakebox-tutorial"
+version = "0.1.0"
+edition = "2021"
+
+[workspace.package]
+edition = "2021"
