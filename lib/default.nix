@@ -121,7 +121,11 @@ in
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
   mkIOSToolchain = callPackage ./mkIOSToolchain.nix { };
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
-  mapWithToolchains = callPackage ./mapWithToolchains.nix { };
+  mapWithToolchains' = f: toolchains: builtins.mapAttrs
+    (toolchainName: toolchain: f toolchainName (toolchain.craneLib.overrideArgs { inherit toolchainName; }))
+    toolchains;
+  mapWithToolchains = f: self.mapWithToolchains' (toochainName: craneLib: f craneLib);
+
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
   universalLlvmConfig = callPackage ./universalLlvmConfig.nix { };

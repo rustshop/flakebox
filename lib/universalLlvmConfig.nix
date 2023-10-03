@@ -10,6 +10,8 @@ pkgs.writeShellScriptBin "llvm-config" ''
   elif [ -n "''${CARGO_BUILD_TARGET:-}" ]; then
     env_name="LLVM_CONFIG_PATH_''${CARGO_BUILD_TARGET//-/_}"
     exec "''${!env_name}" "$@"
+  elif [ -n "''${LLVM_CONFIG_PATH_native:-}" ]; then
+    exec "''${LLVM_CONFIG_PATH_native}" "$@"
   else
     exec llvm-config "$@"
   fi

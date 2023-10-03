@@ -134,4 +134,10 @@ craneLib.overrideScope' (self: prev: {
   overrideArgsDepsOnly'' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
+  mapWithToolchains = f: toolchains: builtins.mapAttrs
+    (toolchainName: toolchain: f (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
+    toolchains;
+  mapWithToolchains' = f: toolchains: builtins.mapAttrs
+    (toolchainName: toolchain: f toolchainName (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
+    toolchains;
 })

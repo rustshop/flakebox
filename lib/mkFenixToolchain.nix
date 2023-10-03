@@ -2,6 +2,7 @@
 , config
 , system
 , pkgs
+, lib
 , crane
 , enhanceCrane
 , mergeArgs
@@ -32,10 +33,16 @@ let
         (map (component: channel.${component}) components)
         ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
-  argsUniversalLlvmConfig = {
-    LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
-  };
-  shellArgs = argsUniversalLlvmConfig // args;
+  # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
+  # figure out when someone complains
+  argsCommon =
+    {
+      LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
+
+      nativeBuildInputs = [ pkgs.clang pkgs.libclang.lib ];
+      LIBCLANG_PATH = "${pkgs.libclang.lib}/lib/";
+    };
+  shellArgs = argsCommon // args;
   buildArgs =
     if defaultCargoBuildTarget != null then
       shellArgs // {
@@ -43,6 +50,8 @@ let
       }
     else
       shellArgs;
+
+  # this can't be a method on `craneLib` because it basically constructs the `craneLib`
   craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs buildArgs;
 in
 {

@@ -42,7 +42,6 @@ let
             nativeBuildInputs = [
               pkgs.pkg-config
             ];
-
           }).overrideArgsDepsOnly {
             cargoVendorDir = craneLib'.vendorCargoDeps {
               inherit src;
@@ -89,4 +88,6 @@ pkgs.linkFarmFromDrvs "workspace-sanity" (lib.optionals (!pkgs.stdenv.isDarwin) 
   multiOutput.x86_64-android.dev.workspaceBuild
   multiOutput.i686-android.dev.workspaceBuild
   multiOutput.armv7-android.dev.workspaceBuild
+  multiOutput.nightly.dev.workspaceBuild
+  multiOutput.dev.workspaceBuild
 ])
