@@ -6,6 +6,7 @@
 , lib
 , android-nixpkgs
 , mkAndroidToolchain
+, mkIOSToolchain
 }:
 
 {
@@ -138,6 +139,13 @@
     target = "arm-linux-androideabi";
   };
 
+  armv7-android = mkAndroidToolchain {
+    arch = "arm";
+    androidVer = 31;
+    target = "armv7-linux-androideabi";
+    androidTarget = "arm-linux-androideabi";
+  };
+
   x86_64-android = mkAndroidToolchain {
     arch = "x86_64";
     androidVer = 31;
@@ -150,19 +158,22 @@
     target = "i686-linux-android";
   };
 
-  # export CC_aarch64_linux_android="`find ${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/ | grep bin/clang$`"
-  # export CXX_aarch64_linux_android="`find ${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/ | grep bin/clang++$`"
-  # export LD_aarch64_linux_android="`find ${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/ | grep bin/ld$`"
-  # export LDFLAGS_aarch64_linux_android="-L `find ${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/ -type d | grep sysroot/usr/lib/aarch64-linux-android/30$` -L `find ${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/ -type d | grep sysroot/usr/lib/aarch64-linux-android$` -L ${fake-libgcc-aarch64}/lib"
+  aarch64-ios = mkIOSToolchain {
+    target = "aarch64-apple-ios";
+  };
+  x86_64-ios = mkIOSToolchain {
+    target = "x86_64-apple-ios";
+  };
 
   wasm32-unknown = mkFenixToolchain {
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
     args = ({
-      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_14.clang-unwrapped}/bin/clang-14";
-      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_14.libclang.lib}/lib/clang/14.0.6/include/";
+      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+      # -Wno-macro-redefined fixes ring building
+      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
     } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_14.llvm}/bin/llvm-ar";
+      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
     });
   };
 
