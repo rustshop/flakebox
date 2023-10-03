@@ -124,6 +124,7 @@ in
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
+  universalLlvmConfig = callPackage ./universalLlvmConfig.nix { };
 
   mergeArgs = l: r: l // r // {
     buildInputs = l.buildInputs or [ ] ++ r.buildInputs or [ ];
