@@ -33,6 +33,8 @@ let
           craneLib = (craneLib'.overrideArgs {
             pname = "workspace-cross-compile";
             version = "0.0.1";
+            inherit src;
+
             buildInputs = [
               pkgs.openssl
             ];
@@ -40,8 +42,6 @@ let
             nativeBuildInputs = [
               pkgs.pkg-config
             ];
-
-            inherit src;
 
           }).overrideArgsDepsOnly {
             cargoVendorDir = craneLib'.vendorCargoDeps {

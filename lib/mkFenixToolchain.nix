@@ -5,6 +5,7 @@
 , crane
 , enhanceCrane
 , mergeArgs
+, universalLlvmConfig
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
 { toolchain ? null
@@ -31,17 +32,23 @@ let
         (map (component: channel.${component}) components)
         ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
-  args' =
+  argsUniversalLlvmConfig = {
+    LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
+  };
+  shellArgs = argsUniversalLlvmConfig // args;
+  buildArgs =
     if defaultCargoBuildTarget != null then
-      args // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
+      shellArgs // {
+        CARGO_BUILD_TARGET = defaultCargoBuildTarget;
+      }
     else
-      args;
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
+      shellArgs;
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs buildArgs;
 in
 {
   toolchain = toolchain';
   inherit components componentTargets;
-  args = args';
-  shellArgs = args;
+  args = buildArgs;
+  inherit shellArgs;
   craneLib = craneLib';
 }
