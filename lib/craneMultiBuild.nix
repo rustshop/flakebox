@@ -11,10 +11,7 @@ let craneLib' = craneLib; in
 let
   profilesFn = craneLib: craneLib.mapWithProfiles outputsFn profiles;
 in
-
-(outputsFn craneLib) //
-(profilesFn craneLib) //
-(mapWithToolchains
-  (toolchainName: craneLib: profilesFn craneLib)
-  toolchains)
+(mapWithToolchains outputsFn { default = toolchains.default; }).default //
+(mapWithToolchains profilesFn { default = toolchains.default; }).default //
+(mapWithToolchains profilesFn toolchains)
 
