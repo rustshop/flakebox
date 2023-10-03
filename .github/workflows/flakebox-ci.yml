@@ -3,17 +3,30 @@
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runs-on }}
     steps:
     - uses: actions/checkout@v4
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@v4
     - name: Magic Nix Cache
       uses: DeterminateSystems/magic-nix-cache-action@v2
-    - name: Build
+    - name: Build on ${{ matrix.host }}
       run: 'nix flake check .#
 
         '
+    strategy:
+      matrix:
+        host:
+        - macos
+        - linux
+        include:
+        - host: linux
+          runs-on: ubuntu-latest
+          timeout: 60
+        - host: macos
+          runs-on: macos-12
+          timeout: 60
+    timeout-minutes: ${{ matrix.timeout }}
   flake:
     name: Flake self-check
     runs-on: ubuntu-latest
