@@ -6,6 +6,7 @@
 , lib
 , android-nixpkgs
 , mkAndroidToolchain
+, mkIOSToolchain
 }:
 
 {
@@ -155,6 +156,13 @@
     arch = "i386";
     androidVer = 31;
     target = "i686-linux-android";
+  };
+
+  aarch64-ios = mkIOSToolchain {
+    target = "aarch64-apple-ios";
+  };
+  x86_64-ios = mkIOSToolchain {
+    target = "x86_64-apple-ios";
   };
 
   wasm32-unknown = mkFenixToolchain {

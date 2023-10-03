@@ -119,6 +119,7 @@ in
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
+  mkIOSToolchain = callPackage ./mkIOSToolchain.nix { };
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains = callPackage ./mapWithToolchains.nix { };
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
