@@ -514,12 +514,18 @@ dependencies = [
  "libsqlite3-sys",
  "openssl",
  "ring",
- "rocksdb",
 ]
 
 [[package]]
 name = "workspace-lib"
 version = "0.1.0"
+
+[[package]]
+name = "workspace-lib-rocksdb"
+version = "0.1.0"
+dependencies = [
+ "rocksdb",
+]
 
 [[package]]
 name = "zstd-sys"

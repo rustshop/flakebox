@@ -8,4 +8,3 @@ edition = { workspace = true }
 libsqlite3-sys = "0.26.0"
 openssl = "0.10.57"
 ring = "0.17.0"
-rocksdb = "0.21.0"

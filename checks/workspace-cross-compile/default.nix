@@ -14,6 +14,7 @@ let
     ".cargo"
     "bin"
     "lib"
+    "rocksdb"
   ];
 
   # paths needed to run some integration/e2e tests
@@ -64,9 +65,12 @@ let
           workspaceBuild = craneLib.buildWorkspace {
             cargoArtifacts = workspaceDeps;
           };
-          bin = craneLib.buildPackage { };
           lib = craneLib.buildPackageGroup {
             packages = [ "workspace-lib" ];
+          };
+          # compiling this stuff is so slow, we do it separately
+          lib-rocksdb = craneLib.buildPackageGroup {
+            packages = [ "workspace-lib-rocksdb" ];
           };
 
           workspace-sanity-test = craneLib.buildCommand {
@@ -84,10 +88,12 @@ let
         });
 in
 pkgs.linkFarmFromDrvs "workspace-sanity" (lib.optionals (!pkgs.stdenv.isDarwin) [
+  # rocksdb only on aarch64, most probably work on other ones
   multiOutput.aarch64-android.dev.workspaceBuild
-  multiOutput.x86_64-android.dev.workspaceBuild
-  multiOutput.i686-android.dev.workspaceBuild
-  multiOutput.armv7-android.dev.workspaceBuild
-  multiOutput.nightly.dev.workspaceBuild
+  multiOutput.x86_64-android.dev.lib
+  multiOutput.i686-android.dev.lib
+  multiOutput.armv7-android.dev.lib
+  multiOutput.nightly.dev.lib
+  # test everything natively as well
   multiOutput.dev.workspaceBuild
 ])
