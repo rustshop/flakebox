@@ -10,9 +10,9 @@
 }:
 
 {
-  # this needs to be a function just to avoid some extra stuff in the result
-  # though in the future, we could use it to parametrize what's being returned
-}:
+  # androidSdk ? null
+  ...
+}@args:
 {
   default = mkFenixToolchain {
     toolchain = config.toolchain.default;
@@ -127,36 +127,36 @@
     });
   };
 
-  aarch64-android = mkAndroidToolchain {
+  aarch64-android = mkAndroidToolchain ({
     arch = "aarch64";
     androidVer = 31;
     target = "aarch64-linux-android";
-  };
+  } // lib.getAttrs [ "androidSdk" ] args);
 
-  arm-android = mkAndroidToolchain {
+  arm-android = mkAndroidToolchain ({
     arch = "arm";
     androidVer = 31;
     target = "arm-linux-androideabi";
-  };
+  } // lib.getAttrs [ "androidSdk" ] args);
 
-  armv7-android = mkAndroidToolchain {
+  armv7-android = mkAndroidToolchain ({
     arch = "arm";
     androidVer = 31;
     target = "armv7-linux-androideabi";
     androidTarget = "arm-linux-androideabi";
-  };
+  } // lib.getAttrs [ "androidSdk" ] args);
 
-  x86_64-android = mkAndroidToolchain {
+  x86_64-android = mkAndroidToolchain ({
     arch = "x86_64";
     androidVer = 31;
     target = "x86_64-linux-android";
-  };
+  } // lib.getAttrs [ "androidSdk" ] args);
 
-  i686-android = mkAndroidToolchain {
+  i686-android = mkAndroidToolchain ({
     arch = "i386";
     androidVer = 31;
     target = "i686-linux-android";
-  };
+  } // lib.getAttrs [ "androidSdk" ] args);
 
   aarch64-ios = mkIOSToolchain {
     target = "aarch64-apple-ios";
