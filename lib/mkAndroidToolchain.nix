@@ -34,6 +34,8 @@ let
   androidSdkPrebuilt =
     if system == "x86_64-linux" then
       "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64"
+    else if system == "x86_64-darwin" then
+      "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64"
     else throw "Missing mapping for ${target} toolchain on ${system}, PRs welcome";
 
   ld_flags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
