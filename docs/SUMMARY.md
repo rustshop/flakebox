@@ -8,6 +8,12 @@
 
 - [Tutorial: Fresh Project](./building-new-project.md)
 
+# Cross-compilation
+
+* [Native toolchains](./native-toolchains.md)
+* [Android toolchains](./android-toolchains.md)
+* [iOS](./ios-toolchains.md)
+
 # API & configuration
 
 - [Config Options](./nixos-options.md)
