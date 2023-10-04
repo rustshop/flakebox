@@ -61,9 +61,83 @@ in
     in
     lib.mkIf config.just.enable {
       just.rules = {
-        core = {
+        default-alias = {
+          priority = 9;
+          content = ''
+            alias b := build
+            alias c := check
+            alias t := test
+          '';
+        };
+        default = {
           priority = 10;
-          content = ./just/justfile;
+          content = ''
+            [private]
+            default:
+              @just --list
+          '';
+        };
+        watch = {
+          priority = 100;
+          content = ''
+            # run and restart on changes
+            watch:
+              env RUST_LOG=''${RUST_LOG:-debug} cargo watch -x run
+          '';
+        };
+        build = {
+          priority = 100;
+          content = ''
+            # run `cargo build` on everything
+            build:
+              cargo build --workspace --all-targets
+          '';
+        };
+        check = {
+          priority = 100;
+          content = ''
+            # run `cargo check` on everything
+            check:
+              cargo check --workspace --all-targets
+          '';
+        };
+
+        test = {
+          priority = 100;
+          content = ''
+            # run tests
+            test: build
+              cargo test
+          '';
+        };
+
+        lint = {
+          priority = 100;
+          content = ''
+            # run lints (git pre-commit hook)
+            lint:
+              env NO_STASH=true $(git rev-parse --git-common-dir)/hooks/pre-commit
+          '';
+        };
+
+        final-check = {
+          priority = 100;
+          content = ''
+            # run all checks recommended before opening a PR
+            final-check: lint ${if config.just.rules ? clippy && config.just.rules.clippy.enable then "clippy" else "" }
+              cargo test --doc
+              just test
+          '';
+        };
+
+        format = {
+          priority = 100;
+          content = ''
+            # run code formatters
+            format:
+              cargo fmt --all
+              nixpkgs-fmt $(echo **.nix)
+          '';
         };
       };
 

@@ -3,39 +3,47 @@ alias b := build
 alias c := check
 alias t := test
 
+
 [private]
 default:
   @just --list
 
-# run and restart on changes
-watch:
-  env RUST_LOG=${RUST_LOG:-debug} cargo watch -x run
-  
+
 # run `cargo build` on everything
 build:
   cargo build --workspace --all-targets
+
 
 # run `cargo check` on everything
 check:
   cargo check --workspace --all-targets
 
-# run tests
-test: build
-  cargo test
-
-# run lints (git pre-commit hook)
-lint:
-  env NO_STASH=true $(git rev-parse --git-common-dir)/hooks/pre-commit
 
 # run all checks recommended before opening a PR
-final-check: lint
+final-check: lint clippy
   cargo test --doc
   just test
+
 
 # run code formatters
 format:
   cargo fmt --all
   nixpkgs-fmt $(echo **.nix)
+
+
+# run lints (git pre-commit hook)
+lint:
+  env NO_STASH=true $(git rev-parse --git-common-dir)/hooks/pre-commit
+
+
+# run tests
+test: build
+  cargo test
+
+
+# run and restart on changes
+watch:
+  env RUST_LOG=${RUST_LOG:-debug} cargo watch -x run
 
 
 # run `cargo clippy` on everything
@@ -66,7 +74,7 @@ typos *PARAMS:
 
 
   if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos {{PARAMS}} --stdin-paths; then
-    >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+    >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
     return 1
   fi
 
