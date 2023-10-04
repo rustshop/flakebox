@@ -139,7 +139,7 @@ function check_typos() {
     set -euo pipefail
 
     if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --stdin-paths ; then
-      >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+      >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
       return 1
     fi
 

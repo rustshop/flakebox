@@ -18,7 +18,7 @@
     git.pre-commit.hooks = {
       typos = ''
         if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --stdin-paths ; then
-          >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+          >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
           return 1
         fi
       '';
@@ -44,7 +44,7 @@
 
 
             if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos {{PARAMS}} --stdin-paths; then
-              >&2 echo "Typos found: Valid new words can be added to '_typos.toml'"
+              >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
               return 1
             fi
 
