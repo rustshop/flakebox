@@ -53,6 +53,11 @@ let
         inherit (pkgs) lld;
       });
 
+    buildInputs = lib.optionals pkgs.stdenv.isDarwin [
+      pkgs.libiconv
+      pkgs.darwin.apple_sdk.frameworks.Security
+    ];
+
     shellHook = ''
       # set the root dir
       export FLAKEBOX_ROOT_DIR_CANDIDATE=${root}
