@@ -74,19 +74,18 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 - [Technical Introduction](./docs/technical-details.md) 
 
-# Building Rust with Nix
+# Getting Started
 
-- [Tutorial: Fresh Project](./docs/building-new-project.md)
+- [Tutorial: Rustbox in a New Project](./docs/building-new-project.md)
 
-# Cross-compilation
 
-* [Native toolchains](./docs/native-toolchains.md)
-* [Android toolchains](./docs/android-toolchains.md)
-* [iOS](./docs/ios-toolchains.md)
+# Reference Manual
 
-# API & configuration
-
-- [Config Options](./docs/nixos-options.md)
+- [Crane and `craneLib`](./docs/crane.md)
+- [Native toolchains](./docs/native-toolchains.md)
+- [Android toolchains](./docs/android-toolchains.md)
+- [iOS toolchains](./docs/ios-toolchains.md)
+k [Config Options](./docs/nixos-options.md)
 
 # Stale, might need a rework
 

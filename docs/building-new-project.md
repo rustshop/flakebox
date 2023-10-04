@@ -1,4 +1,4 @@
-# Tutorial: Building Rust with Nix in a new project
+# Tutorial: Rustbox in a New Project
 
 In this tutorial we will:
 
