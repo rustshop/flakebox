@@ -2,7 +2,7 @@ alias b := build
 alias c := check
 alias t := test
 
-
+[private]
 default:
   @just --list
 
