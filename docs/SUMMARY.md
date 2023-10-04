@@ -4,13 +4,18 @@
 
 - [Technical Introduction](./technical-details.md) 
 
-# Building Rust with Nix
+# Getting Started
 
-- [Tutorial: Fresh Project](./building-new-project.md)
+- [Tutorial: Rustbox in a New Project](./building-new-project.md)
 
-# API & configuration
 
-- [Config Options](./nixos-options.md)
+# Reference Manual
+
+- [Crane and `craneLib`](./crane.md)
+- [Native toolchains](./native-toolchains.md)
+- [Android toolchains](./android-toolchains.md)
+- [iOS toolchains](./ios-toolchains.md)
+k [Config Options](./nixos-options.md)
 
 # Stale, might need a rework
 

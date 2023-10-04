@@ -1,0 +1,54 @@
+# Android Toolchains
+
+Android toolchains uses [`android-nixpkgs`](https://github.com/tadfisher/android-nixpkgs`) to
+source precompiled Android toolchains.
+
+Toolchain short-names:
+
+* aarch64-android 
+* arm-android 
+* armv7-android 
+* x86_64-android 
+* i686-android 
+
+
+It's possible to override the default components of the toolchain with:
+
+
+```nix
+let
+  androidSdk =
+    android-nixpkgs.sdk."${system}" (sdkPkgs: with sdkPkgs; [
+      cmdline-tools-latest
+      build-tools-30-0-3
+      build-tools-32-0-0
+      build-tools-33-0-0
+      platform-tools
+      platforms-android-31
+      platforms-android-33
+      emulator
+      ndk-bundle
+      ndk-23-1-7779620
+      cmake-3-22-1
+      patcher-v4
+      tools
+    ]);
+
+  toolchains = (pkgs.lib.getAttrs [
+    "default"
+    "aarch64-android"
+    "x86_64-android"
+    "arm-android"
+    "armv7-android"
+  ]
+    (flakeboxLib.mkStdFenixToolchains {
+      inherit androidSdk;
+    })
+  );
+
+  toolchain = flakeboxLib.mkFenixMultiToolchain {
+    inherit toolchains;
+  };
+in
+{}
+```
