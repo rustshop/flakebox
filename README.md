@@ -78,6 +78,12 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 - [Tutorial: Fresh Project](./docs/building-new-project.md)
 
+# Cross-compilation
+
+* [Native toolchains](./docs/native-toolchains.md)
+* [Android toolchains](./docs/android-toolchains.md)
+* [iOS](./docs/ios-toolchains.md)
+
 # API & configuration
 
 - [Config Options](./docs/nixos-options.md)
