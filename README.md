@@ -83,6 +83,7 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 - [Crane and `craneLib`](./docs/crane.md)
 - [`flakeboxLib` functions](./docs/flakeboxLib.md)
+- [Best practices](./docs/best-practices.md)
 - [Native toolchains](./docs/native-toolchains.md)
 - [Android toolchains](./docs/android-toolchains.md)
 - [iOS toolchains](./docs/ios-toolchains.md)
