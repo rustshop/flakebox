@@ -49,6 +49,8 @@ let
         inherit (pkgs) nixpkgs-fmt nil;
         # Rust tools
         inherit (pkgs) cargo-watch;
+        # TODO: make conditional on `config.just.enable`
+        inherit (pkgs) just;
         # Linkers
         inherit (pkgs) lld;
       });
