@@ -1,4 +1,4 @@
-{ pkgs, crane, fenix, android-nixpkgs }:
+{ pkgs, crane, fenix, android-nixpkgs, gitHash }:
 { modules ? [ ]
 , config ? { }
 ,
@@ -10,7 +10,7 @@ let
   evalModules = lib.evalModules {
     prefix = [ "config" ];
     specialArgs = {
-      inherit fenix crane pkgs;
+      inherit fenix crane pkgs gitHash;
     };
 
     modules = [
