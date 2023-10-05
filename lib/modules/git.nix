@@ -167,7 +167,7 @@ in
               --nonotice \
             ::: \
             ${hookNames}
-                # newline for the last \ to work
+              check_nothing
           '';
         };
 

@@ -24,3 +24,9 @@ export FLAKEBOX_GIT_LS
 FLAKEBOX_GIT_LS="$(git ls-files)"
 export FLAKEBOX_GIT_LS_TEXT
 FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "^db/|\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico)\$")"
+
+
+function check_nothing() {
+  true
+}
+export -f check_nothing
