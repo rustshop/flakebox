@@ -87,13 +87,18 @@ let
           };
         });
 in
-pkgs.linkFarmFromDrvs "workspace-sanity" (lib.optionals (!pkgs.stdenv.isDarwin) [
-  # rocksdb only on aarch64, most probably work on other ones
-  multiOutput.aarch64-android.dev.workspaceBuild
-  multiOutput.x86_64-android.dev.lib
-  multiOutput.i686-android.dev.lib
-  multiOutput.armv7-android.dev.lib
-  multiOutput.nightly.dev.lib
-  # test everything natively as well
-  multiOutput.dev.workspaceBuild
-])
+pkgs.linkFarmFromDrvs "workspace-sanity" (
+  (lib.optionals (!pkgs.stdenv.isDarwin) [
+    # rocksdb only on aarch64, most probably work on other ones
+    multiOutput.aarch64-android.dev.workspaceBuild
+    multiOutput.x86_64-android.dev.lib
+    multiOutput.i686-android.dev.lib
+    multiOutput.armv7-android.dev.lib
+    # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin
+  ]) ++ lib.optionals (pkgs.stdenv.isAarch64 || !pkgs.stdenv.isDarwin) [
+    # test everything natively as well
+    multiOutput.dev.workspaceBuild
+  ] ++ [
+    multiOutput.nightly.dev.lib
+  ]
+)
