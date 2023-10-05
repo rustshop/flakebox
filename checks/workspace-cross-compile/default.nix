@@ -8,7 +8,7 @@ let
   };
 
   # paths needed to build Rust code
-  buildDirs = [
+  buildPaths = [
     "Cargo.toml"
     "Cargo.lock"
     ".cargo"
@@ -18,7 +18,7 @@ let
   ];
 
   # paths needed to run some integration/e2e tests
-  testDirs = buildDirs ++ [
+  testPaths = buildPaths ++ [
     "scripts"
   ];
 
@@ -26,9 +26,9 @@ let
     (flakeboxLib.craneMultiBuild { })
       (craneLib':
         let
-          src = flakeboxLib.filter.filterSubdirs {
+          src = flakeboxLib.filterSubPaths {
             root = rootDir;
-            dirs = buildDirs;
+            paths = buildPaths;
           };
 
           craneLib = (craneLib'.overrideArgs {
@@ -80,9 +80,9 @@ let
               ./scripts/e2e-tests.sh
             '';
 
-            src = flakeboxLib.filter.filterSubdirs {
+            src = flakeboxLib.filterSubPaths {
               root = rootDir;
-              dirs = testDirs;
+              paths = testPaths;
             };
           };
         });
