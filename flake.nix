@@ -25,9 +25,12 @@
   outputs = { self, nixpkgs, flake-utils, crane, fenix, android-nixpkgs }:
 
     let
+      gitHash =
+        if (self ? rev) then self.rev else "dirty";
+
       mkLib = pkgs: import ./lib
         {
-          inherit pkgs crane fenix android-nixpkgs;
+          inherit pkgs crane fenix android-nixpkgs gitHash;
         };
     in
     { } //

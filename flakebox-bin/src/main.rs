@@ -1,10 +1,9 @@
 mod opts;
 
 use std::fs::{set_permissions, Permissions};
-use std::os::unix;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
-use std::{env, fs, io};
+use std::{fs, io};
 
 use clap::Parser;
 use duct::cmd;
@@ -18,8 +17,6 @@ use walkdir::WalkDir;
 enum AppError {
     #[error("application error")]
     General,
-    #[error("must be run in project directory")]
-    CwdOutside,
 }
 
 type AppResult<T> = error_stack::Result<T, AppError>;
@@ -53,28 +50,23 @@ fn main() -> AppResult<()> {
 }
 
 impl Opts {
-    fn root_dir_candidate(&self) -> &Path {
+    fn root_dir_candidate_path(&self) -> &Path {
         &self.root_dir_candidate
     }
 
-    fn project_root_dir(&self) -> &Path {
+    fn root_dir_candidate_id_path(&self) -> PathBuf {
+        self.root_dir_candidate.join("id")
+    }
+
+    fn project_root_dir_path(&self) -> &Path {
         &self.project_root_dir
     }
 
-    fn current_root_dir_path(&self) -> PathBuf {
+    fn current_root_dir_id_path(&self) -> PathBuf {
         self.project_root_dir
             .join(".config")
             .join("flakebox")
-            .join("current")
-    }
-    fn current_root_dir_path_cwd_rel(&self) -> AppResult<PathBuf> {
-        let current_dir = env::current_dir().expect("Failed to get current directory");
-
-        Ok(self
-            .current_root_dir_path()
-            .strip_prefix(&current_dir)
-            .change_context(AppError::CwdOutside)?
-            .to_owned())
+            .join("id")
     }
 }
 
@@ -82,8 +74,6 @@ impl Opts {
 enum InstallError {
     #[error("IO error: {0}")]
     PathIo(PathBuf),
-    #[error("Dir creation error: {0}")]
-    CreateDir(PathBuf),
     #[error("Copy file error: {src} -> {dst}")]
     CopyError { src: PathBuf, dst: PathBuf },
     #[error("Wrong usage")]
@@ -93,37 +83,16 @@ enum InstallError {
 type InstallResult<T> = error_stack::Result<T, InstallError>;
 
 fn install(opts: &Opts) -> InstallResult<()> {
-    if !opts.project_root_dir().join("Cargo.toml").exists() {
+    if !opts.project_root_dir_path().join("Cargo.toml").exists() {
         return Err(InstallError::Usage)
             .attach_printable("No Cargo.toml in project root directory");
     }
 
-    if !opts.project_root_dir().join("flake.nix").exists() {
+    if !opts.project_root_dir_path().join("flake.nix").exists() {
         return Err(InstallError::Usage).attach_printable("No flake.nix in project root directory");
     }
 
-    install_files(opts.root_dir_candidate(), opts.project_root_dir())?;
-
-    let current = opts.current_root_dir_path();
-    remove_symlink(&current)
-        .change_context_lazy(|| InstallError::PathIo(opts.current_root_dir_path()))?;
-    fs::create_dir_all(
-        current
-            .parent()
-            .ok_or_else(|| InstallError::CreateDir(current.to_owned()))?,
-    )
-    .change_context_lazy(|| InstallError::CreateDir(current.to_owned()))?;
-    unix::fs::symlink(opts.root_dir_candidate(), &current)
-        .change_context_lazy(|| InstallError::PathIo(current.to_owned()))?;
-
-    let _ = cmd!(
-        "git",
-        "add",
-        &opts
-            .current_root_dir_path_cwd_rel()
-            .change_context(InstallError::Usage)?
-    )
-    .run();
+    install_files(opts.root_dir_candidate_path(), opts.project_root_dir_path())?;
 
     Ok(())
 }
@@ -140,7 +109,7 @@ fn install_files(src: &Path, dst: &Path) -> InstallResult<()> {
             fs::create_dir_all(dst_path)
                 .change_context_lazy(|| InstallError::PathIo(relative_path.to_owned()))?;
         } else {
-            remove_symlink(&dst_path)
+            remove_file_or_symlink(&dst_path)
                 .change_context_lazy(|| InstallError::PathIo(dst_path.to_owned()))?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| InstallError::CopyError {
                 src: source_path.to_owned(),
@@ -168,7 +137,7 @@ fn chmod_non_writeable(relative_path: &Path) -> Result<(), error_stack::Report<I
     Ok(())
 }
 
-fn remove_symlink(path: &Path) -> io::Result<()> {
+fn remove_file_or_symlink(path: &Path) -> io::Result<()> {
     if path.symlink_metadata().is_ok() {
         fs::remove_file(path)?;
     }
@@ -177,16 +146,27 @@ fn remove_symlink(path: &Path) -> io::Result<()> {
 }
 
 fn init(opts: &Opts) -> AppResult<()> {
-    let project_fakebox_share_dir = opts.current_root_dir_path();
-    if !project_fakebox_share_dir.exists() {
+    let current_id_path = opts.current_root_dir_id_path();
+    if !current_id_path.exists() {
         eprintln!("⚠️  Flakebox files not installed. Call `flakebox install`.");
         return Ok(());
     }
 
-    let current_share_dir =
-        fs::read_link(project_fakebox_share_dir).change_context_lazy(|| AppError::General)?;
+    let id = fs::read_to_string(&current_id_path)
+        .change_context_lazy(|| AppError::General)
+        .attach_printable_lazy(|| {
+            format!(
+                "data dir id {} file not readable",
+                current_id_path.display()
+            )
+        })?;
 
-    if current_share_dir != opts.root_dir_candidate() {
+    let root_dir_candidate_id = opts.root_dir_candidate_id_path();
+    let candidate_id = fs::read_to_string(root_dir_candidate_id)
+        .change_context_lazy(|| AppError::General)
+        .attach_printable("data dir id file not readable")?;
+
+    if id != candidate_id {
         eprintln!("ℹ️  Flakebox files not up to date. Call `flakebox install`.");
         return Ok(());
     }

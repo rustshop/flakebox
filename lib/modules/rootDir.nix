@@ -1,5 +1,5 @@
 # heavily "inspired" (aka copy&paste&modify) by https://github.com/NixOS/nixpkgs/blob/449ff3b02f9d4aa15c9224af049d6ac170552554/nixos/modules/system/etc/etc.nix
-{ lib, pkgs, config, ... }:
+{ lib, pkgs, config, gitHash, ... }:
 let
   inherit (lib) types mkOption;
 
@@ -129,5 +129,10 @@ in
 
   config = {
     rootDirPackage = rootDir;
+
+
+    rootDir."id" = {
+      text = gitHash + "\n";
+    };
   };
 }
