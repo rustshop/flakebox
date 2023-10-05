@@ -1,4 +1,4 @@
-{ pkgs, crane, fenix, android-nixpkgs, gitHash }:
+{ pkgs, crane, fenix, android-nixpkgs }:
 { modules ? [ ]
 , config ? { }
 ,
@@ -10,7 +10,7 @@ let
   evalModules = lib.evalModules {
     prefix = [ "config" ];
     specialArgs = {
-      inherit fenix crane pkgs gitHash;
+      inherit fenix crane pkgs;
     };
 
     modules = [
@@ -102,7 +102,14 @@ in
       '';
     };
 
-  root = self.config.rootDirPackage;
+  root = let origRootdir = self.config.rootDirPackage; in
+    pkgs.runCommand "flakebox-root-id-gen" { } ''
+      cp -aL "${origRootdir}" $out
+      chmod u+w $out/.config/flakebox
+
+      ${pkgs.rblake2sum}/bin/rblake2sum $out | cut -d ' ' -f 1 > id
+      mv id $out/.config/flakebox/
+    '';
 
   craneLib = self.enhanceCrane self.config.craneLib.default;
   craneLibNightly = self.enhanceCrane self.config.craneLib.nightly;

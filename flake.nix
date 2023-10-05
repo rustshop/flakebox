@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    # nixpkgs.url = "github:nixos/nixpkgs/?rev=8f40f2f90b9c9032d1b824442cfbbe0dbabd0dbd";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
     crane = {
@@ -22,25 +22,27 @@
     };
 
   };
-  outputs = { self, nixpkgs, flake-utils, crane, fenix, android-nixpkgs }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils, crane, fenix, android-nixpkgs }:
 
     let
-      gitHash =
-        if (self ? rev) then self.rev else "dirty";
-
       mkLib = pkgs: import ./lib
         {
-          inherit pkgs crane fenix android-nixpkgs gitHash;
+          inherit pkgs crane fenix android-nixpkgs;
         };
     in
     { } //
     flake-utils.lib.eachDefaultSystem (system:
       let
+        pkgs-unstable = import nixpkgs-unstable {
+          inherit system;
+        };
         pkgs = import nixpkgs {
           inherit system;
 
           overlays = [
             (final: prev: {
+              rblake2sum = pkgs-unstable.rblake2sum;
+
               # TODO: switch to mainstream after https://github.com/crate-ci/typos/pull/708 is released
               typos = prev.rustPlatform.buildRustPackage {
                 pname = "typos";
