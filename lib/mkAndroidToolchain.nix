@@ -36,6 +36,9 @@ let
       "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64"
     else if system == "x86_64-darwin" then
       "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64"
+    else if system == "aarch64-darwin" then
+    # uses the x86_64 binaries, as aarch64 are not available (yet?)
+      "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64"
     else throw "Missing mapping for ${target} toolchain on ${system}, PRs welcome";
 
   readFileNoNewline = file: builtins.replaceStrings [ "\n" ] [ "" ] (builtins.readFile file);
