@@ -240,7 +240,7 @@ Verify the files installed by `flakebox install`:
 On branch master
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
-	new file:   .config/fakeroot/current
+	new file:   .config/flakebox/current
 	new file:   .config/flakebox/shellHook.sh
 	new file:   .config/semgrep.yaml
 	new file:   .envrc
@@ -294,7 +294,7 @@ Skipping semgrep check: .config/semgrep.yaml empty
 tail: error reading 'standard input': Is a directory
 [master f387a84] Setup flakebox dev shell
  11 files changed, 390 insertions(+)
- create mode 120000 .config/fakeroot/current
+ create mode 120000 .config/flakebox/current
 # ... skipped for brevity
 ```
 

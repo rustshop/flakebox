@@ -64,7 +64,7 @@ impl Opts {
     fn current_root_dir_path(&self) -> PathBuf {
         self.project_root_dir
             .join(".config")
-            .join("fakeroot")
+            .join("flakebox")
             .join("current")
     }
     fn current_root_dir_path_cwd_rel(&self) -> AppResult<PathBuf> {
