@@ -10,7 +10,7 @@ rm -f "${dot_git}/hooks/pre-commit"
 ln -sf "$(pwd)/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"
 
 # set template
-/nix/store/nqdyqplahmhdgz8pzzd5nip17zf3ijzx-git-2.40.1/bin/git config commit.template misc/git-hooks/commit-template.txt
+git config commit.template misc/git-hooks/commit-template.txt
 
 if [ -n "${DIRENV_IN_ENVRC:-}" ]; then
   # and not set DIRENV_LOG_FORMAT

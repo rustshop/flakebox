@@ -13,6 +13,7 @@
 
 - [Crane and `craneLib`](./crane.md)
 - [`flakeboxLib` functions](./flakeboxLib.md)
+- [Best practices](./best-practices.md)
 - [Native toolchains](./native-toolchains.md)
 - [Android toolchains](./android-toolchains.md)
 - [iOS toolchains](./ios-toolchains.md)
