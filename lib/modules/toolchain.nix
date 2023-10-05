@@ -61,7 +61,7 @@ in
         description = lib.mdDoc ''
           Stable channel toolchain
 
-          Toolchain to use in situations that require stable toolchain. 
+          Toolchain to use in situations that require stable toolchain.
         '';
         default =
           fenix.packages.${system}.${config.toolchain.channel.stable}.withComponents config.toolchain.components;
