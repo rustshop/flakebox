@@ -15,7 +15,7 @@
 
 
   config = lib.mkIf config.typos.enable {
-    git.pre-commit.hooks = {
+    git.pre-commit.hooks = lib.mkIf config.typos.pre-commit.enable {
       typos = ''
         if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --stdin-paths ; then
           >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
