@@ -131,7 +131,7 @@ in
     rootDirPackage = rootDir;
 
 
-    rootDir."id" = {
+    rootDir.".config/flakebox/id" = {
       text = gitHash + "\n";
     };
   };

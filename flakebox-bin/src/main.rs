@@ -55,7 +55,10 @@ impl Opts {
     }
 
     fn root_dir_candidate_id_path(&self) -> PathBuf {
-        self.root_dir_candidate.join("id")
+        self.root_dir_candidate
+            .join(".config")
+            .join("flakebox")
+            .join("id")
     }
 
     fn project_root_dir_path(&self) -> &Path {
