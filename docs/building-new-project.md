@@ -1,4 +1,4 @@
-# Tutorial: Rustbox in a New Project
+# Tutorial: Flakebox in a New Project
 
 In this tutorial we will:
 

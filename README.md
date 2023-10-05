@@ -76,7 +76,7 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 # Getting Started
 
-- [Tutorial: Rustbox in a New Project](./docs/building-new-project.md)
+- [Tutorial: Flakebox in a New Project](./docs/building-new-project.md)
 
 
 # Reference Manual
@@ -85,7 +85,7 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 - [Native toolchains](./docs/native-toolchains.md)
 - [Android toolchains](./docs/android-toolchains.md)
 - [iOS toolchains](./docs/ios-toolchains.md)
-k [Config Options](./docs/nixos-options.md)
+- [Config Options](./docs/nixos-options.md)
 
 # Stale, might need a rework
 

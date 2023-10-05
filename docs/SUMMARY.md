@@ -6,7 +6,7 @@
 
 # Getting Started
 
-- [Tutorial: Rustbox in a New Project](./building-new-project.md)
+- [Tutorial: Flakebox in a New Project](./building-new-project.md)
 
 
 # Reference Manual
@@ -15,7 +15,7 @@
 - [Native toolchains](./native-toolchains.md)
 - [Android toolchains](./android-toolchains.md)
 - [iOS toolchains](./ios-toolchains.md)
-k [Config Options](./nixos-options.md)
+- [Config Options](./nixos-options.md)
 
 # Stale, might need a rework
 
