@@ -93,6 +93,15 @@ enum InstallError {
 type InstallResult<T> = error_stack::Result<T, InstallError>;
 
 fn install(opts: &Opts) -> InstallResult<()> {
+    if !opts.project_root_dir().join("Cargo.toml").exists() {
+        return Err(InstallError::Usage)
+            .attach_printable("No Cargo.toml in project root directory");
+    }
+
+    if !opts.project_root_dir().join("flake.nix").exists() {
+        return Err(InstallError::Usage).attach_printable("No flake.nix in project root directory");
+    }
+
     install_files(opts.root_dir_candidate(), opts.project_root_dir())?;
 
     let current = opts.current_root_dir_path();
