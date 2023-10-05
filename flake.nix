@@ -57,28 +57,15 @@
         };
         lib = pkgs.lib;
         flakeboxLib = mkLib pkgs {
-          config = {
-            # we're going to do `check` from now on
-            # github.ci.buildOutputs = [
-            #   ".#ci.flakebox"
-            #   ".#aarch64-android.ci.flakebox"
-            #   ".#x86_64-android.ci.flakebox"
-            #   ".#arm-android.ci.flakebox"
-            #   ".#docs"
-
-            #   # too slow
-            #   # ".#aarch64-linux.ci.flakebox"
-            #   # ".#x86_64-linux.ci.flakebox"
-            # ];
-          };
+          config = { };
         };
 
-        src = flakeboxLib.filter.filterSubdirs {
+        src = flakeboxLib.filterSubPaths {
           root = builtins.path {
             name = "flakebox";
             path = ./.;
           };
-          dirs = [
+          paths = [
             "Cargo.toml"
             "Cargo.lock"
             ".cargo"

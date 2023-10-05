@@ -20,17 +20,43 @@ let
           include;
     };
 
-  filterSubdirs =
-    { root, dirs, trace ? false }:
+  # Filter `root` path, retaining only paths matching/included in elements of `paths`
+  # while correctly handling deeply nested `paths`.
+  filterSubPaths =
+    { root, paths, trace ? false }:
     cleanSourceWithRel {
       inherit root trace;
       filter = (relPath: type:
-        builtins.any
-          (dir: lib.hasPrefix ("/" + dir) relPath)
-          dirs
+        let
+          # since `/` can't appear in path elements, we can use it as a terminator to avoid
+          # elements that are just prefix matching full element filter
+          relPathTerm = relPath + "/";
+
+          isPrefix =
+            builtins.any
+              (dir: lib.hasPrefix relPathTerm ("/" + dir + "/"))
+              paths;
+          isPrefixed =
+            builtins.any
+              (dir: lib.hasPrefix ("/" + dir + "/") relPathTerm)
+              paths;
+        in
+        if type == "directory" then
+          isPrefix || isPrefixed
+        else
+          isPrefixed
       );
     };
+
+  filterSubdirs =
+    { root, dirs, trace ? false }:
+    lib.warn "`flakeboxLib.filter.filterSubdirs` is now `flakeboxLib.filterSubPaths` and argument `dirs` was renamed to `paths`"
+      filterSubPaths
+      {
+        inherit root trace;
+        paths = dirs;
+      };
 in
 {
-  inherit cleanSourceWith cleanSourceWithRel filterSubdirs;
+  inherit cleanSourceWith cleanSourceWithRel filterSubdirs filterSubPaths;
 }

@@ -1,11 +1,11 @@
 { cranePrivateCommonArgs
-, filter
+, filterSubPaths
 , craneLib
 }:
 let
-  src = filter.filterSubdirs {
+  src = filterSubPaths {
     root = cranePrivateCommonArgs.src;
-    dirs = [
+    paths = [
       "Cargo.toml"
       "Cargo.lock"
       ".cargo"

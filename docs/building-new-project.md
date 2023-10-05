@@ -321,12 +321,12 @@ index f09763b..a65ba7a 100644
        let
          flakeboxLib = flakebox.lib.${system} { };
 +
-+        rustSrc = flakeboxLib.filter.filterSubdirs {
++        rustSrc = flakeboxLib.filterSubPaths {
 +          root = builtins.path {
 +            name = "flakebox-tutorial";
 +            path = ./.;
 +          };
-+          dirs = [
++          paths = [
 +            "Cargo.toml"
 +            "Cargo.lock"
 +            ".cargo"
@@ -417,12 +417,12 @@ the library output it exposes for the current `system`.
 The next binding is:
 
 ```nix
-        rustSrc = flakeboxLib.filter.filterSubdirs {
+        rustSrc = flakeboxLib.filterSubPaths {
           root = builtins.path {
             name = "flakebox-tutorial";
             path = ./.;
           };
-          dirs = [
+          paths = [
             "Cargo.toml"
             "Cargo.lock"
             ".cargo"
@@ -431,7 +431,7 @@ The next binding is:
         };
 ```
 
-This `filter.filterSubdirs` is a function exposed by
+This `filterSubPaths` is a function exposed by
 `flakeboxLib` and is used for easy source code filtering.
 This is useful to avoid having to rebuild our Rust project
 when only irrelevant files changed. It's not strictly
@@ -704,7 +704,7 @@ index a65ba7a..f4c64d7 100644
 +
          flakeboxLib = flakebox.lib.${system} { };
  
-         rustSrc = flakeboxLib.filter.filterSubdirs {
+         rustSrc = flakeboxLib.filterSubPaths {
 @@ -36,6 +41,10 @@
                craneLib = (craneLib'.overrideArgs {
                  pname = "flexbox-multibuild";

@@ -116,6 +116,8 @@ in
 
   filter = callPackage ./filter { };
 
+  filterSubPaths = self.filter.filterSubPaths;
+
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
