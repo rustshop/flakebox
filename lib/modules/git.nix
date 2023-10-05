@@ -195,7 +195,7 @@ in
       env.shellHooks = [
         ''
           # set template
-          ${pkgs.git}/bin/git config commit.template misc/git-hooks/commit-template.txt
+          git config commit.template misc/git-hooks/commit-template.txt
         ''
       ];
 

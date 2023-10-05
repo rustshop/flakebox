@@ -64,9 +64,6 @@ let
       export FLAKEBOX_PROJECT_ROOT_DIR="''${PWD}"
       export PATH=${root}/bin/:''${PATH}
 
-      # make sure we have git in the PATH
-      export PATH=${pkgs.git}/bin/:''${PATH}
-
       if [ -e "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh" ]; then
         source "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh"
       fi
