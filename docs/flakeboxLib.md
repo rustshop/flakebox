@@ -20,7 +20,7 @@ it manually.
 While Nix includes functions for that purposes, we've found the `filterSubPaths`
 an easy to use and maintain.
 
-```
+```nix
 let
   root = builtins.path {
     name = "flakebox";
@@ -41,7 +41,8 @@ in
 
 It's a good practice to concatenate list of paths when chaining
 post-build derivations.
-```
+
+```nix
 let
   root = builtins.path {
     name = "flakebox";
