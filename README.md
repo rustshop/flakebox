@@ -77,7 +77,7 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 # Getting Started
 
 - [Tutorial: Flakebox in a New Project](./docs/building-new-project.md)
-
+- [Setting up Flakebox](./docs/getting-started.md)
 
 # Reference Manual
 
@@ -88,9 +88,5 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 - [Android toolchains](./docs/android-toolchains.md)
 - [iOS toolchains](./docs/ios-toolchains.md)
 - [Config Options](./docs/nixos-options.md)
-
-# Stale, might need a rework
-
-- [Setting up Flakebox](./docs/getting-started.md)
 
 <!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->

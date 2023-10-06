@@ -2,8 +2,8 @@
 
 ## Install Nix with Flake support
 
-Flakebox leverages the power of Nix Flakes. Don't worry, you don't
-have to know Nix to use it. But you do need to install Nix with Flake
+Flakebox leverages the power of Nix Flakes. Don't worry, you should
+be able to use it even if you don't know Nix. But you do need to install Nix with Flake
 support, and all other developers working on your project will need
 Nix installed as well.
 
@@ -20,32 +20,17 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 
 ## Setup Flakebox
 
-#### Set up via bootstrap via script
+If you're starting in a project without `flake.nix`, see [Tutorial: Flakebox in a New Project](./building-new-project.md)
+instead.
 
-If you're not familiar with Nix, and you want an easy way get started,
-you can use a script that will set it up. Otherwise skip to the next
-section.
-
-After you install Nix, you can bootstrap Flakebox in any Rust project
-by running the following in its root directory:
-
-```sh
-nix run github:rustshop/flakebox#bootstrap
-```
-
-Then read the output and follow the instructions. There won't be many.
-
-#### Setup manually
-
-If you're an existing Nix Flake user and already have a `flake.nix` file
-in your project, you can integrate Flakebox manually:
+Following modifications to `flake.nix` are needed:
 
 ```nix
-  # 1. Add new input to the input section
   inputs = {
 
     # ...
 
+    # Add new input to the input section
     flakebox = {
       url = "github:rustshop/flakebox";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,23 +39,65 @@ in your project, you can integrate Flakebox manually:
     # ...
   }
 
-  # 2. Add the new input to the arguments of the output section
+  # Add the new input to the arguments of the output section
   outputs = { self, nixpkgs, flakebox, ... }:
 
       # ...
 
       let
-        # 3. Set up the flakebox lib for your system
+        # Set project name
+        projectName = "my-project";
+
+        # Set up the flakebox lib for your system
         flakeboxLib = flakebox.lib.${system} {
-          # customizations will go here in the future
+          # customizations go here
+          config = {
+            typos.pre-commit.enable = false;
+          };
         };
+
+        # Add list of Rust-source paths
+        buildPaths = [
+          "Cargo.toml"
+          "Cargo.lock"
+          ".cargo"
+          "src"
+        ];
+
+        # Filter Rust source code
+        buildSrc = flakeboxLib.filterSubPaths {
+          root = builtins.path {
+            name = projectName;
+            path = ./.;
+          };
+          paths = buildPaths;
+        };
+
+        # Add toolchain x profile build matrix
+        multiBuild =
+          (flakeboxLib.craneMultiBuild { }) (craneLib':
+            let
+              craneLib = (craneLib'.overrideArgs {
+                pname = projectName;
+                src = buildSrc;
+              });
+            in
+            {
+              package = craneLib.buildPackage { };
+            });
+
       in
       {
 
-      # ...
+        # Expose external output packages
+        packages.default = multiBuild.package;
+
+        # Expose internal (CI) packages
+        legacyPackages = multiBuild;
+
 
         devShells = {
-          # 4. Use `mkDevShell` wrapper instead of the usual `mkShell`
+          # Use `mkDevShell` wrapper instead of the usual `mkShell`
           default = flakeboxLib.mkDevShell {
             packages = [ ];
           };
@@ -82,4 +109,16 @@ in your project, you can integrate Flakebox manually:
       # ...
 
       }
+```
+
+Start the dev shell:
+
+```
+nix develop
+```
+
+Inside it install all the Flakebox-generated files:
+
+```
+flakebox install
 ```
