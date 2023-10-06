@@ -2,14 +2,15 @@
 
 jobs:
   flakehub-publish:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: '${{ (inputs.tag != null) && format(''refs/tags/{0}'', inputs.tag) ||
-          '''''' }}
-
-          '
+        ref: ${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || ''
+          }}
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@v4
     - name: Flakehub Push
