@@ -24,7 +24,7 @@
       '';
     };
 
-    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
+    env.shellPackages = [
       pkgs.typos
     ];
 
