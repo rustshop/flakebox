@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
+root="$(git rev-parse --show-toplevel)"
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi
+# fix old bug
+rm -f "${dot_git}/hooks/comit-msg"
 rm -f "${dot_git}/hooks/commit-msg"
-ln -sf "$(pwd)/misc/git-hooks/commit-msg" "${dot_git}/hooks/commit-msg"
+ln -sf "${root}/misc/git-hooks/commit-msg" "${root}/hooks/commit-msg"
 
+root="$(git rev-parse --show-toplevel)"
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi
+# fix old bug
+rm -f "${dot_git}/hooks/\*"
+rm -f "${dot_git}/hooks/pre-comit"
 rm -f "${dot_git}/hooks/pre-commit"
-ln -sf "$(pwd)/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"
+ln -sf "${root}/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"
 
 # set template
 git config commit.template misc/git-hooks/commit-template.txt
