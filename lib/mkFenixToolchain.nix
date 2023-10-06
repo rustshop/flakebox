@@ -39,8 +39,9 @@ let
     {
       LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
 
-      nativeBuildInputs = [ pkgs.clang pkgs.libclang.lib ];
-      LIBCLANG_PATH = "${pkgs.libclang.lib}/lib/";
+      # llvm (llvm11) is often too old to compile things, so we use llvm14
+      nativeBuildInputs = [ pkgs.llvmPackages_14.clang pkgs.llvmPackages_14.libclang.lib ];
+      LIBCLANG_PATH = "${pkgs.llvmPackages_14.libclang.lib}/lib/";
     };
   shellArgs = argsCommon // args;
   buildArgs =
