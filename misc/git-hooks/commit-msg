@@ -21,4 +21,3 @@ if ! convco check --from-stdin <<<"$MESSAGE" ; then
    >&2 echo "Use git recommit <args> to fix your commit"
   exit 1
 fi
-

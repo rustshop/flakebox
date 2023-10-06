@@ -164,4 +164,3 @@ parallel \
     check_trailing_whitespace \
     check_typos \
   check_nothing
-
