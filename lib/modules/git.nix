@@ -98,13 +98,23 @@ in
 
 
     (lib.mkIf config.git.commit-msg.enable {
-      rootDir."misc/git-hooks/commit-msg" = {
-        source = pkgs.writeShellScript "commit-msg"
-          (lib.removeSuffix "\n" (builtins.concatStringsSep "\n\n"
-            (lib.mapAttrsToList
-              (rawName: value: value)
-              config.git.commit-msg.hooks)));
-      };
+      rootDir."misc/git-hooks/commit-msg" =
+        let
+          content =
+            (lib.removeSuffix "\n" (builtins.concatStringsSep "\n\n"
+              (lib.mapAttrsToList
+                (rawName: value: value)
+                config.git.commit-msg.hooks)));
+        in
+        {
+          # Note: using `writeScript` instead of `writeShellScript` as we want the current-env `bash`
+          # not a hardcoded one, as we copy these files into the repo
+          source = pkgs.writeScript "commit-msg" ''
+            #!/usr/bin/env bash
+            ${content}
+          ''
+          ;
+        };
 
 
       env.shellHooks = [
@@ -163,7 +173,9 @@ in
             config.git.pre-commit.hooks);
         in
         {
-          source = pkgs.writeShellScript "pre-commit" (lib.removeSuffix "\n" ''
+          # Note: using `writeScript` instead of `writeShellScript` as we want the current-env `bash`
+          # not a hardcoded one, as we copy these files into the repo
+          source = pkgs.writeScript "pre-commit" ''
             ${builtins.readFile ./git/pre-commit.head.sh}
             ${hooksFns}
             parallel \
@@ -171,7 +183,7 @@ in
             ::: \
             ${hookNames}
               check_nothing
-          '');
+          '';
         };
 
 
