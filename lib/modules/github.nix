@@ -221,7 +221,7 @@ in
           buildCmd =
             if builtins.length config.github.ci.buildOutputs == 0 then
               ''
-                nix flake check .#
+                nix flake check -L .#
               '' else
               lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.buildOutputs)
           ;
