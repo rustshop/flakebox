@@ -13,11 +13,14 @@
 ## Rust dev experience we can share and love.
 
 Flakebox is to your Rust project, what NixOS is to your OS, and
-home-manager to your home directory.
+home-manager to your home directory. And more.
 
 Flakebox is based on experiences building and maintaining sophisticated
 and demanding Rust projects using Nix. It integrates wide range of
 ideas, tools and techniques into a powerful yet easy to use toolkit.
+
+Flakebox is more about Rust than Nix, and is focused on onboarding
+Rust developers that want to use Nix in their projects.
 
 Notable features include:
 
