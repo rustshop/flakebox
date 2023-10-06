@@ -134,16 +134,17 @@ let
     jobs = {
       flakehub-publish = {
         runs-on = "ubuntu-latest";
+        permissions = {
+          id-token = "write";
+          contents = "read";
+        };
         steps = [
           {
             uses = "actions/checkout@v4";
             "with" = {
-              ref = ''
-                ''${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '''' }}
-              '';
+              ref = "\${{ (inputs.tag != null) && format('refs/tags/{0}', inputs.tag) || '' }}";
             };
           }
-
 
           {
             name = "Install Nix";
@@ -154,7 +155,6 @@ let
             name = "Flakehub Push";
             uses = "DeterminateSystems/flakehub-push@main";
             "with" = {
-
               visibility = "public";
               name = "\${{ github.repository }}";
               tag = "\${{ inputs.tag }}";
@@ -162,9 +162,7 @@ let
           }
         ];
       };
-
     };
-
   };
 in
 {

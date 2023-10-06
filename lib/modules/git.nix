@@ -100,10 +100,10 @@ in
     (lib.mkIf config.git.commit-msg.enable {
       rootDir."misc/git-hooks/commit-msg" = {
         source = pkgs.writeShellScript "commit-msg"
-          (builtins.concatStringsSep "\n\n"
+          (lib.removeSuffix "\n" (builtins.concatStringsSep "\n\n"
             (lib.mapAttrsToList
               (rawName: value: value)
-              config.git.commit-msg.hooks));
+              config.git.commit-msg.hooks)));
       };
 
 
@@ -111,8 +111,8 @@ in
         ''
           dot_git="$(git rev-parse --git-common-dir)"
           if [[ ! -d "''${dot_git}/hooks" ]]; then mkdir -p "''${dot_git}/hooks"; fi
-          rm -f "''${dot_git}/hooks/comit-msg"
-          ln -sf "$(pwd)/misc/git-hooks/comit-msg" "''${dot_git}/hooks/comit-msg"
+          rm -f "''${dot_git}/hooks/commit-msg"
+          ln -sf "$(pwd)/misc/git-hooks/commit-msg" "''${dot_git}/hooks/commit-msg"
         ''
       ];
 
@@ -160,7 +160,7 @@ in
             config.git.pre-commit.hooks);
         in
         {
-          source = pkgs.writeShellScript "pre-commit" ''
+          source = pkgs.writeShellScript "pre-commit" (lib.removeSuffix "\n" ''
             ${builtins.readFile ./git/pre-commit.head.sh}
             ${hooksFns}
             parallel \
@@ -168,7 +168,7 @@ in
             ::: \
             ${hookNames}
               check_nothing
-          '';
+          '');
         };
 
 
@@ -185,11 +185,12 @@ in
 
     (lib.mkIf config.git.commit-template.enable {
       rootDir."misc/git-hooks/commit-template.txt" = {
-        source = pkgs.writeText "commit-template"
-          ''
+        source = pkgs.writeText "commit-template" (
+          lib.removeSuffix "\n" ''
             ${config.git.commit-template.head}
             ${config.git.commit-template.body}
-          '';
+          ''
+        );
       };
 
       env.shellHooks = [

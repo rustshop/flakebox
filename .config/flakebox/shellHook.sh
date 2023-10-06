@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi
-rm -f "${dot_git}/hooks/comit-msg"
-ln -sf "$(pwd)/misc/git-hooks/comit-msg" "${dot_git}/hooks/comit-msg"
+rm -f "${dot_git}/hooks/commit-msg"
+ln -sf "$(pwd)/misc/git-hooks/commit-msg" "${dot_git}/hooks/commit-msg"
 
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi

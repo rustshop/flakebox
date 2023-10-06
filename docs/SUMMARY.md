@@ -7,7 +7,7 @@
 # Getting Started
 
 - [Tutorial: Flakebox in a New Project](./building-new-project.md)
-
+- [Setting up Flakebox](./getting-started.md)
 
 # Reference Manual
 
@@ -18,7 +18,3 @@
 - [Android toolchains](./android-toolchains.md)
 - [iOS toolchains](./ios-toolchains.md)
 - [Config Options](./nixos-options.md)
-
-# Stale, might need a rework
-
-- [Setting up Flakebox](./getting-started.md)
