@@ -115,7 +115,7 @@ in
           # fix old bug
           rm -f "''${dot_git}/hooks/comit-msg"
           rm -f "''${dot_git}/hooks/commit-msg"
-          ln -sf "''${root}/misc/git-hooks/commit-msg" "''${root}/hooks/commit-msg"
+          ln -sf "''${root}/misc/git-hooks/commit-msg" "''${dot_git}/hooks/commit-msg"
         ''
       ];
 
