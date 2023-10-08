@@ -1,4 +1,4 @@
-{ pkgs, flakeboxLib }:
+{ pkgs, flakeboxLib, full }:
 let
   inherit (pkgs) lib;
 
@@ -65,6 +65,9 @@ let
           workspaceBuild = craneLib.buildWorkspace {
             cargoArtifacts = workspaceDeps;
           };
+          bin = craneLib.buildPackageGroup {
+            packages = [ "workspace-bin" ];
+          };
           lib = craneLib.buildPackageGroup {
             packages = [ "workspace-lib" ];
           };
@@ -91,14 +94,20 @@ pkgs.linkFarmFromDrvs "workspace-sanity" (
   (lib.optionals (!pkgs.stdenv.isDarwin) [
     # rocksdb only on aarch64, most probably work on other ones
     multiOutput.aarch64-android.dev.workspaceBuild
+    # openssl & others, try on android
     multiOutput.x86_64-android.dev.lib
     multiOutput.i686-android.dev.lib
     multiOutput.armv7-android.dev.lib
-    # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin
+    # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin,
+    # it might get fixed at some point (newer llvm or librocksdb-sys)
   ]) ++ lib.optionals (pkgs.stdenv.isAarch64 || !pkgs.stdenv.isDarwin) [
     # test everything natively as well
     multiOutput.dev.workspaceBuild
-  ] ++ [
-    multiOutput.nightly.dev.lib
+    multiOutput.nightly.dev.workspaceBuild
+  ] ++
+  lib.optionals full [
+    multiOutput.aarch64-linux.dev.workspaceBuild
+    multiOutput.x86_64-linux.dev.workspaceBuild
+    multiOutput.i686-linux.dev.workspaceBuild
   ]
 )

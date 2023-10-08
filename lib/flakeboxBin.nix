@@ -1,10 +1,13 @@
-{ cranePrivateCommonArgs
-, filterSubPaths
+{ filterSubPaths
 , craneLib
+, craneMultiBuild
 }:
 let
   src = filterSubPaths {
-    root = cranePrivateCommonArgs.src;
+    root = builtins.path {
+      name = "flakebox";
+      path = ../.;
+    };
     paths = [
       "Cargo.toml"
       "Cargo.lock"
@@ -12,17 +15,27 @@ let
       "flakebox-bin"
     ];
   };
-
-  craneArgs = (cranePrivateCommonArgs // {
-    inherit src;
-
-    pname = "flakebox";
-    cargoExtraArgs = "--locked -p flakebox";
-  });
-
-  deps =
-    craneLib.buildDepsOnly craneArgs;
 in
-craneLib.buildPackage (craneArgs // {
-  cargoArtifacts = deps;
-})
+(
+  (craneMultiBuild { }) (craneLib':
+    let
+      craneLib = (craneLib'.overrideArgs {
+        pname = "flexbox";
+
+        doCheck = false;
+
+        installCargoArtifactsMode = "use-zstd";
+
+        nativeBuildInputs = [ ];
+        inherit src;
+      });
+    in
+    rec {
+
+      deps =
+        craneLib.buildDepsOnly { };
+
+      bin = craneLib.buildPackage {
+        cargoArtifacts = deps;
+      };
+    })).bin

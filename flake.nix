@@ -96,6 +96,12 @@
               };
               flakebox = craneLib.buildPackage { };
               flakeboxGroup = craneLib.buildPackageGroup { packages = [ "flakebox" ]; mainProgram = "flakebox"; };
+              fullChecks =
+                (pkgs.callPackages ./checks {
+                  inherit pkgs;
+                  mkLib = mkLib;
+                  full = true;
+                }).workspaceCross;
             });
 
 
@@ -135,6 +141,25 @@
                 "x86_64-android"
                 "arm-android"
               ]
+                (flakeboxLib.mkStdFenixToolchains { });
+            };
+          };
+          crossFullLinux = flakeboxLib.mkDevShell {
+            packages = [ ];
+            toolchain = flakeboxLib.mkFenixMultiToolchain {
+              toolchains = pkgs.lib.getAttrs
+                ([
+                  "aarch64-android"
+                  "i686-android"
+                  "x86_64-android"
+                  "arm-android"
+                  "aarch64-linux"
+                  "i686-linux"
+                  "x86_64-linux"
+                ] ++ lib.optionals (pkgs.stdenv.isDarwin) [
+                  "aarch64-darwin"
+                  "x86_64-darwin"
+                ])
                 (flakeboxLib.mkStdFenixToolchains { });
             };
           };

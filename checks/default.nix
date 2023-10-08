@@ -1,4 +1,4 @@
-{ pkgs, mkLib }:
+{ pkgs, mkLib, full ? false }:
 let
   inherit (pkgs) lib;
 
@@ -11,5 +11,5 @@ let
 in
 {
   workspaceSanity = callPackage ./workspace-sanity { };
-  workspaceCross = callPackage ./workspace-cross-compile { };
+  workspaceCross = callPackage ./workspace-cross-compile { inherit full; };
 }))

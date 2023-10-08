@@ -7,6 +7,7 @@
 , enhanceCrane
 , mergeArgs
 , universalLlvmConfig
+, targetLlvmConfigWrapper
 }:
 let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
 { toolchain ? null
@@ -33,15 +34,25 @@ let
         (map (component: channel.${component}) components)
         ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
+
+  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] pkgs.stdenv.buildPlatform.config;
+
+  nativeLLvmConfigPkg = targetLlvmConfigWrapper {
+    clangPkg = pkgs.llvmPackages_14.clang;
+    # clangPkg = pkgs.llvmPackages_14.clang-unwrapped.lib;
+    libClangPkg = pkgs.llvmPackages_14.clang-unwrapped.lib;
+  };
+
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
   # figure out when someone complains
   argsCommon =
     {
       LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
+      LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
+      "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
 
       # llvm (llvm11) is often too old to compile things, so we use llvm14
-      nativeBuildInputs = [ pkgs.llvmPackages_14.clang pkgs.llvmPackages_14.libclang.lib ];
-      LIBCLANG_PATH = "${pkgs.llvmPackages_14.libclang.lib}/lib/";
+      # nativeBuildInputs = [ pkgs.llvmPackages_14.clang ];
     };
   shellArgs = argsCommon // args;
   buildArgs =

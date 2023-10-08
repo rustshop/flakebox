@@ -7,12 +7,81 @@
 , android-nixpkgs
 , mkAndroidToolchain
 , mkIOSToolchain
+, targetLlvmConfigWrapper
 }:
 
 {
   # androidSdk ? null
   ...
 }@args:
+
+let
+
+  mkGnuContainer =
+    { gnu
+    , target
+    , clang ? pkgs.llvmPackages_14.clang
+    , llvmConfigPkg ? clang
+    }:
+
+    let
+      target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
+      target_underscores_upper = lib.strings.toUpper target_underscores;
+    in
+    mkFenixToolchain {
+      componentTargets = [ target ];
+      defaultCargoBuildTarget = target;
+      args = (
+        let
+          gnu64 = pkgs.pkgsCross.gnu64;
+        in
+        {
+          # For bindgen, through universal-llvm-config
+          "LLVM_CONFIG_PATH_${target_underscores}" = "${llvmConfigPkg}/bin/llvm-config";
+
+          "CC_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-cc";
+          "CXX_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-c++";
+          "AR_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ar";
+          "LD_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ld";
+          "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${gnu64.stdenv.cc}/bin/${target}-cc";
+          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-Wl,--compress-debug-sections=zlib";
+        }
+      );
+    };
+
+  mkClangToolchain =
+    { target
+    , clang ? pkgs.llvmPackages_14.clang
+    , binPrefix ? ""
+    , buildInputs ? [ ]
+    , nativeBuildInputs ? [ ]
+    , llvmConfigPkg ? clang
+    , args ? { }
+    }:
+    let
+      target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
+      target_underscores_upper = lib.strings.toUpper target_underscores;
+    in
+    mkFenixToolchain {
+      componentTargets = [ target ];
+      defaultCargoBuildTarget = target;
+      args =
+        # if target == build, we don't need any args, the defaults should work
+        lib.optionalAttrs (pkgs.stdenv.buildPlatform.config != target) ({
+          # For bindgen, through universal-llvm-config
+          "LLVM_CONFIG_PATH_${target_underscores}" = "${llvmConfigPkg}/bin/llvm-config";
+
+          "CC_${target_underscores}" = "${clang}/bin/${binPrefix}clang";
+          "CXX_${target_underscores}" = "${clang}/bin/${binPrefix}clang++";
+          "AR_${target_underscores}" = "${clang}/bin/${binPrefix}ar";
+          "LD_${target_underscores}" = "${clang}/bin/${binPrefix}ld";
+          "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/${binPrefix}clang";
+          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib";
+
+          inherit buildInputs nativeBuildInputs;
+        } // args);
+    };
+in
 {
   default = mkFenixToolchain {
     toolchain = config.toolchain.default;
@@ -23,108 +92,102 @@
   nightly = mkFenixToolchain {
     toolchain = config.toolchain.nightly;
   };
-  aarch64-linux = mkFenixToolchain {
-    componentTargets = [ "aarch64-unknown-linux-gnu" ];
-    defaultCargoBuildTarget = "aarch64-unknown-linux-gnu";
-    args =
+  aarch64-linux = mkClangToolchain {
+    target = "aarch64-unknown-linux-gnu";
+    clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
+    binPrefix = "aarch64-unknown-linux-gnu-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      # seems like it would be better, but it seems to pull in incompatible glibc
+      # clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
+      clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
 
-      let
-        clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.clang;
-      in
-      {
-        # CC_aarch64-unknown-linux-gnu = "aarch64-unknown-linux-gnu-clang";
-        # CXX_aarch64-unknown-linux-gnu = "aarch64-unknown-linux-gnu-clang++";
-        # AR_aarch64-unknown-linux-gnu = "aarch64-unknown-linux-gnu-clang";
-        # LD_aarch64-unknown-linux-gnu = "aarch64-unknown-linux-gnu-lld";
-        # CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = "aarch64-unknown-linux-gnu-clang";
-        CC_aarch64-unknown-linux-gnu = "${clang}/bin/aarch64-unknown-linux-gnu-clang";
-        CXX_aarch64-unknown-linux-gnu = "${clang}/bin/aarch64-unknown-linux-gnu-clang++";
-        AR_aarch64-unknown-linux-gnu = "${clang}/bin/aarch64-unknown-linux-gnu-clang";
-        LD_aarch64-unknown-linux-gnu = "${clang}/bin/aarch64-unknown-linux-gnu-lld";
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = "${clang}/bin/aarch64-unknown-linux-gnu-clang";
-
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib";
-
-        buildInputs = [
-          # pkgs.pkgsCross.aarch64-multiplatform.clangStdenv.cc
-          # pkgs.pkgsCross.aarch64-multiplatform.gcc.cc.libgcc
-        ];
-      };
+    args = {
+      CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
   };
-  x86_64-linux = mkFenixToolchain {
-    componentTargets = [ "x86_64-unknown-linux-gnu" ];
-    defaultCargoBuildTarget = "x86_64-unknown-linux-gnu";
-    args = (
-      let clang = pkgs.clang;
-      in {
-        CC_x86_64-unknown-linux-gnu = "${clang}/bin/clang";
-        CXX_x86_64-unknown-linux-gnu = "${clang}/bin/clang++";
-        AR_x86_64-unknown-linux-gnu = "${clang}/bin/clang";
-        LD_x86_64-unknown-linux-gnu = "${clang}/bin/lld";
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${clang}/bin/clang";
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib";
+  x86_64-linux = mkClangToolchain {
+    target = "x86_64-unknown-linux-gnu";
+    clang = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang;
+    binPrefix = "x86_64-unknown-linux-gnu-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      # seems like it would be better, but it seems to pull in incompatible glibc
+      # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
+      clangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
 
-        buildInputs = [
-          # pkgs.pkgsCross.gnu64.gcc.cc.libgcc
-        ];
-      }
-    );
+    args = {
+      CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
   };
-  i686-linux = mkFenixToolchain {
-    componentTargets = [ "i686-unknown-linux-gnu" ];
-    defaultCargoBuildTarget = "i686-unknown-linux-gnu";
-    args = (
-      let
-        clang = pkgs.clang;
-        # gnu32 = pkgs.pkgsCross.gnu32.gcc.cc;
-      in
-      {
-        CC_i686-unknown-linux-gnu = "${clang}/bin/clang";
-        CXX_i686-unknown-linux-gnu = "${clang}/bin/clang++";
-        AR_i686-unknown-linux-gnu = "${clang}/bin/clang";
-        LD_i686-unknown-linux-gnu = "${clang}/bin/lld";
-        CARGO_TARGET_I686_UNKNOWN_LINUX_GNU_LINKER = "${clang}/bin/clang";
+  i686-linux = mkClangToolchain {
+    target = "i686-unknown-linux-gnu";
+    clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
+    binPrefix = "i686-unknown-linux-gnu-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      # seems like it would be better, but it seems to pull in incompatible glibc
+      # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
+      clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
 
-        # CC_i686-unknown-linux-gnu = "${gnu32}/bin/i686-unknown-linux-gnu-cc";
-        # CXX_i686-unknown-linux-gnu = "${gnu32}/bin/i686-unknown-linux-gnu-c++";
-        # AR_i686-unknown-linux-gnu = "${gnu32}/bin/i686-unknown-linux-gnu-ar";
-        # LD_i686-unknown-linux-gnu = "${gnu32}/bin/i686-unknown-linux-gnu-ld";
-        # CARGO_TARGET_I686_UNKNOWN_LINUX_GNU_LINKER = "${gnu32}/bin/i686-unknown-linux-gnu-ld";
-
-        CARGO_TARGET_I686_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-Wl,--compress-debug-sections=zlib";
-
-
-        buildInputs = [
-          # pkgs.pkgsCross.gnu32.gcc.cc.libgcc
-          # pkgs.gcc.cc.libgcc
-        ];
-      }
-    );
+    args = {
+      CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
   };
-  # NOTE: broken, need to figure out
-  # NOTE: probably only works on MacOS
-  # https://stackoverflow.com/questions/4391192/why-do-i-get-cc1plus-error-unrecognized-command-line-option-arch
-  aarch64-darwin = mkFenixToolchain {
-    componentTargets = [ "aarch64-apple-darwin" ];
-    defaultCargoBuildTarget = "aarch64-apple-darwin";
-    args = ({ } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER =
-        let
-          inherit (pkgs.pkgsCross.aarch64-multiplatform.stdenv) cc;
-        in
-        "${cc}/bin/${cc.targetPrefix}cc";
-    });
+  # aarch64-darwin = mkFenixToolchain {
+  #   componentTargets = [ "aarch64-apple-darwin" ];
+  #   defaultCargoBuildTarget = "aarch64-apple-darwin";
+  #   args = ({ } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+  #     CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER =
+  #       let
+  #         inherit (pkgs.pkgsCross.aarch64-multiplatform.stdenv) cc;
+  #       in
+  #       "${cc}/bin/${cc.targetPrefix}cc";
+  #   });
+  # };
+  aarch64-darwin = mkClangToolchain {
+    target = "aarch64-apple-darwin";
+    clang = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang;
+    binPrefix = "aarch64-apple-darwin-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
   };
-  x86_64-darwin = mkFenixToolchain {
-    componentTargets = [ "x86_64-apple-darwin" ];
-    defaultCargoBuildTarget = "x86_64-apple-darwin";
-    args = ({ } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      CARGO_TARGET_x86_64_APPLE_DARWIN_LINKER =
-        let
-          inherit (pkgs.pkgsCross.x86_64-darwin.stdenv) cc;
-        in
-        "${cc}/bin/${cc.targetPrefix}cc";
-    });
+  x86_64-darwin = mkClangToolchain {
+    target = "x86_64-apple-darwin";
+    clang = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang;
+    binPrefix = "x86_64-apple-darwin-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
   };
 
   aarch64-android = mkAndroidToolchain ({
