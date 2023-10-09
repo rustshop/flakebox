@@ -56,23 +56,6 @@ in
 
   config = finalConfig;
 
-  # common args for crane, used for building internal Rust binaries
-  # not meant to be modified as part of downstream customizations
-  cranePrivateCommonArgs = {
-    pname = "flakebox";
-
-    src = builtins.path {
-      name = "flakebox";
-      path = ../.;
-    };
-
-    doCheck = false;
-
-    nativeBuildInputs = [ pkgs.mold ];
-
-    installCargoArtifactsMode = "use-zstd";
-  };
-
   docs =
     pkgs.stdenv.mkDerivation {
       name = "docs";
@@ -138,6 +121,19 @@ in
   mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
   universalLlvmConfig = callPackage ./universalLlvmConfig.nix { };
+
+  # older bindgen (clang-sys) crate can be told to use /usr/bin/clang this way
+  targetLlvmConfigWrapper = { clangPkg, binClangPkg ? clangPkg, libClangPkg ? clangPkg }: pkgs.writeShellScriptBin "llvm-config" ''
+    if [ "$1" == "--bindir" ]; then
+      echo "${binClangPkg}/bin"
+      exit 0
+    fi
+    if [ "$1" == "--prefix" ]; then
+      echo "${libClangPkg}"
+      exit 0
+    fi
+    exec llvm-config "$@"
+  '';
 
   mergeArgs = l: r: l // r // {
     buildInputs = l.buildInputs or [ ] ++ r.buildInputs or [ ];
