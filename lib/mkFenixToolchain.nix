@@ -53,6 +53,9 @@ let
 
       # llvm (llvm11) is often too old to compile things, so we use llvm14
       # nativeBuildInputs = [ pkgs.llvmPackages_14.clang ];
+      # bindgen expect native clang available here, so it's OK to set it globally,
+      # should not break cross-compilation
+      LIBCLANG_PATH = "${pkgs.llvmPackages_14.libclang.lib}/lib/";
     };
   shellArgs = argsCommon // args;
   buildArgs =
