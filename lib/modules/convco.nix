@@ -15,7 +15,7 @@
 
 
   config = lib.mkIf config.convco.enable {
-    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
+    env.shellPackages = [
       pkgs.convco
     ];
     git.commit-msg.hooks = {

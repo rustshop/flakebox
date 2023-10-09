@@ -1,4 +1,4 @@
-# Native Toolchains
+# Native toolchains
 
 Flakebox features 3 toolchains corresponding to 3 `config.toolchain.channel.<name>` settings:
 

@@ -77,10 +77,12 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 - [Technical Introduction](./docs/technical-details.md) 
 
+
 # Getting Started
 
 - [Tutorial: Flakebox in a New Project](./docs/building-new-project.md)
 - [Setting up Flakebox](./docs/getting-started.md)
+
 
 # Reference Manual
 
@@ -88,6 +90,8 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 - [`flakeboxLib` functions](./docs/flakeboxLib.md)
 - [Best practices](./docs/best-practices.md)
 - [Native toolchains](./docs/native-toolchains.md)
+- [Linux toolchains](./docs/linux-toolchains.md)
+- [Darwin (MacOS) toolchains](./docs/darwin-toolchains.md)
 - [Android toolchains](./docs/android-toolchains.md)
 - [iOS toolchains](./docs/ios-toolchains.md)
 - [Config Options](./docs/nixos-options.md)
