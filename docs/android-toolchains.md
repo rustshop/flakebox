@@ -1,15 +1,15 @@
-# Android Toolchains
+# Android toolchains
 
 Android toolchains uses [`android-nixpkgs`](https://github.com/tadfisher/android-nixpkgs`) to
 source precompiled Android toolchains.
 
 Toolchain short-names:
 
-* aarch64-android 
-* arm-android 
-* armv7-android 
-* x86_64-android 
-* i686-android 
+* `aarch64-android` - `aarch64-linux-android` target
+* `arm-android` - `arm-linux-androideabi` target
+* `armv7-android` - `armv7-linux-androideabi` target
+* `x86_64-android` - `x86_64-linux-android` target
+* `i686-android` - `i686-linux-android` target
 
 
 It's possible to override the default components of the toolchain with:
