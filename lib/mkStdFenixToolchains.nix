@@ -50,7 +50,7 @@ let
         } // args);
     };
 in
-{
+({
   default = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.default;
   });
@@ -114,17 +114,19 @@ in
       BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
     };
   };
-  # aarch64-darwin = mkFenixToolchain {
-  #   componentTargets = [ "aarch64-apple-darwin" ];
-  #   defaultCargoBuildTarget = "aarch64-apple-darwin";
-  #   args = ({ } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-  #     CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER =
-  #       let
-  #         inherit (pkgs.pkgsCross.aarch64-multiplatform.stdenv) cc;
-  #       in
-  #       "${cc}/bin/${cc.targetPrefix}cc";
-  #   });
-  # };
+  wasm32-unknown = mkFenixToolchain {
+    componentTargets = [ "wasm32-unknown-unknown" ];
+    defaultCargoBuildTarget = "wasm32-unknown-unknown";
+    args = ({
+      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+      # -Wno-macro-redefined fixes ring building
+      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+    });
+  };
+
+} // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
   aarch64-darwin = mkClangToolchain {
     target = "aarch64-apple-darwin";
     clang = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang;
@@ -157,7 +159,17 @@ in
       BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
     };
   };
-
+} // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+  aarch64-ios = mkIOSToolchain {
+    target = "aarch64-apple-ios";
+  };
+  aarch64-ios-sim = mkIOSToolchain {
+    target = "aarch64-apple-ios-sim";
+  };
+  x86_64-ios = mkIOSToolchain {
+    target = "x86_64-apple-ios";
+  };
+} // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
   aarch64-android = mkAndroidToolchain ({
     arch = "aarch64";
     androidVer = 31;
@@ -188,28 +200,5 @@ in
     androidVer = 31;
     target = "i686-linux-android";
   } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
-
-  aarch64-ios = mkIOSToolchain {
-    target = "aarch64-apple-ios";
-  };
-  aarch64-ios-sim = mkIOSToolchain {
-    target = "aarch64-apple-ios-sim";
-  };
-  x86_64-ios = mkIOSToolchain {
-    target = "x86_64-apple-ios";
-  };
-
-  wasm32-unknown = mkFenixToolchain {
-    componentTargets = [ "wasm32-unknown-unknown" ];
-    defaultCargoBuildTarget = "wasm32-unknown-unknown";
-    args = ({
-      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
-      # -Wno-macro-redefined fixes ring building
-      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
-    });
-  };
-
-}
+})
 

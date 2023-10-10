@@ -90,29 +90,40 @@ let
           };
         });
 in
-pkgs.linkFarmFromDrvs "workspace-sanity" (
-  (lib.optionals (!pkgs.stdenv.isDarwin) [
+pkgs.linkFarmFromDrvs "workspace-non-rust" (
+
+  # if Android is supported, test at leasat one cross-compilation target to android
+  lib.optionals (multiOutput ? aarch64-android) [
     # rocksdb only on aarch64, most probably work on other ones
     multiOutput.aarch64-android.dev.workspaceBuild
+  ] ++
+  # on Linux test all android cross-compilation
+  lib.optionals (pkgs.system == "x86_64-linux") [
     # openssl & others, try on android
     multiOutput.x86_64-android.dev.lib
     multiOutput.i686-android.dev.lib
     multiOutput.armv7-android.dev.lib
     # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin,
     # it might get fixed at some point (newer llvm or librocksdb-sys)
-  ]) ++ lib.optionals (pkgs.stdenv.isAarch64 || !pkgs.stdenv.isDarwin) [
-    # test everything natively as well
-    multiOutput.dev.workspaceBuild
+
+    # double check nightly too
     multiOutput.nightly.dev.workspaceBuild
   ] ++
+  # test native build on every platform
+  [
+    multiOutput.dev.workspaceBuild
+  ] ++
+  # in full mode test cross-compilation to Linux targets
   lib.optionals full [
+    multiOutput.aarch64-linux.dev.workspaceBuild
+    multiOutput.x86_64-linux.dev.workspaceBuild
+    multiOutput.i686-linux.dev.workspaceBuild
+  ] ++
+    # in full mode, when supported, test all android targets
+  lib.optionals (full && multiOutput ? aarch64-android) [
     multiOutput.aarch64-android.dev.workspaceBuild
     multiOutput.x86_64-android.dev.workspaceBuild
     multiOutput.i686-android.dev.workspaceBuild
     multiOutput.armv7-android.dev.workspaceBuild
-
-    multiOutput.aarch64-linux.dev.workspaceBuild
-    multiOutput.x86_64-linux.dev.workspaceBuild
-    multiOutput.i686-linux.dev.workspaceBuild
   ]
 )
