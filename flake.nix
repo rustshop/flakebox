@@ -96,12 +96,6 @@
               };
               flakebox = craneLib.buildPackage { };
               flakeboxGroup = craneLib.buildPackageGroup { packages = [ "flakebox" ]; mainProgram = "flakebox"; };
-              fullChecks =
-                (pkgs.callPackages ./checks {
-                  inherit pkgs;
-                  mkLib = mkLib;
-                  full = true;
-                }).workspaceCross;
             });
 
 
@@ -121,6 +115,12 @@
           root = flakeboxLib.root;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
+          fullChecks =
+            (pkgs.callPackages ./checks {
+              inherit pkgs;
+              mkLib = mkLib;
+              full = true;
+            }).workspaceCross;
         };
 
         legacyPackages = outputs;
