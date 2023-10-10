@@ -106,6 +106,11 @@ pkgs.linkFarmFromDrvs "workspace-sanity" (
     multiOutput.nightly.dev.workspaceBuild
   ] ++
   lib.optionals full [
+    multiOutput.aarch64-android.dev.workspaceBuild
+    multiOutput.x86_64-android.dev.workspaceBuild
+    multiOutput.i686-android.dev.workspaceBuild
+    multiOutput.armv7-android.dev.workspaceBuild
+
     multiOutput.aarch64-linux.dev.workspaceBuild
     multiOutput.x86_64-linux.dev.workspaceBuild
     multiOutput.i686-linux.dev.workspaceBuild
