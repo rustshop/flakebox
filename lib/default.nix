@@ -1,4 +1,4 @@
-{ pkgs, crane, fenix, android-nixpkgs }:
+{ nixpkgs, pkgs, crane, fenix, android-nixpkgs }:
 { modules ? [ ]
 , config ? { }
 ,
@@ -109,7 +109,7 @@ in
   filterSubPaths = self.filter.filterSubPaths;
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
-  mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
+  mkFenixToolchain = callPackage ./mkFenixToolchain.nix { inherit nixpkgs; };
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
   mkIOSToolchain = callPackage ./mkIOSToolchain.nix { };
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };

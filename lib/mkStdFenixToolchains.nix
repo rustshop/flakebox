@@ -9,13 +9,20 @@
 , mkIOSToolchain
 , targetLlvmConfigWrapper
 }:
-
 {
   # androidSdk ? null
-  ...
+  clang ? pkgs.llvmPackages_14.clang
+, ...
 }@args:
-
 let
+  cleanedArgs = (
+    lib.optionalAttrs (clang ? useMold)
+      {
+        useMold = args.useMold;
+      } // {
+      inherit clang;
+    }
+  );
 
   mkGnuContainer =
     { gnu
@@ -51,7 +58,7 @@ let
 
   mkClangToolchain =
     { target
-    , clang ? pkgs.llvmPackages_14.clang
+    , clang ? args.clang
     , binPrefix ? ""
     , buildInputs ? [ ]
     , nativeBuildInputs ? [ ]
@@ -83,15 +90,15 @@ let
     };
 in
 {
-  default = mkFenixToolchain {
+  default = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.default;
-  };
-  stable = mkFenixToolchain {
+  });
+  stable = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.stable;
-  };
-  nightly = mkFenixToolchain {
+  });
+  nightly = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.nightly;
-  };
+  });
   aarch64-linux = mkClangToolchain {
     target = "aarch64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
