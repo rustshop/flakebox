@@ -8,8 +8,37 @@
 , mergeArgs
 , universalLlvmConfig
 , targetLlvmConfigWrapper
+, nixpkgs
 }:
-let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default}; in
+let
+  defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
+
+  # mold wrapper from https://discourse.nixos.org/t/using-mold-as-linker-prevents-libraries-from-being-found/18530/5
+  mold-wrapped =
+    let
+      bintools-wrapper = "${nixpkgs}/pkgs/build-support/bintools-wrapper";
+    in
+    pkgs.symlinkJoin {
+      name = "mold";
+      paths = [ pkgs.mold ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      suffixSalt = lib.replaceStrings [ "-" "." ] [ "_" "_" ] pkgs.targetPlatform.config;
+      postBuild = ''
+        for bin in ${pkgs.mold}/bin/*; do
+          rm $out/bin/"$(basename "$bin")"
+
+          export prog="$bin"
+          substituteAll "${bintools-wrapper}/ld-wrapper.sh" $out/bin/"$(basename "$bin")"
+          chmod +x $out/bin/"$(basename "$bin")"
+
+          mkdir -p $out/nix-support
+          substituteAll "${bintools-wrapper}/add-flags.sh" $out/nix-support/add-flags.sh
+          substituteAll "${bintools-wrapper}/add-hardening.sh" $out/nix-support/add-hardening.sh
+          substituteAll "${bintools-wrapper}/../wrapper-common/utils.bash" $out/nix-support/utils.bash
+        done
+      '';
+    };
+in
 { toolchain ? null
 , channel ? defaultChannel
 , components ? [
@@ -24,6 +53,11 @@ let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default
 , args ? { }
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
+
+, clang ? pkgs.llvmPackages_14.clang
+, libclang ? pkgs.llvmPackages_14.libclang.lib
+, clang-unwrapped ? pkgs.llvmPackages_14.clang-unwrapped
+, useMold ? pkgs.stdenv.isLinux
 }:
 let
   toolchain' =
@@ -36,11 +70,11 @@ let
       ));
 
   target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] pkgs.stdenv.buildPlatform.config;
+  target_underscores_upper = lib.strings.toUpper target_underscores;
 
   nativeLLvmConfigPkg = targetLlvmConfigWrapper {
-    clangPkg = pkgs.llvmPackages_14.clang;
-    # clangPkg = pkgs.llvmPackages_14.clang-unwrapped.lib;
-    libClangPkg = pkgs.llvmPackages_14.clang-unwrapped.lib;
+    clangPkg = clang;
+    libClangPkg = clang-unwrapped.lib;
   };
 
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
@@ -51,11 +85,24 @@ let
       LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
       "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
 
-      # llvm (llvm11) is often too old to compile things, so we use llvm14
-      # nativeBuildInputs = [ pkgs.llvmPackages_14.clang ];
       # bindgen expect native clang available here, so it's OK to set it globally,
       # should not break cross-compilation
-      LIBCLANG_PATH = "${pkgs.llvmPackages_14.libclang.lib}/lib/";
+      LIBCLANG_PATH = "${libclang.lib}/lib/";
+
+      # just use newer clang
+      "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
+      # native toolchain default settings
+      "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
+        # seems like Darwin can't handle mold or compress-debug-sections
+        if pkgs.stdenv.isLinux then
+          if useMold then
+            "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
+          else
+            "-C link-arg=-Wl,--compress-debug-sections=zlib"
+        else
+          "";
+
+      nativeBuildInputs = lib.optionals useMold [ mold-wrapped ];
     };
   shellArgs = argsCommon // args;
   buildArgs =

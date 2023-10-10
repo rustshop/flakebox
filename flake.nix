@@ -27,7 +27,7 @@
     let
       mkLib = pkgs: import ./lib
         {
-          inherit pkgs crane fenix android-nixpkgs;
+          inherit pkgs crane fenix android-nixpkgs nixpkgs;
         };
     in
     { } //
@@ -127,7 +127,7 @@
 
         devShells = {
           default = flakeboxLib.mkDevShell {
-            packages = [ pkgs.mold pkgs.mdbook ];
+            packages = [ pkgs.mdbook ];
           };
 
           cross = flakeboxLib.mkDevShell {

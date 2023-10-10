@@ -9,49 +9,17 @@
 , mkIOSToolchain
 , targetLlvmConfigWrapper
 }:
-
 {
   # androidSdk ? null
   ...
 }@args:
-
 let
-
-  mkGnuContainer =
-    { gnu
-    , target
-    , clang ? pkgs.llvmPackages_14.clang
-    , llvmConfigPkg ? clang
-    }:
-
-    let
-      target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
-      target_underscores_upper = lib.strings.toUpper target_underscores;
-    in
-    mkFenixToolchain {
-      componentTargets = [ target ];
-      defaultCargoBuildTarget = target;
-      args = (
-        let
-          gnu64 = pkgs.pkgsCross.gnu64;
-        in
-        {
-          # For bindgen, through universal-llvm-config
-          "LLVM_CONFIG_PATH_${target_underscores}" = "${llvmConfigPkg}/bin/llvm-config";
-
-          "CC_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-cc";
-          "CXX_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-c++";
-          "AR_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ar";
-          "LD_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ld";
-          "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${gnu64.stdenv.cc}/bin/${target}-cc";
-          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-Wl,--compress-debug-sections=zlib";
-        }
-      );
-    };
+  cleanedArgs =
+    removeAttrs args [ "androidSdk" ];
 
   mkClangToolchain =
     { target
-    , clang ? pkgs.llvmPackages_14.clang
+    , clang
     , binPrefix ? ""
     , buildInputs ? [ ]
     , nativeBuildInputs ? [ ]
@@ -83,15 +51,15 @@ let
     };
 in
 {
-  default = mkFenixToolchain {
+  default = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.default;
-  };
-  stable = mkFenixToolchain {
+  });
+  stable = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.stable;
-  };
-  nightly = mkFenixToolchain {
+  });
+  nightly = mkFenixToolchain (cleanedArgs // {
     toolchain = config.toolchain.nightly;
-  };
+  });
   aarch64-linux = mkClangToolchain {
     target = "aarch64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
