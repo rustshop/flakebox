@@ -11,54 +11,15 @@
 }:
 {
   # androidSdk ? null
-  clang ? pkgs.llvmPackages_14.clang
-, ...
+  ...
 }@args:
 let
-  cleanedArgs = (
-    lib.optionalAttrs (clang ? useMold)
-      {
-        useMold = args.useMold;
-      } // {
-      inherit clang;
-    }
-  );
-
-  mkGnuContainer =
-    { gnu
-    , target
-    , clang ? pkgs.llvmPackages_14.clang
-    , llvmConfigPkg ? clang
-    }:
-
-    let
-      target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
-      target_underscores_upper = lib.strings.toUpper target_underscores;
-    in
-    mkFenixToolchain {
-      componentTargets = [ target ];
-      defaultCargoBuildTarget = target;
-      args = (
-        let
-          gnu64 = pkgs.pkgsCross.gnu64;
-        in
-        {
-          # For bindgen, through universal-llvm-config
-          "LLVM_CONFIG_PATH_${target_underscores}" = "${llvmConfigPkg}/bin/llvm-config";
-
-          "CC_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-cc";
-          "CXX_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-c++";
-          "AR_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ar";
-          "LD_${target_underscores}" = "${gnu64.stdenv.cc}/bin/${target}-ld";
-          "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${gnu64.stdenv.cc}/bin/${target}-cc";
-          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-Wl,--compress-debug-sections=zlib";
-        }
-      );
-    };
+  cleanedArgs =
+    removeAttrs args [ "androidSdk" ];
 
   mkClangToolchain =
     { target
-    , clang ? args.clang
+    , clang
     , binPrefix ? ""
     , buildInputs ? [ ]
     , nativeBuildInputs ? [ ]
