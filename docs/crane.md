@@ -7,6 +7,11 @@ incremental list of layers, offering compact storage, high performance, and effi
 
 We recommend Flakebox users to familiarize with Crane.
 
+## Why Crane
+
+While there are many solutions for compiling Rust projects in Nix,
+based on our experiences using it, we believe that Crane has a simple and natural
+for Rust developers model of operation that is efficient, easy to understand and debug.
 
 ## Flakebox `craneLib` extensions
 
