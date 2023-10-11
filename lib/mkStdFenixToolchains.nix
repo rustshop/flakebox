@@ -101,8 +101,6 @@ in
     clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
     binPrefix = "i686-unknown-linux-gnu-";
     llvmConfigPkg = targetLlvmConfigWrapper {
-      # seems like it would be better, but it seems to pull in incompatible glibc
-      # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
       clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib;
     };

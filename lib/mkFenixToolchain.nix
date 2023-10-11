@@ -58,6 +58,7 @@ in
 , libclang ? pkgs.llvmPackages_14.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_14.clang-unwrapped
 , useMold ? pkgs.stdenv.isLinux
+, isLintShell ? false
 }:
 let
   toolchain' =
@@ -79,33 +80,32 @@ let
 
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
   # figure out when someone complains
-  argsCommon =
-    {
-      LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
-      LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
-      "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
+  argsCommon = lib.optionalAttrs (!isLintShell) {
+    LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
+    LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
+    "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
 
-      # bindgen expect native clang available here, so it's OK to set it globally,
-      # should not break cross-compilation
-      LIBCLANG_PATH = "${libclang.lib}/lib/";
-      CC = "${clang}/bin/clang";
-      CXX = "${clang}/bin/clang++";
+    # bindgen expect native clang available here, so it's OK to set it globally,
+    # should not break cross-compilation
+    LIBCLANG_PATH = "${libclang.lib}/lib/";
+    CC = "${clang}/bin/clang";
+    CXX = "${clang}/bin/clang++";
 
-      # just use newer clang
-      "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
-      # native toolchain default settings
-      "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-        # seems like Darwin can't handle mold or compress-debug-sections
-        if pkgs.stdenv.isLinux then
-          if useMold then
-            "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
-          else
-            "-C link-arg=-Wl,--compress-debug-sections=zlib"
+    # just use newer clang
+    "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
+    # native toolchain default settings
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
+      # seems like Darwin can't handle mold or compress-debug-sections
+      if pkgs.stdenv.isLinux then
+        if useMold then
+          "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
         else
-          "";
+          "-C link-arg=-Wl,--compress-debug-sections=zlib"
+      else
+        "";
 
-      nativeBuildInputs = lib.optionals useMold [ mold-wrapped ];
-    };
+    nativeBuildInputs = lib.optionals useMold [ mold-wrapped ];
+  };
   shellArgs = argsCommon // args;
   buildArgs =
     if defaultCargoBuildTarget != null then
