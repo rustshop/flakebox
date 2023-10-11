@@ -88,6 +88,8 @@ let
       # bindgen expect native clang available here, so it's OK to set it globally,
       # should not break cross-compilation
       LIBCLANG_PATH = "${libclang.lib}/lib/";
+      CC = "${clang}/bin/clang";
+      CXX = "${clang}/bin/clang++";
 
       # just use newer clang
       "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
