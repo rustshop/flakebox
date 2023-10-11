@@ -120,6 +120,8 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
     multiOutput.aarch64-linux.dev.workspaceBuild
     multiOutput.x86_64-linux.dev.workspaceBuild
     multiOutput.i686-linux.dev.workspaceBuild
+
+    multiOutput.x86_64-mingw.dev.workspaceBuild
   ] ++
     # in full mode, when supported, test all android targets
   lib.optionals (full && multiOutput ? aarch64-android) [

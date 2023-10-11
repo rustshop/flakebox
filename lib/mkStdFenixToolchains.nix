@@ -114,6 +114,22 @@ in
       BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
     };
   };
+  x86_64-mingw = mkClangToolchain {
+    target = "x86_64-pc-windows-gnu";
+    clang = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang;
+    binPrefix = "x86_64-pc-windows-gnu-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CPPFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CXXFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+    };
+  };
   wasm32-unknown = mkFenixToolchain {
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";

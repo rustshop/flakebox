@@ -155,6 +155,7 @@
                     "aarch64-linux"
                     "i686-linux"
                     "x86_64-linux"
+                    "x86_64-mingw"
                   ] ++ lib.optionals (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) [
                     "aarch64-darwin"
                   ] ++ lib.optionals (pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64) [
