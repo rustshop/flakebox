@@ -63,7 +63,7 @@ let
       git_root="$(git rev-parse --show-toplevel)"
       export FLAKEBOX_ROOT_DIR_CANDIDATE=${root}
       export FLAKEBOX_PROJECT_ROOT_DIR="''${git_root:-$PWD}"
-      export PATH=${root}/bin/:''${PATH}
+      export PATH="''${git_root}/.config/flakebox/bin/:''${PATH}"
 
       if [ -e "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh" ]; then
         source "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh"

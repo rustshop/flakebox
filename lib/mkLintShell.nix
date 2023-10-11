@@ -1,6 +1,5 @@
 { pkgs
 , config
-, root
 , docs
 , mkFenixToolchain
 , lib
@@ -39,9 +38,8 @@ let
     shellHook = ''
       # set the root dir
       git_root="$(git rev-parse --show-toplevel)"
-      export FLAKEBOX_ROOT_DIR_CANDIDATE=${root}
       export FLAKEBOX_PROJECT_ROOT_DIR="''${git_root:-$PWD}"
-      export PATH=${root}/bin/:''${PATH}
+      export PATH="''${git_root}/.config/flakebox/bin/:''${PATH}"
     '';
   };
 in
