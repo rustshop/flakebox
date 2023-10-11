@@ -80,7 +80,7 @@ let
 
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
   # figure out when someone complains
-  argsCommon = lib.optionalAttrs (!isLintShell) {
+  argsCommon = lib.optionalAttrs (!isLintShell) ({
     LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
     LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
     "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
@@ -88,24 +88,24 @@ let
     # bindgen expect native clang available here, so it's OK to set it globally,
     # should not break cross-compilation
     LIBCLANG_PATH = "${libclang.lib}/lib/";
+
     CC = "${clang}/bin/clang";
     CXX = "${clang}/bin/clang++";
-
+  }
+  # Note: do not touch MacOS's linker, stuff is brittle there
+  # Also seems like Darwin can't handle mold or compress-debug-sections
+  // lib.optionalAttrs (pkgs.stdenv.isLinux) {
     # just use newer clang
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
     # native toolchain default settings
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-      # seems like Darwin can't handle mold or compress-debug-sections
-      if pkgs.stdenv.isLinux then
-        if useMold then
-          "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
-        else
-          "-C link-arg=-Wl,--compress-debug-sections=zlib"
+      if useMold then
+        "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
       else
-        "";
+        "-C link-arg=-Wl,--compress-debug-sections=zlib";
 
     nativeBuildInputs = lib.optionals useMold [ mold-wrapped ];
-  };
+  });
   shellArgs = argsCommon // args;
   buildArgs =
     if defaultCargoBuildTarget != null then
