@@ -10,6 +10,12 @@ In this tutorial we will:
 * then compile and cross-compile again;
 * and set up a cross-compiling dev shell.
 
+## Please help
+
+It's a laborious task to keep a tutorial like that up to date in an immature project.
+If you notice any problems please report them. If you have any questions, please use
+community channels to ask for help. Thank you.
+
 ## Creating new project
 
 Create a new project:
@@ -140,10 +146,8 @@ index 25ce16f..f09763b 100644
 +        flakeboxLib = flakebox.lib.${system} { };
 +      in
 +      {
-+        devShells = {
-+          default = flakeboxLib.mkDevShell {
-+            packages = [ ];
-+          };
++        devShells = flakeboxLib.mkShells {
++          packages = [ ];
 +        };
 +      });
  }
@@ -176,10 +180,8 @@ Since that's a bit handful, let me paste the whole content:
         flakeboxLib = flakebox.lib.${system} { };
       in
       {
-        devShells = {
-          default = flakeboxLib.mkDevShell {
-            packages = [ ];
-          };
+        devShells = flakeboxLib.mkShells {
+          packages = [ ];
         };
       });
 }
@@ -352,9 +354,8 @@ index f09763b..a65ba7a 100644
        in
        {
 +        legacyPackages = outputs;
-         devShells = {
-           default = flakeboxLib.mkDevShell {
-             packages = [ ];
+         devShells = flakeboxLib.mkShells {
+           packages = [ ];
 ```
 
 Let's check if it works:
@@ -721,16 +722,14 @@ index a65ba7a..f4c64d7 100644
              rec {
 @@ -50,6 +59,10 @@
          legacyPackages = outputs;
-         devShells = {
-           default = flakeboxLib.mkDevShell {
-+            buildInputs = [
-+              pkgs.openssl
-+            ];
-+            nativeBuildInputs = [
-+              pkgs.pkg-config
-+            ];
-             packages = [ ];
-           };
+         devShells = flakeboxLib.mkShells {
++          buildInputs = [
++            pkgs.openssl
++          ];
++          nativeBuildInputs = [
++            pkgs.pkg-config
++          ];
+           packages = [ ];
          };
 > nix flake check
 # ...
@@ -809,56 +808,10 @@ downloads toolchains on demand - it requires bringing in all the supported cross
 toolchains upfront. This can cost gigabytes of downloaded data and storage,
 while most developers for most projects will not need it.
 
-Add the cross-compilation shell:
-
-```
-> hx flake.nix
-> git diff
-```
-
-```diff
-diff --git a/flake.nix b/flake.nix
-index a81e867..439fdb7 100644
---- a/flake.nix
-+++ b/flake.nix
-@@ -76,6 +76,25 @@
-             ];
-             packages = [ ];
-           };
-+
-+          cross = flakeboxLib.mkDevShell {
-+            toolchain = flakeboxLib.mkFenixMultiToolchain {
-+              toolchains = pkgs.lib.getAttrs [
-+                "aarch64-android"
-+                "i686-android"
-+                "x86_64-android"
-+                "arm-android"
-+              ]
-+                (flakeboxLib.mkStdFenixToolchains { });
-+            };
-+
-+            buildInputs = [
-+              pkgs.openssl
-+            ];
-+            nativeBuildInputs = [
-+              pkgs.pkg-config
-+            ];
-+          };
-         };
-       });
- }
- ```
+ The default cross shell enabled only the relatively lightweight toolchains like Android ones, which use pre-built binaries SDK toolchains of the Android project.
+At least you don't need to compile them from scratch.
  
- As you can see, we create another dev shell, this time passing a `toolchain =` argument to
- `flakeboxLib.mkDevShell` call. We set it to a result of `flakeboxLib.mkFenixMultiToolchain`
- which is used to compose multiple toolchains into one, and we use `pkgs.lib.getAttrs`
- to pick only 4 specific toolchain from the result of `flakeboxLib.mkStdFenixToolchains { }`
- which returns all the toolchains available in Flakebox.
- 
- The selected toolchains use pre-built binaries SDK toolchains of the Android project,
- so should be relatively lightweight. At least you don't need to compile them from scratch.
- 
- Enter the new shell:
+ Enter the 'cross' shell:
  
  ```
  > nix develop .#cross

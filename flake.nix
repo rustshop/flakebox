@@ -125,49 +125,9 @@
 
         legacyPackages = outputs;
 
-        devShells = {
-          lint = flakeboxLib.mkLintShell {
-            packages = [ ];
-          };
-
-          default = flakeboxLib.mkDevShell {
-            packages = [ pkgs.mdbook ];
-          };
-
-          cross = flakeboxLib.mkDevShell {
-            packages = [ ];
-            toolchain = flakeboxLib.mkFenixMultiToolchain {
-              toolchains = pkgs.lib.getAttrs [
-                "aarch64-android"
-                "i686-android"
-                "x86_64-android"
-                "arm-android"
-              ]
-                (flakeboxLib.mkStdFenixToolchains { });
-            };
-          };
-          crossFull = flakeboxLib.mkDevShell {
-            packages = [ ];
-            toolchain = flakeboxLib.mkFenixMultiToolchain {
-              toolchains = pkgs.lib.getAttrs
-                (
-                  [
-                    "aarch64-android"
-                    "i686-android"
-                    "x86_64-android"
-                    "arm-android"
-                    "aarch64-linux"
-                    "i686-linux"
-                    "x86_64-linux"
-                  ] ++ lib.optionals (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) [
-                    "aarch64-darwin"
-                  ] ++ lib.optionals (pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64) [
-                    "x86_64-darwin"
-                  ]
-                )
-                (flakeboxLib.mkStdFenixToolchains { });
-            };
-          };
+        devShells = flakeboxLib.mkShells {
+          packages = [ pkgs.mdbook ];
         };
+
       });
 }
