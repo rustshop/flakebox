@@ -126,6 +126,10 @@
         legacyPackages = outputs;
 
         devShells = {
+          lint = flakeboxLib.mkLintShell {
+            packages = [ ];
+          };
+
           default = flakeboxLib.mkDevShell {
             packages = [ pkgs.mdbook ];
           };

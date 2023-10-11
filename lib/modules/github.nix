@@ -63,7 +63,7 @@ let
             name = "Commit Check";
             run = ''
               # run the same check that git `pre-commit` hook does
-              nix develop --ignore-environment .# --command ./misc/git-hooks/pre-commit
+              nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
             '';
           }
         ];
