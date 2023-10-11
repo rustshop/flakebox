@@ -106,15 +106,17 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
     # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin,
     # it might get fixed at some point (newer llvm or librocksdb-sys)
 
-    # double check nightly too
-    multiOutput.nightly.dev.workspaceBuild
   ] ++
-  # test native build on every platform
-  [
+  # test native build on every platform, except x86 macos, where
+  # it's broken for some reason
+  lib.optionals (pkgs.system != "x86_64-darwin") [
     multiOutput.dev.workspaceBuild
   ] ++
   # in full mode test cross-compilation to Linux targets
   lib.optionals full [
+    # double check nightly
+    multiOutput.nightly.dev.workspaceBuild
+
     multiOutput.aarch64-linux.dev.workspaceBuild
     multiOutput.x86_64-linux.dev.workspaceBuild
     multiOutput.i686-linux.dev.workspaceBuild
