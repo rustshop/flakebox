@@ -51,12 +51,11 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
         path: ~/.cargo
     - name: Commit Check
-      run: "# run the same check that git `pre-commit` hook does\nif [ -n \"$(nix\
-        \ flake show --json | jq '.devShells | recurse| objects | select(has(\"lint\"\
-        ))')\" ]; then\n  nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit\n\
-        else\n  >&2 echo \"Define devShell 'lint' with `flakeboxLib.mkLintShell` for\
-        \ better performance\"\n  nix develop --ignore-environment .# --command ./misc/git-hooks/pre-commit\n\
-        fi\n"
+      run: '# run the same check that git `pre-commit` hook does
+
+        nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
+
+        '
 name: CI
 'on':
   merge_group:
