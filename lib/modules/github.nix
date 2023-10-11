@@ -63,12 +63,7 @@ let
             name = "Commit Check";
             run = ''
               # run the same check that git `pre-commit` hook does
-              if [ -n "$(nix flake show --json | jq '.devShells | recurse| objects | select(has("lint"))')" ]; then
-                nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
-              else
-                >&2 echo "Define devShell 'lint' with `flakeboxLib.mkLintShell` for better performance"
-                nix develop --ignore-environment .# --command ./misc/git-hooks/pre-commit
-              fi
+              nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
             '';
           }
         ];

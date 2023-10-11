@@ -102,6 +102,7 @@ in
   # wrapper over `mkShell` setting up flakebox env
   mkDevShell = callPackage ./mkDevShell.nix { };
   mkLintShell = callPackage ./mkLintShell.nix { };
+  mkShells = callPackage ./mkShells.nix { };
 
   flakeboxBin = callPackage ./flakeboxBin.nix { };
 
