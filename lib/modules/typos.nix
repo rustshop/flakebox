@@ -17,7 +17,7 @@
   config = lib.mkIf config.typos.enable {
     git.pre-commit.hooks = lib.mkIf config.typos.pre-commit.enable {
       typos = ''
-        if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --stdin-paths ; then
+        if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --file-list - --force-exclude ; then
           >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
           return 1
         fi
@@ -43,7 +43,7 @@
             FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "^db/|\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico)\$")"
 
 
-            if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos {{PARAMS}} --stdin-paths; then
+            if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos {{PARAMS}} --file-list - --force-exclude ; then
               >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
               return 1
             fi
