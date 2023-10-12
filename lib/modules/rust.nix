@@ -49,7 +49,7 @@ in
     (lib.mkIf config.rust.pre-commit.clippy.enable {
       git.pre-commit.hooks = {
         clippy = ''
-          cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
+          cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
         '';
       };
 
@@ -73,11 +73,11 @@ in
         content = ''
           # run `cargo clippy` on everything
           clippy:
-            cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
+            cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
 
           # run `cargo clippy --fix` on everything
           clippy-fix:
-            cargo clippy --workspace --all-targets --fix
+            cargo clippy --locked --offline --workspace --all-targets --fix
         '';
       };
     }

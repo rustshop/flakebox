@@ -23,4 +23,10 @@ pub enum Commands {
         #[arg(long, env = "FLAKEBOX_DOCS_DIR")]
         docs_dir: Option<PathBuf>,
     },
+    Lint {
+        #[arg(long)]
+        fix: bool,
+        #[arg(long)]
+        silent: bool,
+    },
 }

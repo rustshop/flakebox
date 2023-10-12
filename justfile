@@ -48,11 +48,11 @@ watch:
 
 # run `cargo clippy` on everything
 clippy:
-  cargo clippy --workspace --all-targets -- --deny warnings --allow deprecated
+  cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
 
 # run `cargo clippy --fix` on everything
 clippy-fix:
-  cargo clippy --workspace --all-targets --fix
+  cargo clippy --locked --offline --workspace --all-targets --fix
 
 
 # run `semgrep`
