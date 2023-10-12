@@ -43,24 +43,26 @@
             (final: prev: {
               rblake2sum = pkgs-unstable.rblake2sum;
 
-              # TODO: switch to mainstream after https://github.com/crate-ci/typos/pull/708 is released
-              typos = prev.rustPlatform.buildRustPackage {
+              # TODO: waiting for nixpkgs to have https://github.com/crate-ci/typos/commit/35a8bc67870d6c0b7407683319ae175577e24261
+              typos = pkgs-unstable.rustPlatform.buildRustPackage {
                 pname = "typos";
-                version = "1.16.9-stdin-inputs";
+                version = "1.16.19";
 
                 src = prev.fetchFromGitHub {
-                  owner = "dpc";
+                  owner = "crate-ci";
                   repo = "typos";
-                  rev = "04059e022c800ef0e1d6376f3a94923b0b697990";
-                  hash = "sha256-5OLq9uevJW1dTGMAkCGx2PyAyemmoiSIJ9DRGiL6gpM=";
+                  rev = "35a8bc67870d6c0b7407683319ae175577e24261";
+                  hash = "sha256-R/144kHAP3npxrsBAskl1i1viARXZSdLKWFaWp/rkbs=";
                 };
 
-                cargoHash = "sha256-wD6D3v6QxMNmULGZY8hSpcXPipzeV00TqyvUgUi4hrI=";
+                cargoHash = "sha256-tYqEFoemFM8fYq9LuNcr7b0XyQQbn8cDlgk3z4Uk36c=";
               };
             })
           ];
         };
+
         lib = pkgs.lib;
+
         flakeboxLib = mkLib pkgs {
           config = { };
         };
