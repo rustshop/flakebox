@@ -1,6 +1,6 @@
 [workspace]
-resolver = "2"
 members = [ "flakebox-bin" ]
+resolver = "2"
 
 [workspace.package]
 version = "0.0.1"
@@ -14,12 +14,12 @@ license = "MPL-2.0"
 keywords = ["nix", "tool", "dx"]
 
 [profile.dev]
-debug = "line-tables-only"
-lto = "off"
 
 [profile.ci]
+debug = "line-tables-only"
 inherits = "dev"
 incremental = false
+lto = "off"
 
 [profile.release]
 debug = "line-tables-only"

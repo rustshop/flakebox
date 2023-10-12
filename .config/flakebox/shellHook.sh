@@ -18,6 +18,10 @@ ln -sf "${root}/misc/git-hooks/pre-commit" "${dot_git}/hooks/pre-commit"
 # set template
 git config commit.template misc/git-hooks/commit-template.txt
 
+if ! flakebox lint --silent; then
+  >&2 echo "ℹ️  Project recommendations detected. Run 'flakebox lint' for more info."
+fi
+
 if [ -n "${DIRENV_IN_ENVRC:-}" ]; then
   # and not set DIRENV_LOG_FORMAT
   if [ -n "${DIRENV_LOG_FORMAT:-}" ]; then
