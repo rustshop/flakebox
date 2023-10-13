@@ -103,6 +103,20 @@ fn lint_cargo_toml_fix_resolver_v2(opts: &Opts) -> AppResult<()> {
     Ok(())
 }
 
+fn lint_cargo_toml_fix_ci_build_profile(opts: &Opts) -> AppResult<()> {
+    let (path, mut cargo_toml) = load_root_cargo_toml(opts)?;
+
+    cargo_toml["profile"]["ci"] = toml_edit::Item::Table(toml_edit::Table::new());
+    cargo_toml["profile"]["ci"]["inherits"] = value("dev");
+    cargo_toml["profile"]["ci"]["incremental"] = value(false);
+    cargo_toml["profile"]["ci"]["debug"] = value("line-tables-only");
+    cargo_toml["profile"]["ci"]["lto"] = value("off");
+
+    fs::write(path, cargo_toml.to_string()).change_context(AppError::IO)?;
+
+    Ok(())
+}
+
 fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
     let (path, cargo_toml) = load_root_cargo_toml(opts)?;
 
@@ -111,12 +125,23 @@ fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
             Some(toml_edit::Item::Value(toml_edit::Value::String(ref v))) if v.value() == "2" => {}
             _ => {
                 problems.push(LintItem {
-                    path,
+                    path: path.clone(),
                     msg: "`workspace.resolver` missing or not set to 'v2'".to_string(),
                     fix: Some(lint_cargo_toml_fix_resolver_v2),
                 });
             }
         }
+    }
+    if cargo_toml
+        .get("profile")
+        .and_then(|profile| profile.get("ci"))
+        .is_none()
+    {
+        problems.push(LintItem {
+            path,
+            msg: "`profile.ci` missing".to_string(),
+            fix: Some(lint_cargo_toml_fix_ci_build_profile),
+        });
     }
     Ok(())
 }
