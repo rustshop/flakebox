@@ -58,6 +58,8 @@ let
       pkgs.darwin.apple_sdk.frameworks.Security
     ];
 
+    JUST_UNSTABLE = "true";
+
     shellHook = ''
       # set the root dir
       git_root="$(git rev-parse --show-toplevel)"
