@@ -4,10 +4,13 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.systems.follows = "systems";
 
     crane = {
-      url = "github:dpc/crane?rev=bf5f4b71b446e5784900ee9ae0f2569e5250e360";
+      url = "github:dpc/crane?rev=7693522d303ad3a85b1af63335e6febcc23ca73d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -22,8 +25,7 @@
     };
 
   };
-  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils, crane, fenix, android-nixpkgs }:
-
+  outputs = { flake-utils, nixpkgs, nixpkgs-unstable, crane, fenix, android-nixpkgs, ... }:
     let
       mkLib = pkgs: import ./lib
         {
@@ -43,6 +45,25 @@
             (final: prev: {
               rblake2sum = pkgs-unstable.rblake2sum;
 
+              just = pkgs-unstable.just.overrideAttrs (prev: rec {
+                pname = "just";
+                version = "1.15.0";
+
+                src = pkgs-unstable.fetchFromGitHub {
+                  owner = "casey";
+                  repo = "just";
+                  rev = "refs/tags/${version}";
+                  hash = "sha256-r1YJ7L98aLAwBd3g+WlW/UijceR7t9z7aXSZZjlMNnM=";
+                };
+
+                cargoHash = "sha256-Fx2BdSHo+W43ZM/SX1ccddXG9QHlftrupT2cbyT4KM0=";
+                cargoDeps = prev.cargoDeps.overrideAttrs (prevDeps: {
+                  name = "${pname}-vendor.tar.gz";
+                  inherit src;
+                  outputHash = "sha256-h8l4af/FMsOSqBf1V1tbniS6r1dQos7JM1215o1pmTA=";
+                });
+              });
+
               # TODO: waiting for nixpkgs to have https://github.com/crate-ci/typos/commit/35a8bc67870d6c0b7407683319ae175577e24261
               typos = pkgs-unstable.rustPlatform.buildRustPackage {
                 pname = "typos";
@@ -60,8 +81,6 @@
             })
           ];
         };
-
-        lib = pkgs.lib;
 
         flakeboxLib = mkLib pkgs {
           config = { };
