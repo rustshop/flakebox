@@ -72,6 +72,8 @@ let
       fi
 
       flakebox init
+
+      ${cleanedArgs.shellHook or ""}
     '';
   };
 in
