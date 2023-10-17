@@ -2,6 +2,8 @@
 let lib = pkgs.lib; in craneLib:
 craneLib.overrideScope' (self: prev: {
   cargoProfile = "release";
+  toolchainName = null;
+
   args = {
     # https://github.com/ipetkov/crane/issues/76#issuecomment-1296025495
     installCargoArtifactsMode = "use-zstd";
@@ -133,9 +135,10 @@ craneLib.overrideScope' (self: prev: {
   overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
   overrideArgsDepsOnly'' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
   overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
+  overrideToolchainName = toolchainName: self.overrideScope' (self: prev: { inherit toolchainName; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
   mapWithToolchains = f: toolchains: builtins.mapAttrs
-    (toolchainName: toolchain: f (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
+    (toolchainName: toolchain: f ((self.overrideToolchainName toolchainName).overrideArgs toolchain.args))
     toolchains;
   mapWithToolchains' = f: toolchains: builtins.mapAttrs
     (toolchainName: toolchain: f toolchainName (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
