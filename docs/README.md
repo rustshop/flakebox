@@ -52,6 +52,17 @@ Flakebox will bring that vision into your projects.
 rough edges and some amount of churn before we figure out the
 core pieces.
 
+## Try it out
+
+The easiest way to see how it works in practice is
+checking some projects that use it, e.g. ones listed in
+[*I'm using it!* community discussions](https://github.com/rustshop/flakebox/discussions/categories/i-m-using-it).
+
+In particular, feel free to submit a fake PR to [htmx-sorta](https://github.com/rustshop/htmx-sorta). Clone it,
+install Nix via [DeterminateSystems nix-installer](https://github.com/DeterminateSystems/nix-installer) if you
+don't have Nix yet, enter the dev shell with `nix develop`, make
+some changes and submit a PR. It's OK, we don't mind, it's a demo app.
+
 ## Join the Community
 
 [Our Github Discussions](https://github.com/rustshop/flakebox/discussions)
