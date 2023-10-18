@@ -16,14 +16,17 @@ to the reproducibility that Nix provides.
 Functionality of Flakebox is meant to offer a complete and consistent
 handling of all the common aspects of Rust project development:
 
+* building Rust projects with Rust,
 * setting up configuration files (e.g. git hooks, commit templates, `justfile`),
 * integrating all the best lints (e.g. [`typos`](https://github.com/crate-ci/typos), [`semgrep`](https://semgrep.dev/), formatters, etc.),
 * integrating all the best utilities,
 * setting up Github Actions workflow files,
 * providing standardized tools and scripts for handling Rust project.
 
-To make it clear: Flakebox doesn't just setup/install some tools. It will fully integrate
-them into conhesive and convenient environment, so e.g. all relevant lints from
+with a possibility to customize and disable each part.
+
+To make it clear: Flakebox doesn't just setup/install some tools. It fully integrates
+them into cohesive and convenient environment, so e.g. all relevant lints from
 all the enabled linters run both in git's `pre-commit` hook, and in the CI, etc.
 The goal is to get by default a level of end to end polish that only the largest
 and most mature projects usually have, all in just few lines of Nix code.
