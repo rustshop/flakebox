@@ -141,6 +141,6 @@ craneLib.overrideScope' (self: prev: {
     (toolchainName: toolchain: f ((self.overrideToolchainName toolchainName).overrideArgs toolchain.args))
     toolchains;
   mapWithToolchains' = f: toolchains: builtins.mapAttrs
-    (toolchainName: toolchain: f toolchainName (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
+    (toolchainName: toolchain: f toolchainName ((self.overrideToolchainName toolchainName).overrideArgs ({ inherit toolchainName; } // toolchain.args)))
     toolchains;
 })
