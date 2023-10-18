@@ -72,6 +72,13 @@ Flakebox provides `flakeboxLib.filterSubPaths` function for convenient
 source code filtering.
 
 
-### TBD: mold
+### Use mold when possible
+
+[`mold`](https://github.com/rui314/mold) is an extremely fast linker.
+Especially during daily dev work, each incremental Rust codebase build
+tends to spend a significant time in linking phase. `mold` helps a lot.
+
+Flakebox will automatically link using `mold` on Linux, also taking care of
+some important low level NixOS details.
 
 ### TBD: `cargo` accidental-recompilation prevention
