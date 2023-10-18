@@ -44,40 +44,8 @@
           overlays = [
             (final: prev: {
               rblake2sum = pkgs-unstable.rblake2sum;
-
-              just = pkgs-unstable.just.overrideAttrs (prev: rec {
-                pname = "just";
-                version = "1.15.0";
-
-                src = pkgs-unstable.fetchFromGitHub {
-                  owner = "casey";
-                  repo = "just";
-                  rev = "refs/tags/${version}";
-                  hash = "sha256-r1YJ7L98aLAwBd3g+WlW/UijceR7t9z7aXSZZjlMNnM=";
-                };
-
-                cargoHash = "sha256-Fx2BdSHo+W43ZM/SX1ccddXG9QHlftrupT2cbyT4KM0=";
-                cargoDeps = prev.cargoDeps.overrideAttrs (prevDeps: {
-                  name = "${pname}-vendor.tar.gz";
-                  inherit src;
-                  outputHash = "sha256-h8l4af/FMsOSqBf1V1tbniS6r1dQos7JM1215o1pmTA=";
-                });
-              });
-
-              # TODO: waiting for nixpkgs to have https://github.com/crate-ci/typos/commit/35a8bc67870d6c0b7407683319ae175577e24261
-              typos = pkgs-unstable.rustPlatform.buildRustPackage {
-                pname = "typos";
-                version = "1.16.19";
-
-                src = prev.fetchFromGitHub {
-                  owner = "crate-ci";
-                  repo = "typos";
-                  rev = "35a8bc67870d6c0b7407683319ae175577e24261";
-                  hash = "sha256-R/144kHAP3npxrsBAskl1i1viARXZSdLKWFaWp/rkbs=";
-                };
-
-                cargoHash = "sha256-tYqEFoemFM8fYq9LuNcr7b0XyQQbn8cDlgk3z4Uk36c=";
-              };
+              just = pkgs-unstable.just;
+              typos = pkgs-unstable.typos;
             })
           ];
         };
