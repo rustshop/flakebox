@@ -13,7 +13,6 @@
     };
   };
 
-
   config = lib.mkIf config.semgrep.enable {
     git.pre-commit.hooks = {
       semgrep = ''
@@ -36,11 +35,6 @@
         env SEMGREP_ENABLE_VERSION_CHECK=0 \
           semgrep -q --error --config .config/semgrep.yaml
       '';
-    };
-
-    rootDir.".config/semgrep.yaml" = lib.mkIf config.git.commit-template.enable {
-      text = ''
-        '';
     };
 
     env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
