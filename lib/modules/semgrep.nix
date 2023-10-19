@@ -33,7 +33,7 @@
         fi
 
         env SEMGREP_ENABLE_VERSION_CHECK=0 \
-          semgrep -q --error --config .config/semgrep.yaml
+          semgrep -q --error --no-rewrite-rule-ids --config .config/semgrep.yaml
       '';
     };
 
@@ -47,7 +47,7 @@
           # run `semgrep`
           semgrep:
             env SEMGREP_ENABLE_VERSION_CHECK=0 \
-              semgrep --error --config .config/semgrep.yaml
+              semgrep --error --no-rewrite-rule-ids --config .config/semgrep.yaml
         '';
       };
     };
