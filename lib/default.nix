@@ -110,6 +110,8 @@ in
 
   filterSubPaths = self.filter.filterSubPaths;
 
+  pickBinary = callPackage ./pickBinary.nix { };
+
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { inherit nixpkgs; };
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };

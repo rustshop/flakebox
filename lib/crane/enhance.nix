@@ -47,7 +47,9 @@ craneLib.overrideScope' (self: prev: {
     );
 
   crateNameFromCargoToml = args: prev.crateNameFromCargoToml (mergeArgs self.args args);
+
   mkDummySrc = args: prev.mkDummySrc (mergeArgs self.args args);
+
   buildPackage = args: prev.buildPackage (
     let mergedArgs = mergeArgs self.args args; in (mergedArgs // {
       # implicit deps building is breaking caching somehow, so we need to do it ourselves here
@@ -61,7 +63,11 @@ craneLib.overrideScope' (self: prev: {
         }));
     })
   );
+
   buildTrunkPackage = args: prev.buildTrunkPackage (mergeArgs self.args args);
+
+  cargoAudit = args: prev.cargoAudit (mergeArgs self.args args);
+
   # causes issues
   vendorCargoDeps = args: prev.vendorCargoDeps (mergeArgs self.args args);
 
@@ -141,6 +147,6 @@ craneLib.overrideScope' (self: prev: {
     (toolchainName: toolchain: f ((self.overrideToolchainName toolchainName).overrideArgs toolchain.args))
     toolchains;
   mapWithToolchains' = f: toolchains: builtins.mapAttrs
-    (toolchainName: toolchain: f toolchainName (self.overrideArgs ({ inherit toolchainName; } // toolchain.args)))
+    (toolchainName: toolchain: f toolchainName ((self.overrideToolchainName toolchainName).overrideArgs ({ inherit toolchainName; } // toolchain.args)))
     toolchains;
 })
