@@ -88,9 +88,6 @@ let
     # bindgen expect native clang available here, so it's OK to set it globally,
     # should not break cross-compilation
     LIBCLANG_PATH = "${libclang.lib}/lib/";
-
-    CC = "${clang}/bin/clang";
-    CXX = "${clang}/bin/clang++";
   }
   # Note: do not touch MacOS's linker, stuff is brittle there
   # Also seems like Darwin can't handle mold or compress-debug-sections
