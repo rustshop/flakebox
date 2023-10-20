@@ -1,4 +1,4 @@
-{ nixpkgs, pkgs, crane, fenix, android-nixpkgs }:
+{ pkgs, crane, fenix, android-nixpkgs }:
 { modules ? [ ]
 , config ? { }
 ,
@@ -113,7 +113,7 @@ in
   pickBinary = callPackage ./pickBinary.nix { };
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
-  mkFenixToolchain = callPackage ./mkFenixToolchain.nix { inherit nixpkgs; };
+  mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
   mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
   mkIOSToolchain = callPackage ./mkIOSToolchain.nix { };
   mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
