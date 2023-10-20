@@ -8,36 +8,9 @@
 , mergeArgs
 , universalLlvmConfig
 , targetLlvmConfigWrapper
-, nixpkgs
 }:
 let
   defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
-
-  # mold wrapper from https://discourse.nixos.org/t/using-mold-as-linker-prevents-libraries-from-being-found/18530/5
-  mold-wrapped =
-    let
-      bintools-wrapper = "${nixpkgs}/pkgs/build-support/bintools-wrapper";
-    in
-    pkgs.symlinkJoin {
-      name = "mold";
-      paths = [ pkgs.mold ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      suffixSalt = lib.replaceStrings [ "-" "." ] [ "_" "_" ] pkgs.targetPlatform.config;
-      postBuild = ''
-        for bin in ${pkgs.mold}/bin/*; do
-          rm $out/bin/"$(basename "$bin")"
-
-          export prog="$bin"
-          substituteAll "${bintools-wrapper}/ld-wrapper.sh" $out/bin/"$(basename "$bin")"
-          chmod +x $out/bin/"$(basename "$bin")"
-
-          mkdir -p $out/nix-support
-          substituteAll "${bintools-wrapper}/add-flags.sh" $out/nix-support/add-flags.sh
-          substituteAll "${bintools-wrapper}/add-hardening.sh" $out/nix-support/add-hardening.sh
-          substituteAll "${bintools-wrapper}/../wrapper-common/utils.bash" $out/nix-support/utils.bash
-        done
-      '';
-    };
 in
 { toolchain ? null
 , channel ? defaultChannel
@@ -101,7 +74,7 @@ let
       else
         "-C link-arg=-Wl,--compress-debug-sections=zlib";
 
-    nativeBuildInputs = lib.optionals useMold [ mold-wrapped ];
+    nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
   });
   shellArgs = argsCommon // args;
   buildArgs =

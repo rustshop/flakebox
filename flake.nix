@@ -29,7 +29,7 @@
     let
       mkLib = pkgs: import ./lib
         {
-          inherit pkgs crane fenix android-nixpkgs nixpkgs;
+          inherit pkgs crane fenix android-nixpkgs;
         };
     in
     { } //
@@ -46,6 +46,8 @@
               rblake2sum = pkgs-unstable.rblake2sum;
               just = pkgs-unstable.just;
               typos = pkgs-unstable.typos;
+              mold = pkgs-unstable.mold;
+              mold-wrapped = pkgs-unstable.mold-wrapped;
             })
           ];
         };
