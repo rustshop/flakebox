@@ -27,9 +27,9 @@ in
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
 
-, clang ? pkgs.llvmPackages_14.clang
-, libclang ? pkgs.llvmPackages_14.libclang.lib
-, clang-unwrapped ? pkgs.llvmPackages_14.clang-unwrapped
+, clang ? pkgs.llvmPackages_16.clang
+, libclang ? pkgs.llvmPackages_16.libclang.lib
+, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
 , useMold ? pkgs.stdenv.isLinux
 , isLintShell ? false
 }:
