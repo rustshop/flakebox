@@ -53,7 +53,9 @@
         };
 
         flakeboxLib = mkLib pkgs {
-          config = { };
+          config = {
+            github.ci.cachixRepo = "rustshop";
+          };
         };
 
         src = flakeboxLib.filterSubPaths {
