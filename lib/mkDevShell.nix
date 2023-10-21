@@ -11,9 +11,7 @@ let
   defaultToolchain = config.toolchain.default;
   rustfmt = config.toolchain.rustfmt;
   rust-analyzer = config.toolchain.rust-analyzer;
-
 in
-
 { packages ? [ ]
 , toolchain ? mkFenixToolchain { toolchain = defaultToolchain; }
 , ...
@@ -25,6 +23,12 @@ let
   ];
 in
 let
+  flakeboxInit = if config.flakebox.init.enable
+    then ''
+      flakebox init
+    ''
+    else "";
+
   args = cleanedArgs // {
     packages =
       packages ++ [
@@ -71,7 +75,7 @@ let
         source "''${FLAKEBOX_PROJECT_ROOT_DIR}/.config/flakebox/shellHook.sh"
       fi
 
-      flakebox init
+      ${flakeboxInit}
 
       ${cleanedArgs.shellHook or ""}
     '';
