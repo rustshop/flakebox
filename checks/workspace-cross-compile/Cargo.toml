@@ -13,3 +13,9 @@ edition = "2021"
 
 [workspace.package]
 edition = "2021"
+
+[profile.ci]
+debug = "line-tables-only"
+inherits = "dev"
+incremental = false
+lto = "off"

@@ -95,14 +95,14 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
   # if Android is supported, test at leasat one cross-compilation target to android
   lib.optionals (multiOutput ? aarch64-android) [
     # rocksdb only on aarch64, most probably work on other ones
-    multiOutput.aarch64-android.dev.workspaceBuild
+    multiOutput.aarch64-android.ci.workspaceBuild
   ] ++
   # on Linux test all android cross-compilation
   lib.optionals (pkgs.system == "x86_64-linux") [
     # openssl & others, try on android
-    multiOutput.x86_64-android.dev.lib
-    multiOutput.i686-android.dev.lib
-    multiOutput.armv7-android.dev.lib
+    multiOutput.x86_64-android.ci.lib
+    multiOutput.i686-android.ci.lib
+    multiOutput.armv7-android.ci.lib
     # even with newer llvm14, rocksdb doesn't compile on x86_64-darwin,
     # it might get fixed at some point (newer llvm or librocksdb-sys)
 
@@ -110,22 +110,22 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
   # test native build on every platform, except x86 macos, where
   # it's broken for some reason
   lib.optionals (pkgs.system != "x86_64-darwin") [
-    multiOutput.dev.workspaceBuild
+    multiOutput.ci.workspaceBuild
   ] ++
   # in full mode test cross-compilation to Linux targets
   lib.optionals full [
     # double check nightly
-    multiOutput.nightly.dev.workspaceBuild
+    multiOutput.nightly.ci.workspaceBuild
 
-    multiOutput.aarch64-linux.dev.workspaceBuild
-    multiOutput.x86_64-linux.dev.workspaceBuild
-    multiOutput.i686-linux.dev.workspaceBuild
+    multiOutput.aarch64-linux.ci.workspaceBuild
+    multiOutput.x86_64-linux.ci.workspaceBuild
+    multiOutput.i686-linux.ci.workspaceBuild
   ] ++
     # in full mode, when supported, test all android targets
   lib.optionals (full && multiOutput ? aarch64-android) [
-    multiOutput.aarch64-android.dev.workspaceBuild
-    multiOutput.x86_64-android.dev.workspaceBuild
-    multiOutput.i686-android.dev.workspaceBuild
-    multiOutput.armv7-android.dev.workspaceBuild
+    multiOutput.aarch64-android.ci.workspaceBuild
+    multiOutput.x86_64-android.ci.workspaceBuild
+    multiOutput.i686-android.ci.workspaceBuild
+    multiOutput.armv7-android.ci.workspaceBuild
   ]
 )
