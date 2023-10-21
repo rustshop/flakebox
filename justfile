@@ -59,7 +59,7 @@ clippy-fix:
 # run `semgrep`
 semgrep:
   env SEMGREP_ENABLE_VERSION_CHECK=0 \
-    semgrep --error --config .config/semgrep.yaml
+    semgrep --error --no-rewrite-rule-ids --config .config/semgrep.yaml
 
 
 # check typos

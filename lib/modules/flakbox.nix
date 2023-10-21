@@ -11,6 +11,11 @@ in
         default = true;
       };
     };
+    init = {
+      enable = lib.mkEnableOption (lib.mdDoc "the `flakebox init` in dev shells") // {
+        default = true;
+      };
+    };
   };
 
   config = lib.mkMerge [

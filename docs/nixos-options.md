@@ -18,7 +18,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/cargo\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/cargo.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/cargo\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/cargo.nix)
 
 
 
@@ -44,7 +44,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/cargo\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/cargo.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/cargo\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/cargo.nix)
 
 
 
@@ -70,7 +70,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/convco\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/convco.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/convco\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/convco.nix)
 
 
 
@@ -96,7 +96,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/convco\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/convco.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/convco\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/convco.nix)
 
 
 
@@ -181,7 +181,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane.nix)
 
 
 
@@ -266,7 +266,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane.nix)
 
 
 
@@ -351,7 +351,7 @@ attribute set
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/crane.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/crane.nix)
 
 
 
@@ -377,7 +377,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/direnv\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/direnv.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/direnv\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/direnv.nix)
 
 
 
@@ -403,7 +403,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/env\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/env.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/env\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/env.nix)
 
 
 
@@ -424,7 +424,33 @@ list of package
 ` [ ] `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/env\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/env.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/env\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/env.nix)
+
+
+
+## config\.flakebox\.init\.enable
+
+
+
+Whether to enable the ` flakebox init ` in dev shells\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/flakbox\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/flakbox.nix)
 
 
 
@@ -450,7 +476,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/flakbox\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/flakbox.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/flakbox\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/flakbox.nix)
 
 
 
@@ -476,7 +502,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -497,7 +523,7 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -523,7 +549,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -549,7 +575,7 @@ string or path
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -570,7 +596,7 @@ string or path
 ` "" `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -596,7 +622,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -617,7 +643,7 @@ attribute set of (null or string or path)
 ` { } `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -643,7 +669,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -669,7 +695,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/git.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/git.nix)
 
 
 
@@ -695,7 +721,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github.nix)
 
 
 
@@ -716,7 +742,7 @@ list of string
 ` [ ] `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github.nix)
 
 
 
@@ -737,7 +763,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github.nix)
 
 
 
@@ -759,7 +785,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github.nix)
 
 
 
@@ -780,7 +806,7 @@ attribute set of anything
 ` null `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/github.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/github.nix)
 
 
 
@@ -806,7 +832,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -827,7 +853,7 @@ list of string
 ` [ ] `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -851,7 +877,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -873,7 +899,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -896,7 +922,7 @@ string or path
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -919,7 +945,7 @@ signed integer
 ` 1000 `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/just.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/just.nix)
 
 
 
@@ -940,7 +966,7 @@ attribute set of (submodule)
 ` { } `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -962,7 +988,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -985,7 +1011,7 @@ string
 ` "symlink" `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -1001,7 +1027,7 @@ Path of the source file\.
 path
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -1017,7 +1043,7 @@ Name of symlink (relative to root dir)\. Defaults to the attribute name\.
 string
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -1038,7 +1064,7 @@ null or strings concatenated with “\\n”
 ` null `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -1054,7 +1080,7 @@ Derivation containing all rootDir files/symlinks
 package
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rootDir.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rootDir.nix)
 
 
 
@@ -1080,7 +1106,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust.nix)
 
 
 
@@ -1106,7 +1132,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust.nix)
 
 
 
@@ -1132,7 +1158,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust.nix)
 
 
 
@@ -1148,7 +1174,7 @@ The content of the file
 string
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/rust.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/rust.nix)
 
 
 
@@ -1174,7 +1200,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/semgrep\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/semgrep.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/semgrep\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/semgrep.nix)
 
 
 
@@ -1200,7 +1226,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/semgrep\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/semgrep.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/semgrep\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/semgrep.nix)
 
 
 
@@ -1226,7 +1252,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/shellcheck\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/shellcheck.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/shellcheck\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/shellcheck.nix)
 
 
 
@@ -1252,7 +1278,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/shellcheck\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/shellcheck.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/shellcheck\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/shellcheck.nix)
 
 
 
@@ -1275,7 +1301,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1296,7 +1322,7 @@ string
 ` "complete" `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1317,7 +1343,7 @@ string
 ` "stable" `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1347,7 +1373,7 @@ list of string
 ```
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1368,7 +1394,7 @@ package
 ` <derivation rust-stable-with-components-2023-10-05> `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1389,7 +1415,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-10-10> `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1414,7 +1440,7 @@ package
 ` <derivation rust-analyzer-2023-05-15> `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1440,7 +1466,7 @@ package
 ` <derivation rust-nightly-complete-with-components-2023-10-10> `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1463,7 +1489,7 @@ package
 ` <derivation rust-stable-with-components-2023-10-05> `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/toolchain.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/toolchain.nix)
 
 
 
@@ -1489,7 +1515,7 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/typos\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/typos.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/typos\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/typos.nix)
 
 
 
@@ -1515,6 +1541,6 @@ boolean
 ` true `
 
 *Declared by:*
- - [/nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/typos\.nix](file:///nix/store/m4qciw1nfl14dhcmrqs0hzq7sk59k4fr-source/lib/modules/typos.nix)
+ - [/nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/typos\.nix](file:///nix/store/35vws3vxpy1mz0hihbvlcbznyjwrzm5h-source/lib/modules/typos.nix)
 
 
