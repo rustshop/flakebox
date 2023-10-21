@@ -85,8 +85,8 @@ let
         });
 in
 pkgs.linkFarmFromDrvs "workspace-sanity" [
-  multiOutput.dev.workspaceBuild
-  multiOutput.dev.workspace-sanity
-  multiOutput.dev.workspace-sanity-lib
-  multiOutput.dev.workspace-sanity-test
+  multiOutput.ci.workspaceBuild
+  multiOutput.ci.workspace-sanity
+  multiOutput.ci.workspace-sanity-lib
+  multiOutput.ci.workspace-sanity-test
 ]
