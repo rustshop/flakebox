@@ -122,20 +122,24 @@ We still don't have even `cargo` for our project, so let's do that next:
 
 ```diff
 diff --git a/flake.nix b/flake.nix
-index 25ce16f..f09763b 100644
+index a96aa14..bce12c5 100644
 --- a/flake.nix
 +++ b/flake.nix
-@@ -8,13 +8,20 @@
-       url = "github:rustshop/flakebox";
-       inputs.nixpkgs.follows = "nixpkgs";
-     };
--  };
--
--  outputs = { self, nixpkgs, flakebox }: {
--
+@@ -1,11 +1,25 @@
+ {
+   description = "A very basic flake";
+ 
+-  outputs = { self, nixpkgs }: {
++  inputs = {
++    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+ 
 -    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
 -
 -    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
++    flakebox = {
++      url = "github:rustshop/flakebox";
++      inputs.nixpkgs.follows = "nixpkgs";
++    };
  
 +    flake-utils.url = "github:numtide/flake-utils";
    };
@@ -151,6 +155,7 @@ index 25ce16f..f09763b 100644
 +        };
 +      });
  }
+
 ```
  
 Since that's a bit handful, let me paste the whole content:
