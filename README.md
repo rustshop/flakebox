@@ -93,7 +93,7 @@ In projects already using Flakebox, the documentation can be accessed using `fla
 
 - [Tutorial: Flakebox in a New Project](./docs/building-new-project.md)
 - [Setting up Flakebox](./docs/getting-started.md)
-
+- [Flake template](./docs/flake-template.md)
 
 # Reference Manual
 
