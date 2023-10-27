@@ -23,7 +23,8 @@ let
   ];
 in
 let
-  flakeboxInit = if config.flakebox.init.enable
+  flakeboxInit =
+    if config.flakebox.init.enable
     then ''
       flakebox init
     ''
