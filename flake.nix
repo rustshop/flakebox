@@ -32,7 +32,14 @@
           inherit pkgs crane fenix android-nixpkgs;
         };
     in
-    { } //
+    {
+      templates = {
+        default = {
+          path = ./templates/default;
+          description = "Flakebox default project template";
+        };
+      };
+    } //
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs-unstable = import nixpkgs-unstable {

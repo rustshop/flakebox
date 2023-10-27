@@ -1,0 +1,31 @@
+[package]
+name = "flakebox-project"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[profile.dev]
+debug = "line-tables-only"
+lto = "off"
+
+[profile.ci]
+inherits = "dev"
+incremental = false
+
+[profile.release]
+debug = "line-tables-only"
+lto = "fat"
+codegen-units = 1
+
+# Workaround: https://github.com/rust-lang/cargo/issues/12457 which causes
+#             https://github.com/ipetkov/crane/issues/370
+[profile.dev.build-override]
+debug = false
+[profile.ci.build-override]
+debug = false
+[profile.release.build-override]
+debug = false
