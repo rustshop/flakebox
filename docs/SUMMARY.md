@@ -9,7 +9,7 @@
 
 - [Tutorial: Flakebox in a New Project](./building-new-project.md)
 - [Setting up Flakebox](./getting-started.md)
-
+- [Flake template](./flake-template.md)
 
 # Reference Manual
 
