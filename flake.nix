@@ -62,6 +62,9 @@
         flakeboxLib = mkLib pkgs {
           config = {
             github.ci.cachixRepo = "rustshop";
+            just.includePaths = [
+              "justfile.custom"
+            ];
           };
         };
 
