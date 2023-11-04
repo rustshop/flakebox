@@ -239,25 +239,22 @@ fn install_files(src: &Path, dst: &Path) -> AppResult<()> {
         } else {
             remove_file_or_symlink(&dst_path).change_context_lazy(|| AppError::IO)?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| AppError::IO)?;
-            let _ = cmd!("git", "add", &relative_path).run();
+            let _ = cmd!("git", "add", &dst_path).run();
 
-            chmod_non_writeable(relative_path)?;
+            chmod_non_writeable(&dst_path)?;
         }
     }
 
     Ok(())
 }
 
-fn chmod_non_writeable(relative_path: &Path) -> AppResult<()> {
-    let current_permissions = fs::metadata(relative_path)
+fn chmod_non_writeable(path: &Path) -> AppResult<()> {
+    let current_permissions = fs::metadata(path)
         .change_context_lazy(|| AppError::IO)?
         .permissions()
         .mode();
-    set_permissions(
-        relative_path,
-        Permissions::from_mode(current_permissions & !(0o222)),
-    )
-    .change_context_lazy(|| AppError::IO)?;
+    set_permissions(path, Permissions::from_mode(current_permissions & !(0o222)))
+        .change_context_lazy(|| AppError::IO)?;
     Ok(())
 }
 
