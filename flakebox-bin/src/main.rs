@@ -10,6 +10,7 @@ use duct::cmd;
 use error_stack::ResultExt;
 use fs_err as fs;
 use opts::{Commands, Opts};
+use serde::Deserialize;
 use thiserror::Error;
 use toml_edit::value;
 use tracing_subscriber::EnvFilter;
@@ -146,10 +147,24 @@ fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
     Ok(())
 }
 
+#[derive(Deserialize)]
+struct CargoMetadataOutput {
+    workspace_root: PathBuf,
+}
+
+fn detect_cargo_root(_opts: &Opts) -> AppResult<PathBuf> {
+    let output = cmd!("cargo", "metadata", "--no-deps", "--format-version", "1")
+        .read()
+        .change_context(AppError::IO)?;
+    let metdata: CargoMetadataOutput =
+        serde_json::from_str(&output).change_context(AppError::IO)?;
+    Ok(metdata.workspace_root)
+}
+
 fn load_root_cargo_toml(
     opts: &Opts,
 ) -> Result<(PathBuf, toml_edit::Document), error_stack::Report<AppError>> {
-    let path = opts.project_root_dir_path().join("Cargo.toml");
+    let path = detect_cargo_root(opts)?.join("Cargo.toml");
     let cargo_toml = fs::read_to_string(&path).change_context(AppError::IO)?;
     let cargo_toml = cargo_toml
         .parse::<toml_edit::Document>()
@@ -198,8 +213,11 @@ fn install(opts: &Opts) -> AppResult<()> {
 }
 
 fn check_project_root_env(opts: &Opts) -> AppResult<()> {
-    if !opts.project_root_dir_path().join("Cargo.toml").exists() {
-        return Err(AppError::Project).attach_printable("No Cargo.toml in project root directory");
+    let cargo_toml_path = detect_cargo_root(opts)?.join("Cargo.toml");
+    if !cargo_toml_path.exists() {
+        return Err(AppError::Project).attach_printable_lazy(|| {
+            format!("No Cargo.toml found at {}", cargo_toml_path.display())
+        });
     }
 
     if !opts.project_root_dir_path().join("flake.nix").exists() {
@@ -221,25 +239,22 @@ fn install_files(src: &Path, dst: &Path) -> AppResult<()> {
         } else {
             remove_file_or_symlink(&dst_path).change_context_lazy(|| AppError::IO)?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| AppError::IO)?;
-            let _ = cmd!("git", "add", &relative_path).run();
+            let _ = cmd!("git", "add", &dst_path).run();
 
-            chmod_non_writeable(relative_path)?;
+            chmod_non_writeable(&dst_path)?;
         }
     }
 
     Ok(())
 }
 
-fn chmod_non_writeable(relative_path: &Path) -> AppResult<()> {
-    let current_permissions = fs::metadata(relative_path)
+fn chmod_non_writeable(path: &Path) -> AppResult<()> {
+    let current_permissions = fs::metadata(path)
         .change_context_lazy(|| AppError::IO)?
         .permissions()
         .mode();
-    set_permissions(
-        relative_path,
-        Permissions::from_mode(current_permissions & !(0o222)),
-    )
-    .change_context_lazy(|| AppError::IO)?;
+    set_permissions(path, Permissions::from_mode(current_permissions & !(0o222)))
+        .change_context_lazy(|| AppError::IO)?;
     Ok(())
 }
 
