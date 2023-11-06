@@ -31,7 +31,7 @@ in
       git.pre-commit.hooks = {
         leftover_dbg = ''
           errors=""
-          for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep  '.*\.rs'); do
+          for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep '.*\.rs'); do
             if grep 'dbg!(' "$path" > /dev/null; then
               >&2 echo "$path contains dbg! macro"
               errors="true"
@@ -49,11 +49,18 @@ in
     (lib.mkIf config.rust.pre-commit.clippy.enable {
       git.pre-commit.hooks = {
         clippy = ''
-          cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
+          flakebox-in-each-cargo-workspace cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
         '';
       };
 
     })
+
+    {
+      rootDir.".config/flakebox/bin/flakebox-in-each-cargo-workspace" = {
+        source = ./rust/flakebox-in-each-cargo-workspace;
+        mode = "0555";
+      };
+    }
 
     (lib.mkIf config.rust.rustfmt.enable {
       rootDir.".rustfmt.toml" = {

@@ -20,7 +20,7 @@
         git.pre-commit.hooks = {
           cargo_lock = ''
             # https://users.rust-lang.org/t/check-if-the-cargo-lock-is-up-to-date-without-building-anything/91048/5
-            cargo update --workspace --locked
+            flakebox-in-each-cargo-workspace cargo update --workspace --locked
           '';
         };
       })
@@ -30,7 +30,7 @@
       {
         git.pre-commit.hooks = {
           cargo_fmt = ''
-            cargo fmt --all --check
+            flakebox-in-each-cargo-workspace cargo fmt --all --check
           '';
         };
       })

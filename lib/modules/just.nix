@@ -88,6 +88,11 @@ in
           content = ''
             # run and restart on changes
             watch:
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               env RUST_LOG=''${RUST_LOG:-debug} cargo watch -x run
           '';
         };
@@ -96,6 +101,11 @@ in
           content = ''
             # run `cargo build` on everything
             build:
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               cargo build --workspace --all-targets
           '';
         };
@@ -104,6 +114,11 @@ in
           content = ''
             # run `cargo check` on everything
             check:
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               cargo check --workspace --all-targets
           '';
         };
@@ -113,6 +128,11 @@ in
           content = ''
             # run tests
             test: build
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               cargo test
           '';
         };
@@ -122,6 +142,8 @@ in
           content = ''
             # run lints (git pre-commit hook)
             lint:
+              #!/usr/bin/env bash
+              set -euo pipefail
               env NO_STASH=true $(git rev-parse --git-common-dir)/hooks/pre-commit
           '';
         };
@@ -131,6 +153,11 @@ in
           content = ''
             # run all checks recommended before opening a PR
             final-check: lint ${if config.just.rules ? clippy && config.just.rules.clippy.enable then "clippy" else "" }
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               cargo test --doc
               just test
           '';
@@ -141,6 +168,11 @@ in
           content = ''
             # run code formatters
             format:
+              #!/usr/bin/env bash
+              set -euo pipefail
+              if [ ! -f Cargo.toml ]; then
+                cd {{invocation_directory()}}
+              fi
               cargo fmt --all
               nixpkgs-fmt $(echo **.nix)
           '';
