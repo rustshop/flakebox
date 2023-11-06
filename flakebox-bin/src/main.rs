@@ -107,6 +107,10 @@ fn lint_cargo_toml_fix_resolver_v2(opts: &Opts) -> AppResult<()> {
 fn lint_cargo_toml_fix_ci_build_profile(opts: &Opts) -> AppResult<()> {
     let (path, mut cargo_toml) = load_root_cargo_toml(opts)?;
 
+    if cargo_toml.get("profile").is_none() {
+        cargo_toml["profile"] = toml_edit::Item::Table(toml_edit::Table::new());
+    }
+
     cargo_toml["profile"]["ci"] = toml_edit::Item::Table(toml_edit::Table::new());
     cargo_toml["profile"]["ci"]["inherits"] = value("dev");
     cargo_toml["profile"]["ci"]["incremental"] = value(false);
