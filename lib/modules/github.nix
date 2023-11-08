@@ -21,6 +21,32 @@ in
         default = [ ];
       };
 
+      buildMatrix = lib.mkOption {
+        type = types.attrs;
+        description = lib.mdDoc "Build matrix to use in the workflow `strategy.matrix` of `build` job";
+        default = {
+          host = [ "macos" "linux" ];
+          include = [
+            {
+              host = "linux";
+              runs-on = "ubuntu-latest";
+              timeout = 60;
+            }
+            {
+              host = "macos";
+              runs-on = "macos-12";
+              timeout = 60;
+            }
+          ];
+        };
+      };
+
+      buildMatrixExtra = lib.mkOption {
+        type = types.attrs;
+        description = lib.mdDoc "Additional build matrix to deep merge with `buildMatrix`";
+        default = { };
+      };
+
       workflows = lib.mkOption {
         default = { };
         description = lib.mdDoc ''
@@ -72,7 +98,7 @@ in
         continue-on-error = true;
       };
 
-      flakebox-ci = { buildCmd, cacheStep ? magicNixCacheStep }: {
+      flakebox-ci = { buildCmd, buildMatrix, cacheStep ? magicNixCacheStep }: {
         name = "CI";
 
         on = {
@@ -141,21 +167,7 @@ in
           build = {
             name = "Build";
             strategy = {
-              matrix = {
-                host = [ "macos" "linux" ];
-                include = [
-                  {
-                    host = "linux";
-                    runs-on = "ubuntu-latest";
-                    timeout = 60;
-                  }
-                  {
-                    host = "macos";
-                    runs-on = "macos-12";
-                    timeout = 60;
-                  }
-                ];
-              };
+              matrix = buildMatrix;
             };
             runs-on = "\${{ matrix.runs-on }}";
             timeout-minutes = "\${{ matrix.timeout }}";
@@ -229,6 +241,22 @@ in
           };
         };
       };
+
+      recursiveMerge = attrList:
+        let
+          f = attrPath:
+            lib.zipAttrsWith (n: values:
+              if lib.tail values == [ ]
+              then lib.head values
+              else if lib.all lib.isList values
+              then lib.unique (lib.concatLists values)
+              else if lib.all lib.isAttrs values
+              then f (attrPath ++ [ n ]) values
+              else lib.last values
+            );
+        in
+        f [ ] attrList;
+
     in
     lib.mkIf config.github.ci.enable {
 
@@ -242,6 +270,7 @@ in
                 '' else
                 lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.buildOutputs)
             ;
+            buildMatrix = recursiveMerge [ config.github.ci.buildMatrix config.github.ci.buildMatrixExtra ];
             cacheStep =
               if config.github.ci.cachixRepo != null then
                 cachixCacheStep { name = config.github.ci.cachixRepo; }
