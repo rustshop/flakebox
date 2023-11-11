@@ -1,0 +1,7 @@
+# workaround: https://github.com/casey/just/issues/1669
+[private]
+default-custom:
+  just default
+
+docs-open:
+	nix build .#docs && xdg-open result/index.html
