@@ -87,39 +87,39 @@ in
           priority = 100;
           content = ''
             # run and restart on changes
-            watch:
+            watch *ARGS="-x run":
               #!/usr/bin/env bash
               set -euo pipefail
               if [ ! -f Cargo.toml ]; then
                 cd {{invocation_directory()}}
               fi
-              env RUST_LOG=''${RUST_LOG:-debug} cargo watch -x run
+              env RUST_LOG=''${RUST_LOG:-debug} cargo watch {{ARGS}}
           '';
         };
         build = {
           priority = 100;
           content = ''
             # run `cargo build` on everything
-            build:
+            build *ARGS="--workspace --all-targets":
               #!/usr/bin/env bash
               set -euo pipefail
               if [ ! -f Cargo.toml ]; then
                 cd {{invocation_directory()}}
               fi
-              cargo build --workspace --all-targets
+              cargo build {{ARGS}}
           '';
         };
         check = {
           priority = 100;
           content = ''
             # run `cargo check` on everything
-            check:
+            check *ARGS="--workspace --all-targets":
               #!/usr/bin/env bash
               set -euo pipefail
               if [ ! -f Cargo.toml ]; then
                 cd {{invocation_directory()}}
               fi
-              cargo check --workspace --all-targets
+              cargo check {{ARGS}}
           '';
         };
 

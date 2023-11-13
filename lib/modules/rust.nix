@@ -79,12 +79,12 @@ in
       just.rules.clippy = {
         content = ''
           # run `cargo clippy` on everything
-          clippy:
-            cargo clippy --locked --offline --workspace --all-targets -- --deny warnings --allow deprecated
+          clippy *ARGS="--locked --offline --workspace --all-targets":
+            cargo clippy {{ARGS}} -- --deny warnings --allow deprecated
 
           # run `cargo clippy --fix` on everything
-          clippy-fix:
-            cargo clippy --locked --offline --workspace --all-targets --fix
+          clippy-fix *ARGS="--locked --offline --workspace --all-targets":
+            cargo clippy {{ARGS}} --fix
         '';
       };
     }
