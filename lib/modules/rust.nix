@@ -72,6 +72,7 @@ in
         wrap_comments = true
         format_code_in_doc_comments = true
         imports_granularity = "Module"
+        edition = "2021"
       '';
     })
 
