@@ -64,8 +64,13 @@ in
 
     (lib.mkIf config.git.pre-commit.trailing_whitespace {
       git.pre-commit.hooks.trailing_whitespace = ''
-        if ! git diff --check HEAD ; then
-          echo "Trailing whitespace detected. Please remove them before committing."
+        rev="HEAD"
+        if ! git rev-parse -q 1>/dev/null HEAD 2>/dev/null ; then
+          >&2 echo "Warning: no commits yet, checking against --root"
+          rev="--root"
+        fi
+        if ! git diff --check $rev ; then
+          >&2 echo "Trailing whitespace detected. Please remove them before committing."
           return 1
         fi
       '';
