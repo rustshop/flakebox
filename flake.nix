@@ -2,8 +2,7 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/release-23.11";
 
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
@@ -25,7 +24,7 @@
     };
 
   };
-  outputs = { flake-utils, nixpkgs, nixpkgs-unstable, crane, fenix, android-nixpkgs, ... }:
+  outputs = { flake-utils, nixpkgs, crane, fenix, android-nixpkgs, ... }:
     let
       mkLib = pkgs: import ./lib
         {
@@ -42,22 +41,7 @@
     } //
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs-unstable = import nixpkgs-unstable {
-          inherit system;
-        };
-        pkgs = import nixpkgs {
-          inherit system;
-
-          overlays = [
-            (final: prev: {
-              rblake2sum = pkgs-unstable.rblake2sum;
-              just = pkgs-unstable.just;
-              typos = pkgs-unstable.typos;
-              mold = pkgs-unstable.mold;
-              mold-wrapped = pkgs-unstable.mold-wrapped;
-            })
-          ];
-        };
+        pkgs = nixpkgs.legacyPackages.${system};
 
         flakeboxLib = mkLib pkgs {
           config = {
