@@ -1,19 +1,17 @@
-{ filterSubPaths
-, craneLib
+{ craneLib
 , craneMultiBuild
+, lib
 }:
 let
-  src = filterSubPaths {
-    root = builtins.path {
-      name = "flakebox";
-      path = ../.;
-    };
-    paths = [
-      "Cargo.toml"
-      "Cargo.lock"
-      ".cargo"
-      "flakebox-bin"
-    ];
+  fs = lib.fileset;
+  fileSet = fs.unions [
+    ../Cargo.toml
+    ../Cargo.lock
+    ../flakebox-bin
+  ];
+  src = fs.toSource {
+    root = ../.;
+    fileset = fileSet;
   };
 in
 (
