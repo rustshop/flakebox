@@ -62,54 +62,54 @@ in
   });
   aarch64-linux = mkClangToolchain {
     target = "aarch64-unknown-linux-gnu";
-    clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
+    clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang;
     binPrefix = "aarch64-unknown-linux-gnu-";
     llvmConfigPkg = targetLlvmConfigWrapper {
       # seems like it would be better, but it seems to pull in incompatible glibc
-      # clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang;
-      clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped;
-      libClangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+      # clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang;
+      clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
     args = {
-      CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
   x86_64-linux = mkClangToolchain {
     target = "x86_64-unknown-linux-gnu";
-    clang = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang;
+    clang = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang;
     binPrefix = "x86_64-unknown-linux-gnu-";
     llvmConfigPkg = targetLlvmConfigWrapper {
       # seems like it would be better, but it seems to pull in incompatible glibc
-      # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
-      clangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped;
-      libClangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+      # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang;
+      clangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
     args = {
-      CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
   i686-linux = mkClangToolchain {
     target = "i686-unknown-linux-gnu";
-    clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang;
+    clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang;
     binPrefix = "i686-unknown-linux-gnu-";
     llvmConfigPkg = targetLlvmConfigWrapper {
-      clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped;
-      libClangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+      clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
     args = {
-      CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
   wasm32-unknown = mkFenixToolchain {
@@ -127,34 +127,34 @@ in
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
   aarch64-darwin = mkClangToolchain {
     target = "aarch64-apple-darwin";
-    clang = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang;
+    clang = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang;
     binPrefix = "aarch64-apple-darwin-";
     llvmConfigPkg = targetLlvmConfigWrapper {
-      clangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped;
-      libClangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+      clangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
     args = {
-      CFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CPPFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CXXFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
   x86_64-darwin = mkClangToolchain {
     target = "x86_64-apple-darwin";
-    clang = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang;
+    clang = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang;
     binPrefix = "x86_64-apple-darwin-";
     llvmConfigPkg = targetLlvmConfigWrapper {
-      clangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped;
-      libClangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib;
+      clangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
     args = {
-      CFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CPPFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      CXXFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages_14.clang-unwrapped.lib}/lib/clang/14.0.6/include/";
+      CFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
