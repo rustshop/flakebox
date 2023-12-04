@@ -2,3 +2,5 @@
 extend-ignore-re = [
     "\\b[0-9A-Za-z+/]{7}(=|==)?\\b",
 ]
+[default.extend-words]
+ot = "ot"
