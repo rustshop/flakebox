@@ -1,6 +1,5 @@
-{ craneLib
-, craneMultiBuild
-, lib
+{ lib
+, pkgs
 }:
 let
   fs = lib.fileset;
@@ -14,26 +13,11 @@ let
     fileset = fileSet;
   };
 in
-(
-  (craneMultiBuild { }) (craneLib':
-    let
-      craneLib = (craneLib'.overrideArgs {
-        pname = "flexbox";
+pkgs.rustPlatform.buildRustPackage {
+  inherit src;
 
-        doCheck = false;
+  pname = "flakebox";
+  version = "0.0.1";
 
-        installCargoArtifactsMode = "use-zstd";
-
-        nativeBuildInputs = [ ];
-        inherit src;
-      });
-    in
-    rec {
-
-      deps =
-        craneLib.buildDepsOnly { };
-
-      bin = craneLib.buildPackage {
-        cargoArtifacts = deps;
-      };
-    })).bin
+  cargoSha256 = "sha256-e39iCbrxI24B9usf+XQwTs/n7UIgg0s1hXFWmLajnMg=";
+}
