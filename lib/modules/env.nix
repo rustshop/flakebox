@@ -28,5 +28,10 @@ in
         #!/usr/bin/env bash
       '' + builtins.concatStringsSep "\n" config.env.shellHooks;
     };
+    rootDir.".config/flakebox/.gitignore" = {
+      text = ''
+        tmp/
+      '';
+    };
   };
 }

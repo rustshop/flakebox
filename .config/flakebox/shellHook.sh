@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+yesterday=$(date -d "yesterday" +%s)
+motd_ts_path=".config/flakebox/tmp/motd"
+
+if [ ! -e "$motd_ts_path" ] || [ "$motd_ts_path" -ot "$yesterday" ]; then
+mkdir -p "$(dirname "$motd_ts_path")"
+touch "$motd_ts_path"
+>&2 echo "Welcome to Flakebox dev env"
+
+fi
+
 root="$(git rev-parse --show-toplevel)"
 dot_git="$(git rev-parse --git-common-dir)"
 if [[ ! -d "${dot_git}/hooks" ]]; then mkdir -p "${dot_git}/hooks"; fi

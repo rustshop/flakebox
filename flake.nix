@@ -49,6 +49,12 @@
             just.includePaths = [
               "justfile.custom"
             ];
+            motd = {
+              enable = true;
+              command = ''
+                >&2 echo "Welcome to Flakebox dev env"
+              '';
+            };
           };
         };
 
