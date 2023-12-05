@@ -61,6 +61,8 @@ let
     # bindgen expect native clang available here, so it's OK to set it globally,
     # should not break cross-compilation
     LIBCLANG_PATH = "${libclang.lib}/lib/";
+
+    stdenv = clang.stdenv;
   } //
   # I wish we do that on Darwin as well, but in practice nothing ever
   # works on Darwin if you mess with the defaults :(
@@ -74,7 +76,6 @@ let
     "CC" = "${clang}/bin/clang";
     "CXX" = "${clang}/bin/clang++";
     "AR" = "${clang}/bin/ar";
-    stdenv = clang.stdenv;
   } //
   # Note: do not touch MacOS's linker, stuff is brittle there
   # Also seems like Darwin can't handle mold or compress-debug-sections
