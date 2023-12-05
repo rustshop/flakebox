@@ -63,8 +63,6 @@ let
     # should not break cross-compilation
     LIBCLANG_PATH = "${libclang.lib}/lib/";
 
-    inherit stdenv;
-
     "CC_${target_underscores}" = "${clang}/bin/clang";
     "CXX_${target_underscores}" = "${clang}/bin/clang++";
     "LD_${target_underscores}" = "${clang}/bin/clang";
@@ -93,7 +91,7 @@ let
 
     nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
   });
-  shellArgs = argsCommon // args;
+  shellArgs = argsCommon // args // { inherit stdenv; };
   buildArgs =
     if defaultCargoBuildTarget != null then
       shellArgs // {
