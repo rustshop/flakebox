@@ -35,9 +35,9 @@ let
     ''
     else "";
 
-  args = cleanedArgs // {
+  args = mergeArgs cleanedArgs {
     packages =
-      packages ++ [
+      [
         flakeboxBin
 
         toolchain.toolchain
