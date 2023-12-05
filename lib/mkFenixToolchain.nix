@@ -26,11 +26,10 @@ in
 , args ? { }
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
-
 , clang ? pkgs.llvmPackages_16.clang
 , libclang ? pkgs.llvmPackages_16.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
-, stdenv ? clang.stdenv
+, stdenv ? pkgs.stdenv
 , useMold ? pkgs.stdenv.isLinux
 , isLintShell ? false
 }:
@@ -54,7 +53,7 @@ let
 
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
   # figure out when someone complains
-  argsCommon = lib.optionalAttrs (!isLintShell) ({
+  commonArgs = mergeArgs args (lib.optionalAttrs (!isLintShell) ({
     LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
     LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
     "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
@@ -90,23 +89,19 @@ let
         "-C link-arg=-Wl,--compress-debug-sections=zlib";
 
     nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
-  });
-  shellArgs = argsCommon // args // { inherit stdenv; };
+  }));
+  shellArgs = { };
   buildArgs =
-    if defaultCargoBuildTarget != null then
-      shellArgs // {
-        CARGO_BUILD_TARGET = defaultCargoBuildTarget;
-      }
-    else
-      shellArgs;
+    if defaultCargoBuildTarget != null then {
+      CARGO_BUILD_TARGET = defaultCargoBuildTarget;
+    } else { };
 
   # this can't be a method on `craneLib` because it basically constructs the `craneLib`
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs buildArgs;
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; });
 in
 {
   toolchain = toolchain';
   inherit components componentTargets;
-  args = buildArgs;
-  inherit shellArgs;
+  inherit commonArgs shellArgs buildArgs stdenv;
   craneLib = craneLib';
 }

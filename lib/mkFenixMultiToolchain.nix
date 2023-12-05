@@ -15,7 +15,10 @@ in
 , componentTargetsChannelName ? "stable"
 , channel ? defaultChannel
 , defaultCargoBuildTarget ? null
-, args ? { }
+, commonArgs ? { }
+, shellArgs ? { }
+, buildArgs ? { }
+, stdenv ? pkgs.stdenv
 , componentTargets ? [ ]
 }:
 let
@@ -23,27 +26,41 @@ let
   uniqueList = list: lib.foldl' (acc: elem: if lib.elem elem acc then acc else acc ++ [ elem ]) [ ] list;
   allComponents = uniqueList (builtins.concatLists (map (toolchain: toolchain.components) toolchains'));
   allComponentTargets = uniqueList (builtins.concatLists (map (toolchain: toolchain.componentTargets) toolchains'));
-  allArgs = lib.foldl
+  allCommonArgs = lib.foldl
+    (accCommonArgs: toolchainCommonArgs: mergeArgs accCommonArgs toolchainCommonArgs)
+    commonArgs
+    (map (toolchain: toolchain.commonArgs) toolchains');
+  allShellArgs = lib.foldl
     (accShellArgs: toolchainShellArgs: mergeArgs accShellArgs toolchainShellArgs)
-    args
+    shellArgs
     (map (toolchain: toolchain.shellArgs) toolchains');
+  allBuildArgs = lib.foldl
+    (accBuildArgs: toolchainBuildArgs: mergeArgs accBuildArgs toolchainBuildArgs)
+    buildArgs
+    (map (toolchain: toolchain.buildArgs) toolchains');
+  allStdenv = lib.foldl
+    (accBuildArgs: toolchainStdenv: toolchainStdenv)
+    stdenv
+    (map (toolchain: toolchain.stdenv) toolchains');
   toolchain' =
     (fenix.packages.${system}.combine (
       (map (component: channel.${component}) allComponents)
       ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) allComponentTargets)
     ));
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs args';
-  args' =
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs ((mergeArgs allCommonArgs allBuildArgs) // { stdenv = allStdenv; });
+  allBuildArgs' =
     if defaultCargoBuildTarget != null then
-      allArgs // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
+      allBuildArgs // { CARGO_BUILD_TARGET = defaultCargoBuildTarget; }
     else
-      allArgs;
+      allBuildArgs;
 in
 {
   toolchain = toolchain';
   components = allComponents;
   componentsTargets = allComponentTargets;
-  args = args';
-  shellArgs = allArgs;
+  commonArgs = allCommonArgs;
+  buildArgs = allBuildArgs';
+  shellArgs = allShellArgs;
   craneLib = craneLib';
+  stdenv = allStdenv;
 }
