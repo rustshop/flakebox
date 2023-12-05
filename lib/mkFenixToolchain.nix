@@ -63,25 +63,23 @@ let
     LIBCLANG_PATH = "${libclang.lib}/lib/";
 
     stdenv = clang.stdenv;
-  } //
-  # I wish we do that on Darwin as well, but in practice nothing ever
-  # works on Darwin if you mess with the defaults :(
-  lib.optionalAttrs (pkgs.stdenv.isLinux) {
+
     "CC_${target_underscores}" = "${clang}/bin/clang";
     "CXX_${target_underscores}" = "${clang}/bin/clang++";
     "AR_${target_underscores}" = "${clang}/bin/ar";
+
+    # just use newer clang
+    "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
+
     # setting CC and CXX can't be done via a standard, but if we set `stdenv`
-    # craneLib # will pick up from `args`, and `mkDevShell` will handle manually
+    # craneLib will pick up from `args`, and `mkDevShell` will handle manually
     # for some reason then we need to set `CC` and `CXX` here as well
     "CC" = "${clang}/bin/clang";
     "CXX" = "${clang}/bin/clang++";
     "AR" = "${clang}/bin/ar";
   } //
-  # Note: do not touch MacOS's linker, stuff is brittle there
-  # Also seems like Darwin can't handle mold or compress-debug-sections
+  # Seems like Darwin can't handle mold or compress-debug-sections
   lib.optionalAttrs (pkgs.stdenv.isLinux) {
-    # just use newer clang
-    "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
     # native toolchain default settings
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
       if useMold then
