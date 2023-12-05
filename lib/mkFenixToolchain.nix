@@ -30,6 +30,7 @@ in
 , clang ? pkgs.llvmPackages_16.clang
 , libclang ? pkgs.llvmPackages_16.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
+, stdenv ? clang.stdenv
 , useMold ? pkgs.stdenv.isLinux
 , isLintShell ? false
 }:
@@ -62,7 +63,7 @@ let
     # should not break cross-compilation
     LIBCLANG_PATH = "${libclang.lib}/lib/";
 
-    stdenv = clang.stdenv;
+    inherit stdenv;
 
     "CC_${target_underscores}" = "${clang}/bin/clang";
     "CXX_${target_underscores}" = "${clang}/bin/clang++";
