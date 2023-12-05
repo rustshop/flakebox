@@ -66,19 +66,22 @@ let
 
     "CC_${target_underscores}" = "${clang}/bin/clang";
     "CXX_${target_underscores}" = "${clang}/bin/clang++";
+    "LD_${target_underscores}" = "${clang}/bin/clang";
     "AR_${target_underscores}" = "${clang}/bin/ar";
 
-    # just use newer clang
+    # just use newer clang, default to its ld for linking
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/ld";
 
     # setting CC and CXX can't be done via a standard, but if we set `stdenv`
     # craneLib will pick up from `args`, and `mkDevShell` will handle manually
     # for some reason then we need to set `CC` and `CXX` here as well
     "CC" = "${clang}/bin/clang";
     "CXX" = "${clang}/bin/clang++";
+    "LD" = "${clang}/bin/clang";
     "AR" = "${clang}/bin/ar";
   } //
-  # Seems like Darwin can't handle mold or compress-debug-sections
+  # On Linux (optionally) use mold and compress-debug-sections
   lib.optionalAttrs (pkgs.stdenv.isLinux) {
     # native toolchain default settings
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
