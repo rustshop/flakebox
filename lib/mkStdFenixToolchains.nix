@@ -16,7 +16,9 @@
 }@args:
 let
   cleanedArgs =
-    removeAttrs args [ "androidSdk" ];
+    (removeAttrs args [ "androidSdk" ]) // {
+      inherit extraRustFlags;
+    };
 
   mkClangToolchain =
     { target
@@ -34,7 +36,7 @@ let
     mkFenixToolchain {
       componentTargets = [ target ];
       defaultCargoBuildTarget = target;
-      inherit extraRustFlags;
+      inherit extraRustFlags target;
       args =
         # if target == build, we don't need any args, the defaults should work
         lib.optionalAttrs (pkgs.stdenv.buildPlatform.config != target) ({
@@ -115,6 +117,7 @@ in
     };
   };
   wasm32-unknown = mkFenixToolchain {
+    target = "wasm32-unknown-unknown";
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
     inherit extraRustFlags;
@@ -171,35 +174,35 @@ in
     target = "x86_64-apple-ios";
   };
 } // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
-  aarch64-android = mkAndroidToolchain ({
+  aarch64-android = mkAndroidToolchain (args // {
     arch = "aarch64";
     androidVer = 31;
     target = "aarch64-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  arm-android = mkAndroidToolchain ({
+  arm-android = mkAndroidToolchain (args // {
     arch = "arm";
     androidVer = 31;
     target = "arm-linux-androideabi";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  armv7-android = mkAndroidToolchain ({
+  armv7-android = mkAndroidToolchain (args // {
     arch = "arm";
     androidVer = 31;
     target = "armv7-linux-androideabi";
     androidTarget = "arm-linux-androideabi";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  x86_64-android = mkAndroidToolchain ({
+  x86_64-android = mkAndroidToolchain (args // {
     arch = "x86_64";
     androidVer = 31;
     target = "x86_64-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  i686-android = mkAndroidToolchain ({
+  i686-android = mkAndroidToolchain (args // {
     arch = "i386";
     androidVer = 31;
     target = "i686-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 })
 

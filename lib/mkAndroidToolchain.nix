@@ -59,6 +59,7 @@ let
   ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
 in
 mkFenixToolchain {
+  inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
   inherit extraRustFlags;

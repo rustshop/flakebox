@@ -28,6 +28,7 @@ let
   '';
 in
 mkFenixToolchain {
+  inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
   args = {
