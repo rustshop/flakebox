@@ -21,9 +21,15 @@ in
 , androidVer ? 31
 , androidSdk ? defaultAndroidSdk
 , extraRustFlags ? ""
-}:
+, ...
+}@args:
 
 let
+  toolchainArgs =
+    (removeAttrs args [ "androidSdk" "androidVer" "androidSdk" "androidTarget" "arch" ]) // {
+      inherit extraRustFlags;
+    };
+
   ldLinkerWrapper =
     ld: ldflags:
     pkgs.writeShellScriptBin "ld" ''
@@ -58,11 +64,10 @@ let
   # but in practice it doesn't
   ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
 in
-mkFenixToolchain {
+mkFenixToolchain (toolchainArgs // {
   inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
-  inherit extraRustFlags;
   useMold = false;
   args = {
     # For bindgen, through universal-llvm-config
@@ -84,5 +89,5 @@ mkFenixToolchain {
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
   };
-}
+})
 
