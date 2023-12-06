@@ -63,6 +63,7 @@ mkFenixToolchain {
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
   inherit extraRustFlags;
+  useMold = false;
   args = {
     # For bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";
@@ -77,6 +78,7 @@ mkFenixToolchain {
 
     # cargo needs this
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
 
     # TODO: not clear if this belongs here, especially in presence of mixed android toolchains, this could fall apart
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
