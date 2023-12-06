@@ -20,6 +20,7 @@ in
 , arch
 , androidVer ? 31
 , androidSdk ? defaultAndroidSdk
+, extraRustFlags ? ""
 }:
 
 let
@@ -60,6 +61,7 @@ in
 mkFenixToolchain {
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
+  inherit extraRustFlags;
   args = {
     # For bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";

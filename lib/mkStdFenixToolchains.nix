@@ -11,7 +11,8 @@
 }:
 {
   # androidSdk ? null
-  ...
+  extraRustFlags ? ""
+, ...
 }@args:
 let
   cleanedArgs =
@@ -33,6 +34,7 @@ let
     mkFenixToolchain {
       componentTargets = [ target ];
       defaultCargoBuildTarget = target;
+      inherit extraRustFlags;
       args =
         # if target == build, we don't need any args, the defaults should work
         lib.optionalAttrs (pkgs.stdenv.buildPlatform.config != target) ({
@@ -44,7 +46,7 @@ let
           "AR_${target_underscores}" = "${clang}/bin/${binPrefix}ar";
           "LD_${target_underscores}" = "${clang}/bin/${binPrefix}ld";
           "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/${binPrefix}clang";
-          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib";
+          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
 
           inherit buildInputs nativeBuildInputs;
         } // args);
@@ -115,6 +117,7 @@ in
   wasm32-unknown = mkFenixToolchain {
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
+    inherit extraRustFlags;
     args = ({
       CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
       # -Wno-macro-redefined fixes ring building

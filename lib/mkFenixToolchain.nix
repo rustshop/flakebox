@@ -24,6 +24,7 @@ in
   ]
 , defaultCargoBuildTarget ? null
 , args ? { }
+, extraRustFlags ? ""
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
 , clang ? pkgs.llvmPackages_16.clang
@@ -69,7 +70,7 @@ let
 
     # just use newer clang, default to its ld for linking
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
-    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/ld";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/ld ${extraRustFlags}";
 
     # setting CC and CXX can't be done via a standard, but if we set `stdenv`
     # craneLib will pick up from `args`, and `mkDevShell` will handle manually
@@ -84,9 +85,9 @@ let
     # native toolchain default settings
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
       if useMold then
-        "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
+        "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}"
       else
-        "-C link-arg=-Wl,--compress-debug-sections=zlib";
+        "-C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
 
     nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
   }));
