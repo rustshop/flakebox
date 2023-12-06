@@ -120,14 +120,21 @@ in
     target = "wasm32-unknown-unknown";
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
+    # mold doesn't work for wasm at all
+    useMold = false;
     inherit extraRustFlags;
-    args = ({
-      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
-      # -Wno-macro-redefined fixes ring building
-      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
-    });
+    args = (
+      let target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN"; in {
+        CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+        # -Wno-macro-redefined fixes ring building
+        CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+        # leave these as defaults
+        "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
+        "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
+      } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+      }
+    );
   };
 
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
