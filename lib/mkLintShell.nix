@@ -21,6 +21,11 @@ let
   ];
 in
 let
+  mkShell =
+    if toolchain ? stdenv then
+      pkgs.mkShell.override { stdenv = toolchain.stdenv; }
+    else
+      pkgs.mkShell;
   args = cleanedArgs // {
     packages =
       packages ++ [
@@ -43,6 +48,6 @@ let
     '';
   };
 in
-pkgs.mkShell (
+mkShell (
   mergeArgs toolchain.shellArgs args
 )

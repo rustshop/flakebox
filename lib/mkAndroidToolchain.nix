@@ -20,9 +20,16 @@ in
 , arch
 , androidVer ? 31
 , androidSdk ? defaultAndroidSdk
-}:
+, extraRustFlags ? ""
+, ...
+}@args:
 
 let
+  toolchainArgs =
+    (removeAttrs args [ "androidSdk" "androidVer" "androidSdk" "androidTarget" "arch" ]) // {
+      inherit extraRustFlags;
+    };
+
   ldLinkerWrapper =
     ld: ldflags:
     pkgs.writeShellScriptBin "ld" ''
@@ -57,9 +64,11 @@ let
   # but in practice it doesn't
   ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
 in
-mkFenixToolchain {
+mkFenixToolchain (toolchainArgs // {
+  inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
+  useMold = false;
   args = {
     # For bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";
@@ -74,10 +83,11 @@ mkFenixToolchain {
 
     # cargo needs this
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
 
     # TODO: not clear if this belongs here, especially in presence of mixed android toolchains, this could fall apart
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
   };
-}
+})
 

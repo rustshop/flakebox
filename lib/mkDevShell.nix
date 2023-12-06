@@ -24,8 +24,8 @@ let
 in
 let
   mkShell =
-    if toolchain.shellArgs ? stdenv then
-      pkgs.mkShell.override { stdenv = toolchain.shellArgs.stdenv; }
+    if toolchain ? stdenv then
+      pkgs.mkShell.override { stdenv = toolchain.stdenv; }
     else
       pkgs.mkShell;
   flakeboxInit =
@@ -35,9 +35,9 @@ let
     ''
     else "";
 
-  args = cleanedArgs // {
+  args = mergeArgs cleanedArgs {
     packages =
-      packages ++ [
+      [
         flakeboxBin
 
         toolchain.toolchain
@@ -88,5 +88,5 @@ let
   };
 in
 mkShell (
-  mergeArgs toolchain.shellArgs args
+  mergeArgs (mergeArgs toolchain.commonArgs toolchain.shellArgs) args
 )

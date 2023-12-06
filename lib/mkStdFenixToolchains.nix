@@ -11,11 +11,14 @@
 }:
 {
   # androidSdk ? null
-  ...
+  extraRustFlags ? ""
+, ...
 }@args:
 let
   cleanedArgs =
-    removeAttrs args [ "androidSdk" ];
+    (removeAttrs args [ "androidSdk" ]) // {
+      inherit extraRustFlags;
+    };
 
   mkClangToolchain =
     { target
@@ -33,6 +36,7 @@ let
     mkFenixToolchain {
       componentTargets = [ target ];
       defaultCargoBuildTarget = target;
+      inherit extraRustFlags target;
       args =
         # if target == build, we don't need any args, the defaults should work
         lib.optionalAttrs (pkgs.stdenv.buildPlatform.config != target) ({
@@ -44,7 +48,7 @@ let
           "AR_${target_underscores}" = "${clang}/bin/${binPrefix}ar";
           "LD_${target_underscores}" = "${clang}/bin/${binPrefix}ld";
           "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/${binPrefix}clang";
-          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib";
+          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
 
           inherit buildInputs nativeBuildInputs;
         } // args);
@@ -113,15 +117,24 @@ in
     };
   };
   wasm32-unknown = mkFenixToolchain {
+    target = "wasm32-unknown-unknown";
     componentTargets = [ "wasm32-unknown-unknown" ];
     defaultCargoBuildTarget = "wasm32-unknown-unknown";
-    args = ({
-      CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
-      # -Wno-macro-redefined fixes ring building
-      CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
-    });
+    # mold doesn't work for wasm at all
+    useMold = false;
+    inherit extraRustFlags;
+    args = (
+      let target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN"; in {
+        CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+        # -Wno-macro-redefined fixes ring building
+        CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+        # leave these as defaults
+        "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
+        "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
+      } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+      }
+    );
   };
 
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
@@ -168,35 +181,35 @@ in
     target = "x86_64-apple-ios";
   };
 } // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
-  aarch64-android = mkAndroidToolchain ({
+  aarch64-android = mkAndroidToolchain (args // {
     arch = "aarch64";
     androidVer = 31;
     target = "aarch64-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  arm-android = mkAndroidToolchain ({
+  arm-android = mkAndroidToolchain (args // {
     arch = "arm";
     androidVer = 31;
     target = "arm-linux-androideabi";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  armv7-android = mkAndroidToolchain ({
+  armv7-android = mkAndroidToolchain (args // {
     arch = "arm";
     androidVer = 31;
     target = "armv7-linux-androideabi";
     androidTarget = "arm-linux-androideabi";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  x86_64-android = mkAndroidToolchain ({
+  x86_64-android = mkAndroidToolchain (args // {
     arch = "x86_64";
     androidVer = 31;
     target = "x86_64-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 
-  i686-android = mkAndroidToolchain ({
+  i686-android = mkAndroidToolchain (args // {
     arch = "i386";
     androidVer = 31;
     target = "i686-linux-android";
-  } // lib.optionalAttrs (args ? androidSdk) (lib.getAttrs [ "androidSdk" ] args));
+  });
 })
 

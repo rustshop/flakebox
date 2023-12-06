@@ -12,7 +12,8 @@
 let
   defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
 in
-{ toolchain ? null
+{ target ? pkgs.stdenv.buildPlatform.config
+, toolchain ? null
 , channel ? defaultChannel
 , components ? [
     "rustc"
@@ -24,12 +25,13 @@ in
   ]
 , defaultCargoBuildTarget ? null
 , args ? { }
+, extraRustFlags ? ""
 , componentTargetsChannelName ? "stable"
 , componentTargets ? [ ]
-
 , clang ? pkgs.llvmPackages_16.clang
 , libclang ? pkgs.llvmPackages_16.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
+, stdenv ? pkgs.stdenv
 , useMold ? pkgs.stdenv.isLinux
 , isLintShell ? false
 }:
@@ -43,7 +45,7 @@ let
         ++ (map (target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std) componentTargets)
       ));
 
-  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] pkgs.stdenv.buildPlatform.config;
+  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
   target_underscores_upper = lib.strings.toUpper target_underscores;
 
   nativeLLvmConfigPkg = targetLlvmConfigWrapper {
@@ -53,59 +55,58 @@ let
 
   # TODO: unclear if this belongs here, or in `default` toolchain? or maybe conditional on being native?
   # figure out when someone complains
-  argsCommon = lib.optionalAttrs (!isLintShell) ({
-    LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
-    LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
-    "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
+  commonArgs = mergeArgs
+    (lib.optionalAttrs (!isLintShell) ({
+      LLVM_CONFIG_PATH = "${universalLlvmConfig}/bin/llvm-config";
+      LLVM_CONFIG_PATH_native = "${nativeLLvmConfigPkg}/bin/llvm-config";
+      "LLVM_CONFIG_PATH_${target_underscores}" = "${nativeLLvmConfigPkg}/bin/llvm-config";
 
-    # bindgen expect native clang available here, so it's OK to set it globally,
-    # should not break cross-compilation
-    LIBCLANG_PATH = "${libclang.lib}/lib/";
-  } //
-  # I wish we do that on Darwin as well, but in practice nothing ever
-  # works on Darwin if you mess with the defaults :(
-  lib.optionalAttrs (pkgs.stdenv.isLinux) {
-    "CC_${target_underscores}" = "${clang}/bin/clang";
-    "CXX_${target_underscores}" = "${clang}/bin/clang++";
-    "AR_${target_underscores}" = "${clang}/bin/ar";
-    # setting CC and CXX can't be done via a standard, but if we set `stdenv`
-    # craneLib # will pick up from `args`, and `mkDevShell` will handle manually
-    # for some reason then we need to set `CC` and `CXX` here as well
-    "CC" = "${clang}/bin/clang";
-    "CXX" = "${clang}/bin/clang++";
-    "AR" = "${clang}/bin/ar";
-    stdenv = clang.stdenv;
-  } //
-  # Note: do not touch MacOS's linker, stuff is brittle there
-  # Also seems like Darwin can't handle mold or compress-debug-sections
-  lib.optionalAttrs (pkgs.stdenv.isLinux) {
-    # just use newer clang
-    "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
-    # native toolchain default settings
-    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-      if useMold then
-        "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib"
-      else
-        "-C link-arg=-Wl,--compress-debug-sections=zlib";
+      # bindgen expect native clang available here, so it's OK to set it globally,
+      # should not break cross-compilation
+      LIBCLANG_PATH = "${libclang.lib}/lib/";
 
-    nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
-  });
-  shellArgs = argsCommon // args;
+      "CC_${target_underscores}" = "${clang}/bin/clang";
+      "CXX_${target_underscores}" = "${clang}/bin/clang++";
+      "LD_${target_underscores}" = "${clang}/bin/clang";
+      "AR_${target_underscores}" = "${clang}/bin/ar";
+
+      # just use newer clang, default to its ld for linking
+      "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/clang";
+      "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/ld ${extraRustFlags}";
+
+      # setting CC and CXX can't be done via a standard, but if we set `stdenv`
+      # craneLib will pick up from `args`, and `mkDevShell` will handle manually
+      # for some reason then we need to set `CC` and `CXX` here as well
+      "CC" = "${clang}/bin/clang";
+      "CXX" = "${clang}/bin/clang++";
+      "LD" = "${clang}/bin/clang";
+      "AR" = "${clang}/bin/ar";
+    } //
+    # On Linux (optionally) use mold and compress-debug-sections
+    lib.optionalAttrs (pkgs.stdenv.isLinux) {
+      # native toolchain default settings
+      "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
+        if useMold then
+          "-C link-arg=-fuse-ld=mold -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}"
+        else
+          "-C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
+
+      nativeBuildInputs = lib.optionals useMold [ pkgs.mold-wrapped ];
+    })
+    )
+    args;
+  shellArgs = { };
   buildArgs =
-    if defaultCargoBuildTarget != null then
-      shellArgs // {
-        CARGO_BUILD_TARGET = defaultCargoBuildTarget;
-      }
-    else
-      shellArgs;
+    if defaultCargoBuildTarget != null then {
+      CARGO_BUILD_TARGET = defaultCargoBuildTarget;
+    } else { };
 
   # this can't be a method on `craneLib` because it basically constructs the `craneLib`
-  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs buildArgs;
+  craneLib' = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain')).overrideArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; });
 in
 {
   toolchain = toolchain';
   inherit components componentTargets;
-  args = buildArgs;
-  inherit shellArgs;
+  inherit commonArgs shellArgs buildArgs stdenv;
   craneLib = craneLib';
 }
