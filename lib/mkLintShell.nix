@@ -11,7 +11,8 @@ let
 in
 
 { packages ? [ ]
-, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; isLintShell = true; }
+, stdenv ? pkgs.stdenv
+, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; isLintShell = true; inherit stdenv; }
 , ...
 } @ args:
 let
