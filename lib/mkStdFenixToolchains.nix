@@ -29,12 +29,12 @@ let
     , llvmConfigPkg ? clang
     , args ? { }
     , ...
-    }:
+    } @ mkClangToolchainArgs:
     let
       target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
       target_underscores_upper = lib.strings.toUpper target_underscores;
     in
-    mkFenixToolchain {
+    mkFenixToolchain (mkClangToolchainArgs // {
       componentTargets = [ target ];
       defaultCargoBuildTarget = target;
       inherit extraRustFlags target;
@@ -53,7 +53,7 @@ let
 
           inherit buildInputs nativeBuildInputs;
         } // args);
-    };
+    });
 in
 ({
   default = mkFenixToolchain (cleanedArgs // {
@@ -172,15 +172,15 @@ in
     };
   });
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
-  aarch64-ios = mkIOSToolchain {
+  aarch64-ios = mkIOSToolchain (cleanedArgs // {
     target = "aarch64-apple-ios";
-  };
-  aarch64-ios-sim = mkIOSToolchain {
+  });
+  aarch64-ios-sim = mkIOSToolchain (cleanedArgs // {
     target = "aarch64-apple-ios-sim";
-  };
-  x86_64-ios = mkIOSToolchain {
+  });
+  x86_64-ios = mkIOSToolchain (cleanedArgs // {
     target = "x86_64-apple-ios";
-  };
+  });
 } // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
   aarch64-android = mkAndroidToolchain (args // {
     arch = "aarch64";
