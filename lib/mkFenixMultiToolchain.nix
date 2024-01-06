@@ -8,11 +8,12 @@
 , mkStdFenixToolchains
 , mergeArgs
 }:
-let defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
-
+let
+  defaultChannelName = config.toolchain.channel.default;
+  defaultChannel = fenix.packages.${system}.${defaultChannelName};
 in
 { toolchains ? mkStdFenixToolchains { }
-, componentTargetsChannelName ? "stable"
+, componentTargetsChannelName ? defaultChannelName
 , channel ? defaultChannel
 , defaultCargoBuildTarget ? null
 , commonArgs ? { }
