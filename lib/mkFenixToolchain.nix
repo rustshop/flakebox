@@ -10,7 +10,8 @@
 , targetLlvmConfigWrapper
 }:
 let
-  defaultChannel = fenix.packages.${system}.${config.toolchain.channel.default};
+  defaultChannelName = config.toolchain.channel.default;
+  defaultChannel = fenix.packages.${system}.${defaultChannelName};
 in
 { target ? pkgs.stdenv.buildPlatform.config
 , toolchain ? null
@@ -26,12 +27,12 @@ in
 , defaultCargoBuildTarget ? null
 , args ? { }
 , extraRustFlags ? ""
-, componentTargetsChannelName ? "stable"
+, componentTargetsChannelName ? defaultChannelName
 , componentTargets ? [ ]
 , clang ? pkgs.llvmPackages_16.clang
 , libclang ? pkgs.llvmPackages_16.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
-, stdenv ? pkgs.stdenv
+, stdenv
 , useMold ? pkgs.stdenv.isLinux
 , isLintShell ? false
 }:

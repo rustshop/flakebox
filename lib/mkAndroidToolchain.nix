@@ -21,6 +21,7 @@ in
 , androidVer ? 31
 , androidSdk ? defaultAndroidSdk
 , extraRustFlags ? ""
+, stdenv
 , ...
 }@args:
 

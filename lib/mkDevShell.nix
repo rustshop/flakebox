@@ -13,7 +13,8 @@ let
   rust-analyzer = config.toolchain.rust-analyzer;
 in
 { packages ? [ ]
-, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; }
+, stdenv ? pkgs.stdenv
+, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; inherit stdenv; }
 , ...
 } @ args:
 let

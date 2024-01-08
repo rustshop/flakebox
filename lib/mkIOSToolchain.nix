@@ -5,7 +5,8 @@
 , mkFenixToolchain
 }:
 { target
-}:
+, ...
+} @ args:
 
 let
   target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
@@ -27,7 +28,7 @@ let
     exec llvm-config "$@"
   '';
 in
-mkFenixToolchain {
+mkFenixToolchain (args // {
   inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
@@ -43,5 +44,5 @@ mkFenixToolchain {
 
     nativeBuildInputs = [ target-clang-wrapper ];
   };
-}
+})
 

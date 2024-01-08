@@ -12,12 +12,18 @@
 {
   # androidSdk ? null
   extraRustFlags ? ""
+, stdenv ? pkgs.stdenv
 , ...
 }@args:
 let
+  cleanedArgsAndroid =
+    args // {
+      inherit extraRustFlags stdenv;
+    };
+
   cleanedArgs =
     (removeAttrs args [ "androidSdk" ]) // {
-      inherit extraRustFlags;
+      inherit extraRustFlags stdenv;
     };
 
   mkClangToolchain =
@@ -34,7 +40,7 @@ let
       target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
       target_underscores_upper = lib.strings.toUpper target_underscores;
     in
-    mkFenixToolchain {
+    mkFenixToolchain ({ inherit stdenv; } // {
       componentTargets = [ target ];
       defaultCargoBuildTarget = target;
       inherit extraRustFlags target;
@@ -53,7 +59,7 @@ let
 
           inherit buildInputs nativeBuildInputs;
         } // args);
-    };
+    });
 in
 ({
   default = mkFenixToolchain (cleanedArgs // {
@@ -172,42 +178,42 @@ in
     };
   });
 } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
-  aarch64-ios = mkIOSToolchain {
+  aarch64-ios = mkIOSToolchain (cleanedArgs // {
     target = "aarch64-apple-ios";
-  };
-  aarch64-ios-sim = mkIOSToolchain {
+  });
+  aarch64-ios-sim = mkIOSToolchain (cleanedArgs // {
     target = "aarch64-apple-ios-sim";
-  };
-  x86_64-ios = mkIOSToolchain {
+  });
+  x86_64-ios = mkIOSToolchain (cleanedArgs // {
     target = "x86_64-apple-ios";
-  };
+  });
 } // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
-  aarch64-android = mkAndroidToolchain (args // {
+  aarch64-android = mkAndroidToolchain (cleanedArgsAndroid // {
     arch = "aarch64";
     androidVer = 31;
     target = "aarch64-linux-android";
   });
 
-  arm-android = mkAndroidToolchain (args // {
+  arm-android = mkAndroidToolchain (cleanedArgsAndroid // {
     arch = "arm";
     androidVer = 31;
     target = "arm-linux-androideabi";
   });
 
-  armv7-android = mkAndroidToolchain (args // {
+  armv7-android = mkAndroidToolchain (cleanedArgsAndroid // {
     arch = "arm";
     androidVer = 31;
     target = "armv7-linux-androideabi";
     androidTarget = "arm-linux-androideabi";
   });
 
-  x86_64-android = mkAndroidToolchain (args // {
+  x86_64-android = mkAndroidToolchain (cleanedArgsAndroid // {
     arch = "x86_64";
     androidVer = 31;
     target = "x86_64-linux-android";
   });
 
-  i686-android = mkAndroidToolchain (args // {
+  i686-android = mkAndroidToolchain (cleanedArgsAndroid // {
     arch = "i386";
     androidVer = 31;
     target = "i686-linux-android";
