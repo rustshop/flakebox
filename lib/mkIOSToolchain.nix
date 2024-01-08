@@ -5,6 +5,7 @@
 , mkFenixToolchain
 }:
 { target
+, extraRustFlags ? ""
 , ...
 } @ args:
 
@@ -32,6 +33,7 @@ mkFenixToolchain (args // {
   inherit target;
   componentTargets = [ target ];
   defaultCargoBuildTarget = target;
+  # cross-compilation to ios requires using globally installed xcode, so we need to overwrite env vars to use it
   args = {
     # For older bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${target-llvm-config-wrapper}/bin/llvm-config";
@@ -40,7 +42,9 @@ mkFenixToolchain (args // {
     "CXX_${target_underscores}" = "/usr/bin/clang++";
     ## cc or ld?
     "LD_${target_underscores}" = "/usr/bin/cc";
+
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "/usr/bin/clang";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=/usr/bin/ld ${extraRustFlags}";
 
     nativeBuildInputs = [ target-clang-wrapper ];
   };
