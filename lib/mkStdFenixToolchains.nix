@@ -123,6 +123,22 @@ in
       BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   });
+  riscv64-linux = mkClangToolchain (cleanedArgs // {
+    target = "riscv64gc-unknown-linux-gnu";
+    clang = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang;
+    binPrefix = "riscv64-unknown-linux-gnu-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+    };
+  });
   wasm32-unknown = mkFenixToolchain (cleanedArgs // {
     target = "wasm32-unknown-unknown";
     componentTargets = [ "wasm32-unknown-unknown" ];
