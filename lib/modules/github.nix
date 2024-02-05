@@ -25,7 +25,7 @@ in
         type = types.attrs;
         description = lib.mdDoc "Build matrix to use in the workflow `strategy.matrix` of `build` job";
         default = {
-          host = [ "macos" "linux" ];
+          host = [ "macos-x86_64" "macos-aarch64" "linux" ];
           include = [
             {
               host = "linux";
@@ -33,8 +33,13 @@ in
               timeout = 60;
             }
             {
-              host = "macos";
+              host = "macos-x86_64";
               runs-on = "macos-12";
+              timeout = 60;
+            }
+            {
+              host = "macos-aarch64";
+              runs-on = "macos-14";
               timeout = 60;
             }
           ];
