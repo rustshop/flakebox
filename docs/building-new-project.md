@@ -73,7 +73,7 @@ index a96aa14..25ce16f 100644
  
 -  outputs = { self, nixpkgs }: {
 +  inputs = {
-+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
++    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
 +
 +    flakebox = {
 +      url = "github:rustshop/flakebox";
@@ -131,7 +131,7 @@ index a96aa14..bce12c5 100644
  
 -  outputs = { self, nixpkgs }: {
 +  inputs = {
-+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
++    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
  
 -    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
 -
@@ -169,7 +169,7 @@ Since that's a bit handful, let me paste the whole content:
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
 
     flakebox = {
       url = "github:rustshop/flakebox";
@@ -691,7 +691,7 @@ index a65ba7a..f4c64d7 100644
 --- a/flake.nix
 +++ b/flake.nix
 @@ -5,7 +5,7 @@
-     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
  
      flakebox = {
 -      url = "github:rustshop/flakebox";
