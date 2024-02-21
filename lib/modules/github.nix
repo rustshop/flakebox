@@ -274,7 +274,7 @@ in
                 ''
                   nix flake check -L .#
                 '' else
-                lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build ${output}") config.github.ci.buildOutputs)
+                lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build -L ${output}") config.github.ci.buildOutputs)
             ;
             buildMatrix = recursiveMerge [ config.github.ci.buildMatrix config.github.ci.buildMatrixExtra ];
             cacheStep =
