@@ -15,6 +15,12 @@ in
         default = null;
       };
 
+      runsOn = lib.mkOption {
+        type = types.anything;
+        description = lib.mdDoc "Value of a runs-on to use for default Linu workflows (lint, self-check, etc.)";
+        default = "ubuntu-latest";
+      };
+
       buildOutputs = lib.mkOption {
         type = types.listOf types.str;
         description = lib.mdDoc "List of outputs to build";
@@ -29,7 +35,7 @@ in
           include = [
             {
               host = "linux";
-              runs-on = "ubuntu-latest";
+              runs-on = config.github.ci.runsOn;
               timeout = 60;
             }
             {
@@ -118,7 +124,7 @@ in
         jobs = {
           flake = {
             name = "Flake self-check";
-            runs-on = "ubuntu-latest";
+            runs-on = config.github.ci.runsOn;
             steps = [
               { uses = "actions/checkout@v4"; }
               {
@@ -133,7 +139,7 @@ in
 
           lint = {
             name = "Lint";
-            runs-on = "ubuntu-latest";
+            runs-on = config.github.ci.runsOn;
             steps = [
               { uses = "actions/checkout@v4"; }
 
@@ -210,7 +216,7 @@ in
 
         jobs = {
           flakehub-publish = {
-            runs-on = "ubuntu-latest";
+            runs-on = config.github.ci.runsOn;
             permissions = {
               id-token = "write";
               contents = "read";
