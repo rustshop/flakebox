@@ -88,7 +88,10 @@
                 cargoArtifacts = workspaceDeps;
               };
               flakebox = craneLib.buildPackage { };
-              flakeboxGroup = craneLib.buildPackageGroup { packages = [ "flakebox" ]; mainProgram = "flakebox"; };
+              flakeboxGroup = craneLib.buildPackageGroup {
+                packages = [ "flakebox" ];
+                mainProgram = "flakebox";
+              };
             });
 
 

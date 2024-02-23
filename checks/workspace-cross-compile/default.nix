@@ -116,6 +116,10 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
   lib.optionals full [
     # double check nightly
     multiOutput.nightly.ci.workspaceBuild
+  ] ++
+  lib.optionals (full && pkgs.stdenv.isLinux) [
+    # double check nightly
+    multiOutput.nightly.ci.workspaceBuild
 
     multiOutput.aarch64-linux.ci.workspaceBuild
     multiOutput.x86_64-linux.ci.workspaceBuild

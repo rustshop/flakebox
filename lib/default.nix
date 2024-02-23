@@ -62,7 +62,7 @@ in
       src = ../docs;
 
       # depend on our options doc derivation
-      buildInput = [ optionsDocMd ];
+      buildInputs = [ optionsDocMd ];
 
       # mkdocs dependencies
       nativeBuildInputs = builtins.attrValues {
@@ -94,10 +94,7 @@ in
       mv id $out/.config/flakebox/
     '';
 
-  craneLib = self.enhanceCrane self.config.craneLib.default;
-  craneLibNightly = self.enhanceCrane self.config.craneLib.nightly;
-  craneLibStable = self.enhanceCrane self.config.craneLib.stable;
-
+  craneLib = self.enhanceCrane self.config.craneLib;
 
   # wrapper over `mkShell` setting up flakebox env
   mkDevShell = callPackage ./mkDevShell.nix { };
@@ -122,9 +119,18 @@ in
     toolchains;
   mapWithToolchains = f: self.mapWithToolchains' (toochainName: craneLib: f craneLib);
 
-  mkStdFenixToolchains = callPackage ./mkStdFenixToolchains.nix { };
+  mkClangTarget = callPackage ./mkClangTarget.nix { };
+  mkNativeTarget = callPackage ./mkNativeTarget.nix { };
+  mkIOSTarget = callPackage ./mkIOSTarget.nix { };
+  mkStdTargets = callPackage ./mkStdTargets.nix { };
+  mkStdToolchains = callPackage ./mkStdToolchains.nix { };
+  mkStdFenixToolchains = callPackage ./mkStdToolchains.nix { };
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
   universalLlvmConfig = callPackage ./universalLlvmConfig.nix { };
+
+
+  mkTarget = callPackage ./mkTarget.nix { };
+  mkAndroidTarget = callPackage ./mkAndroidTarget.nix { };
 
   # older bindgen (clang-sys) crate can be told to use /usr/bin/clang this way
   targetLlvmConfigWrapper = { clangPkg, binClangPkg ? clangPkg, libClangPkg ? clangPkg }: pkgs.writeShellScriptBin "llvm-config" ''

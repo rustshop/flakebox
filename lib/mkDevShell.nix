@@ -4,23 +4,28 @@
 , root
 , docs
 , mkFenixToolchain
+, mkStdTargets
 , lib
 , mergeArgs
 }:
 let
-  defaultToolchain = config.toolchain.default;
   rustfmt = config.toolchain.rustfmt;
-  rust-analyzer = config.toolchain.rust-analyzer;
 in
 { packages ? [ ]
 , stdenv ? pkgs.stdenv
-, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; inherit stdenv; }
+, targets ? lib.getAttrs [ "default" ] (mkStdTargets { })
+, toolchain ? mkFenixToolchain {
+    channel = config.toolchain.channel;
+    components = config.toolchain.components;
+    inherit targets;
+  }
 , ...
 } @ args:
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
     "packages"
+    "targets"
   ];
 in
 let
@@ -41,11 +46,10 @@ let
       [
         flakeboxBin
 
-        toolchain.toolchain
+
+        (toolchain.toolchain)
 
         rustfmt
-        rust-analyzer
-
 
         pkgs.nodePackages.bash-language-server
 
@@ -62,12 +66,14 @@ let
         inherit (pkgs) cargo-watch;
         # TODO: make conditional on `config.just.enable`
         inherit (pkgs) just;
-      });
+      }) ++ toolchain.toolchain.packages or [ ];
 
     buildInputs = lib.optionals pkgs.stdenv.isDarwin [
       pkgs.libiconv
       pkgs.darwin.apple_sdk.frameworks.Security
-    ];
+    ] ++ toolchain.toolchain.buildInputs or [ ];
+
+    nativeBuildInputs = toolchain.toolchain.nativeBuildInputs or [ ];
 
     JUST_UNSTABLE = "true";
 

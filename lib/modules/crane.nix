@@ -1,52 +1,17 @@
-{ lib, config, pkgs, crane, ... }:
+{ lib, config, pkgs, crane, fenix, ... }:
 
 let
   system = pkgs.system;
   inherit (lib) types mkOption;
 in
 {
+  options.craneLib = mkOption {
+    type = types.attrs;
+    description = lib.mdDoc ''
+      craneLib to use by default
 
-  options.craneLib = {
-    default = mkOption {
-      type = types.attrs;
-      description = lib.mdDoc ''
-        craneLib to use by default
-        
-        Default value is craneLib initialized with `config.toolchain.default`
-      '';
-      default = crane.lib.${system}.overrideToolchain config.toolchain.default;
-      # FIXME:
-      # defaultText = lib.mdDoc ''
-      #   `crane.lib.''${system}.overrideToolchain config.toolchain.default`
-      # '';
-    };
-
-    nightly = mkOption {
-      type = types.attrs;
-      description = lib.mdDoc ''
-        craneLib to use when nightly toolchain is needed
-        
-        Default value is craneLib initialized with `config.toolchain.nightly`
-      '';
-      default = crane.lib.${system}.overrideToolchain config.toolchain.nightly;
-      # FIXME:
-      # defaultText = lib.mdDoc ''
-      #   `crane.lib.''${system}.overrideToolchain config.toolchain.nightly`
-      # '';
-    };
-
-    stable = mkOption {
-      type = types.attrs;
-      description = lib.mdDoc ''
-        craneLib to use when stable toolchain is needed
-        
-        Default value is craneLib initialized with `config.toolchain.stable`
-      '';
-      default = crane.lib.${system}.overrideToolchain config.toolchain.stable;
-      # FIXME:
-      # defaultText = lib.mdDoc ''
-      #   `crane.lib.''${system}.overrideToolchain config.toolchain.stable`
-      # '';
-    };
+      Default value is craneLib initialized with `config.toolchain.channel` toolchain with `config.toolchain.components`
+    '';
+    default = crane.lib.${system}.overrideToolchain (fenix.packages.${system}.${config.toolchain.channel}.withComponents config.toolchain.components);
   };
 }

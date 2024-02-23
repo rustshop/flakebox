@@ -1,10 +1,12 @@
-{ mkStdFenixToolchains
+{ mkFenixToolchain
 , craneLib
 , mapWithToolchains
+, mkTarget
+, mkStdToolchains
+, lib
 }:
 let craneLib' = craneLib; in
-
-{ toolchains ? mkStdFenixToolchains { }
+{ toolchains ? mkStdToolchains { }
 , profiles ? [ "dev" "ci" "release" ]
 , craneLib ? craneLib'
 }: outputsFn:
