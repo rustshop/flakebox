@@ -484,7 +484,7 @@ boolean
 
 
 
-Whether to enable git pre-commit hook\.
+Whether to enable git commit-msg hook\.
 
 
 

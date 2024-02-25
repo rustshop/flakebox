@@ -137,7 +137,7 @@ in
 
     })
 
-    (lib.mkIf config.git.commit-msg.enable {
+    (lib.mkIf config.git.pre-commit.enable {
       rootDir."misc/git-hooks/pre-commit" =
         let
           indentString = str: numSpaces:
