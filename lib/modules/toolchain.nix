@@ -87,18 +87,6 @@ in
         '';
         default = fenix.packages.${system}.${config.toolchain.channel.nightly}.withComponents [ "rustfmt" ];
       };
-
-      rust-analyzer = mkOption {
-        type = lib.types.package;
-        description = lib.mdDoc ''
-          rust-analyzer package to use in the shell and lints
-
-          Separate from the toolchain as it's common to want a custom version.
-
-          Defaults to the standard rust-analyzer from nixpkgs input.
-        '';
-        default = pkgs.rust-analyzer;
-      };
     };
 
   config = { };

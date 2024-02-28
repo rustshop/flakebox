@@ -10,7 +10,6 @@
 let
   defaultToolchain = config.toolchain.default;
   rustfmt = config.toolchain.rustfmt;
-  rust-analyzer = config.toolchain.rust-analyzer;
 in
 { packages ? [ ]
 , stdenv ? pkgs.stdenv
@@ -44,7 +43,6 @@ let
         toolchain.toolchain
 
         rustfmt
-        rust-analyzer
 
 
         pkgs.nodePackages.bash-language-server
