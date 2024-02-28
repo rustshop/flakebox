@@ -20,9 +20,9 @@ in
     "rustc"
     "cargo"
     "clippy"
-    "rust-analysis"
+    "rust-analyzer"
     "rust-src"
-    "llvm-tools-preview"
+    "llvm-tools"
   ]
 , defaultCargoBuildTarget ? null
 , args ? { }

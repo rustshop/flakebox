@@ -19,7 +19,7 @@ in
           "rustc"
           "cargo"
           "clippy"
-          "rust-analysis"
+          "rust-analyzer"
           "rust-src"
         ];
       };
