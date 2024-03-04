@@ -111,6 +111,9 @@
           root = flakeboxLib.root;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
+        };
+
+        legacyPackages = outputs // {
           fullChecks =
             (pkgs.callPackages ./checks {
               inherit pkgs;
@@ -118,8 +121,6 @@
               full = true;
             }).workspaceCross;
         };
-
-        legacyPackages = outputs;
 
         devShells = flakeboxLib.mkShells {
           packages = [ pkgs.mdbook ];

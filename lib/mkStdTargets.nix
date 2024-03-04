@@ -9,8 +9,9 @@
 , mkClangTarget
 , mkNativeTarget
 , mkTarget
+, android-nixpkgs
 }:
-{ ... }: {
+{ ... }@mkStdTargetsArgs: {
   default = mkNativeTarget { };
 
 } // lib.optionalAttrs pkgs.stdenv.isLinux {
@@ -105,7 +106,7 @@
       );
     }
     args;
-
+} // lib.optionalAttrs ((mkStdTargetsArgs ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
   aarch64-android = mkAndroidTarget {
     arch = "aarch64";
     androidVer = 31;
@@ -136,8 +137,8 @@
     androidVer = 31;
     target = "i686-linux-android";
   };
-} // lib.optionalAttrs pkgs.stdenv.isDarwin {
 
+} // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "aarch64-apple-darwin") {
   aarch64-darwin = mkClangTarget {
     target = "aarch64-apple-darwin";
     clang = pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang;
@@ -155,6 +156,7 @@
     };
   };
 
+} // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "x86_64-apple-darwin") {
   x86_64-darwin = mkClangTarget {
     target = "x86_64-apple-darwin";
     clang = pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang;

@@ -4,6 +4,7 @@
 , pkgs
 , system
 , fenix
+, android-nixpkgs
 }:
 { clang ? pkgs.llvmPackages_16.clang
 , libclang ? pkgs.llvmPackages_16.libclang.lib
@@ -61,6 +62,7 @@ in
     };
   });
 
+} // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
 
   aarch64-android = mkFenixToolchain {
     defaultTarget = "aarch64-linux-android";
@@ -86,13 +88,16 @@ in
       armv7-android = stdTargets.armv7-android;
     };
   };
-} // lib.optionalAttrs pkgs.stdenv.isDarwin {
+
+} // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "aarch64-apple-darwin") {
   aarch64-darwin = mkFenixToolchain (args // {
     defaultTarget = "aarch64-apple-darwin";
     targets = {
       aarch64-darwin = stdTargets.aarch64-darwin;
     };
   });
+
+} // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "x86_64-apple-darwin") {
   x86_64-darwin = mkFenixToolchain (args // {
     defaultTarget = "x86_64-apple-darwin";
     targets = {
