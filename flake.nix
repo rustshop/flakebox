@@ -88,7 +88,10 @@
                 cargoArtifacts = workspaceDeps;
               };
               flakebox = craneLib.buildPackage { };
-              flakeboxGroup = craneLib.buildPackageGroup { packages = [ "flakebox" ]; mainProgram = "flakebox"; };
+              flakeboxGroup = craneLib.buildPackageGroup {
+                packages = [ "flakebox" ];
+                mainProgram = "flakebox";
+              };
             });
 
 
@@ -108,6 +111,9 @@
           root = flakeboxLib.root;
           default = outputs.flakebox;
           docs = flakeboxLib.docs;
+        };
+
+        legacyPackages = outputs // {
           fullChecks =
             (pkgs.callPackages ./checks {
               inherit pkgs;
@@ -115,8 +121,6 @@
               full = true;
             }).workspaceCross;
         };
-
-        legacyPackages = outputs;
 
         devShells = flakeboxLib.mkShells {
           packages = [ pkgs.mdbook ];

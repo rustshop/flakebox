@@ -2,7 +2,7 @@
 , pkgs
 , system
 , android-nixpkgs
-, mkFenixToolchain
+, mkTarget
 }:
 let
   defaultAndroidSdk =
@@ -19,26 +19,23 @@ in
 , androidTarget ? target
 , arch
 , androidVer ? 31
-, androidSdk ? defaultAndroidSdk
-, extraRustFlags ? ""
-, stdenv
 , ...
-}@args:
-
+}:
+let defaultAndroidVer = androidVer; in
+{ extraRustFlags ? ""
+, androidVer ? defaultAndroidVer
+, androidSdk ? defaultAndroidSdk
+, ...
+}@mkTargetArgs:
 let
-  toolchainArgs =
-    (removeAttrs args [ "androidSdk" "androidVer" "androidSdk" "androidTarget" "arch" ]) // {
-      inherit extraRustFlags;
-    };
+  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
+  target_underscores_upper = lib.strings.toUpper target_underscores;
 
   ldLinkerWrapper =
     ld: ldflags:
     pkgs.writeShellScriptBin "ld" ''
       exec "${ld}" ${ldflags} "$@"
     '';
-  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
-  target_underscores_upper = lib.strings.toUpper target_underscores;
-
   androidSdkPrebuilt =
     if system == "x86_64-linux" then
       "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64"
@@ -65,11 +62,10 @@ let
   # but in practice it doesn't
   ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
 in
-mkFenixToolchain (toolchainArgs // {
+mkTarget
+{
   inherit target;
-  componentTargets = [ target ];
-  defaultCargoBuildTarget = target;
-  useMold = false;
+  canUseMold = false;
   args = {
     # For bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";
@@ -90,5 +86,6 @@ mkFenixToolchain (toolchainArgs // {
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
   };
-})
+}
+  mkTargetArgs
 

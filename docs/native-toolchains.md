@@ -13,7 +13,7 @@ To change the default toolchain channel to nightly use:
 ```nix
 flakeboxLib = flakebox.lib.${system} {
   config = {
-    toolchain.channel.default = "complete"; # or "latest", see https://github.com/nix-community/fenix for details
+    toolchain.channel = "complete"; # or "latest", see https://github.com/nix-community/fenix for details
   };
 };
 ```

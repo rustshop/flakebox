@@ -4,15 +4,21 @@
 , mkFenixToolchain
 , lib
 , mergeArgs
+, mkStdTargets
 }:
 let
-  defaultToolchain = config.toolchain.default;
   rustfmt = config.toolchain.rustfmt;
 in
 
 { packages ? [ ]
 , stdenv ? pkgs.stdenv
-, toolchain ? mkFenixToolchain { toolchain = defaultToolchain; isLintShell = true; inherit stdenv; }
+, targets ? lib.getAttrs [ "default" ] (mkStdTargets { })
+, toolchain ? mkFenixToolchain {
+    inherit targets stdenv;
+    channel = config.toolchain.channel;
+    components = config.toolchain.components;
+    isLintShell = true;
+  }
 , ...
 } @ args:
 let

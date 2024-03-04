@@ -1,31 +1,46 @@
 { mkLintShell
 , mkDevShell
-, mkStdFenixToolchains
-, mkFenixMultiToolchain
+, mkFenixToolchain
+, mkStdTargets
 , pkgs
+, lib
+, config
 }:
-{ lintPackages ? [ ]
-, toolchains ? [
-    "default"
-    "aarch64-android"
-    "i686-android"
-    "x86_64-android"
-    "arm-android"
-  ]
+{ channel ? config.toolchain.channel
+, components ? config.toolchain.components
+
+, targets ? lib.getAttrs [ "default" ] (mkStdTargets { })
+, toolchain ? mkFenixToolchain {
+    inherit channel components targets;
+  }
+
+, crossTargets ? mkStdTargets { }
+, crossToolchain ? mkFenixToolchain {
+    inherit channel components;
+    targets = crossTargets;
+  }
+
+, lintPackages ? [ ]
 , ...
 } @ args:
 let
-  cleanedArgs = removeAttrs args [ "lintPackages" "toolchains" ];
+  cleanedArgs = removeAttrs args [
+    "channel"
+    "components"
+    "toolchain"
+    "targets"
+    "lintPackages"
+    "crossToolchain"
+    "crossTargets"
+  ];
 in
 {
   lint = mkLintShell { packages = lintPackages; };
-  default = mkDevShell cleanedArgs;
+  default = mkDevShell (cleanedArgs // {
+    inherit toolchain;
+  });
 
-  cross = mkDevShell {
-    packages = [ ];
-    toolchain = mkFenixMultiToolchain {
-      toolchains = pkgs.lib.getAttrs toolchains
-        (mkStdFenixToolchains { });
-    };
-  };
+  cross = mkDevShell (cleanedArgs // {
+    toolchain = crossToolchain;
+  });
 }
