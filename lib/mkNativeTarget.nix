@@ -33,12 +33,12 @@ let
       "CC_${target_underscores}" = "${clang}/bin/clang";
       "CXX_${target_underscores}" = "${clang}/bin/clang++";
       "AR_${target_underscores}" = "${clang}/bin/ar";
-      "LD_${target_underscores}" = "${clang}/bin/ld";
+      "LD_${target_underscores}" = "${clang}/bin/clang";
 
       "CC" = "${clang}/bin/clang";
       "CXX" = "${clang}/bin/clang++";
       "AR" = "${clang}/bin/ar";
-      "LD" = "${clang}/bin/ld";
+      "LD" = "${clang}/bin/clang";
 
       inherit buildInputs nativeBuildInputs;
     }

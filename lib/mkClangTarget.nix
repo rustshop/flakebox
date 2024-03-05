@@ -27,7 +27,7 @@ let
       "CC_${target_underscores}" = "${clang}/bin/${binPrefix}clang";
       "CXX_${target_underscores}" = "${clang}/bin/${binPrefix}clang++";
       "AR_${target_underscores}" = "${clang}/bin/${binPrefix}ar";
-      "LD_${target_underscores}" = "${clang}/bin/${binPrefix}ld";
+      "LD_${target_underscores}" = "${clang}/bin/${binPrefix}clang";
       "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/${binPrefix}clang";
       "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
 
