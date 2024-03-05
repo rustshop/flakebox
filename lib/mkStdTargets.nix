@@ -173,14 +173,14 @@
       BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
-
-  # aarch64-ios = mkIOSTarget ({
-  #   target = "aarch64-apple-ios";
-  # });
-  # aarch64-ios-sim = mkIOSTarget ({
-  #   target = "aarch64-apple-ios-sim";
-  # });
-  # x86_64-ios = mkIOSTarget ({
-  #   target = "x86_64-apple-ios";
-  # });
+} // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+  aarch64-ios = mkIOSTarget ({
+    target = "aarch64-apple-ios";
+  });
+  aarch64-ios-sim = mkIOSTarget ({
+    target = "aarch64-apple-ios-sim";
+  });
+  x86_64-ios = mkIOSTarget ({
+    target = "x86_64-apple-ios";
+  });
 }
