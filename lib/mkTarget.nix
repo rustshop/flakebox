@@ -72,7 +72,7 @@ else
             "${extraRustFlags}";
 
         nativeBuildInputs = lib.optionals (pkgs.stdenv.isLinux && canUseMold) [
-          pkgs.mold
+          pkgs.mold-wrapped
         ];
       }
       args;
