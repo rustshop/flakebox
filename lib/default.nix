@@ -111,9 +111,6 @@ in
 
   enhanceCrane = callPackage ./crane/enhance.nix { };
   mkFenixToolchain = callPackage ./mkFenixToolchain.nix { };
-  mkAndroidToolchain = callPackage ./mkAndroidToolchain.nix { };
-  mkIOSToolchain = callPackage ./mkIOSToolchain.nix { };
-  mkFenixMultiToolchain = callPackage ./mkFenixMultiToolchain.nix { };
   mapWithToolchains' = f: toolchains: builtins.mapAttrs
     (toolchainName: toolchain: f toolchainName (toolchain.craneLib.overrideArgs { inherit toolchainName; }))
     toolchains;
