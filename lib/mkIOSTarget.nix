@@ -6,11 +6,12 @@
 , mergeArgs
 }:
 { target
-, clang
+, clang ? pkgs.llvmPackages_16.clang
+, llvmConfigPkg ? clang
+, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
 , binPrefix ? ""
 , buildInputs ? [ ]
 , nativeBuildInputs ? [ ]
-, llvmConfigPkg ? clang
 , args ? { }
 , ...
 }@mkClangTargetArgs:
