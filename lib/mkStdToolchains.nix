@@ -10,6 +10,7 @@
 , libclang ? pkgs.llvmPackages_16.libclang.lib
 , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
 , stdenv ? pkgs.stdenv
+, ...
 }@args:
 let
   stdTargets = mkStdTargets { };

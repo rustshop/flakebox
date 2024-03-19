@@ -6,11 +6,12 @@
 , mergeArgs
 }:
 { target
-, clang
+, clang ? pkgs.llvmPackages_16.clang
+, llvmConfigPkg ? clang
+, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
 , binPrefix ? ""
 , buildInputs ? [ ]
 , nativeBuildInputs ? [ ]
-, llvmConfigPkg ? clang
 , args ? { }
 , ...
 }@mkClangTargetArgs:
@@ -33,8 +34,9 @@ let
     fi
     exec llvm-config "$@"
   '';
+  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
+  target_underscores_upper = lib.strings.toUpper target_underscores;
   combinedArgs = mergeArgs
-
     {
       # For older bindgen, through universal-llvm-config
       "LLVM_CONFIG_PATH_${target_underscores}" = "${target-llvm-config-wrapper}/bin/llvm-config";
@@ -49,10 +51,7 @@ let
 
       nativeBuildInputs = [ target-clang-wrapper ];
     }
-
-    mkClangTargetArgs.args;
-  target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
-  target_underscores_upper = lib.strings.toUpper target_underscores;
+    (mkClangTargetArgs.args or { });
 in
 mkTarget
 {
