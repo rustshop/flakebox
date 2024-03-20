@@ -56,10 +56,10 @@ in
   });
 } // {
 
-  wasm-unknown = mkFenixToolchain (args // {
-    defaultTarget = "wasm-unknown-unknown";
+  wasm32-unknown = mkFenixToolchain (args // {
+    defaultTarget = "wasm32-unknown-unknown";
     targets = {
-      wasm-unknown = stdTargets.wasm-unknown;
+      wasm32-unknown = stdTargets.wasm32-unknown;
     };
   });
 
