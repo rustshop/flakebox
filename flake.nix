@@ -109,7 +109,7 @@
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
           root = flakeboxLib.root;
-          default = outputs.flakebox;
+          default = flakeboxLib.flakeboxBin;
           docs = flakeboxLib.docs;
         };
 
