@@ -167,11 +167,11 @@ fn detect_cargo_root(_opts: &Opts) -> AppResult<PathBuf> {
 
 fn load_root_cargo_toml(
     opts: &Opts,
-) -> Result<(PathBuf, toml_edit::Document), error_stack::Report<AppError>> {
+) -> Result<(PathBuf, toml_edit::DocumentMut), error_stack::Report<AppError>> {
     let path = detect_cargo_root(opts)?.join("Cargo.toml");
     let cargo_toml = fs::read_to_string(&path).change_context(AppError::IO)?;
     let cargo_toml = cargo_toml
-        .parse::<toml_edit::Document>()
+        .parse::<toml_edit::DocumentMut>()
         .change_context(AppError::IO)?;
     Ok((path, cargo_toml))
 }
