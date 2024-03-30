@@ -1,6 +1,6 @@
 { pkgs, mergeArgs, ... }:
 let lib = pkgs.lib; in craneLib:
-craneLib.overrideScope' (self: prev: {
+craneLib.overrideScope (self: prev: {
   cargoProfile = "release";
   toolchainName = null;
 
@@ -134,14 +134,14 @@ craneLib.overrideScope' (self: prev: {
       cargoExtraArgs = "${pkgsArgs}";
     });
 
-  overrideArgs = args: self.overrideScope' (self: prev: { args = mergeArgs prev.args args; });
-  overrideArgs' = f: self.overrideScope' (self: prev: { args = prev.args // f prev.args; });
-  overrideArgs'' = f: self.overrideScope' (self: prev: { args = prev.args // f self prev.args; });
-  overrideArgsDepsOnly = args: self.overrideScope' (self: prev: { argsDepsOnly = mergeArgs prev.argsDepsOnly args; });
-  overrideArgsDepsOnly' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
-  overrideArgsDepsOnly'' = f: self.overrideScope' (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
-  overrideProfile = cargoProfile: self.overrideScope' (self: prev: { inherit cargoProfile; });
-  overrideToolchainName = toolchainName: self.overrideScope' (self: prev: { inherit toolchainName; });
+  overrideArgs = args: self.overrideScope (self: prev: { args = mergeArgs prev.args args; });
+  overrideArgs' = f: self.overrideScope (self: prev: { args = prev.args // f prev.args; });
+  overrideArgs'' = f: self.overrideScope (self: prev: { args = prev.args // f self prev.args; });
+  overrideArgsDepsOnly = args: self.overrideScope (self: prev: { argsDepsOnly = mergeArgs prev.argsDepsOnly args; });
+  overrideArgsDepsOnly' = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f prev.argsDepsOnly; });
+  overrideArgsDepsOnly'' = f: self.overrideScope (self: prev: { argsDepsOnly = prev.argsDepsOnly // f self prev.argsDepsOnly; });
+  overrideProfile = cargoProfile: self.overrideScope (self: prev: { inherit cargoProfile; });
+  overrideToolchainName = toolchainName: self.overrideScope (self: prev: { inherit toolchainName; });
   mapWithProfiles = f: profiles: builtins.listToAttrs (builtins.map (cargoProfile: { name = cargoProfile; value = f (self.overrideProfile cargoProfile); }) profiles);
   mapWithToolchains = f: toolchains: builtins.mapAttrs
     (toolchainName: toolchain: f ((self.overrideToolchainName toolchainName).overrideArgs toolchain.args))
