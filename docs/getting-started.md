@@ -96,17 +96,9 @@ Following modifications to `flake.nix` are needed:
         legacyPackages = multiBuild;
 
 
-        devShells = {
-          # Use `mkDevShell` wrapper instead of the usual `mkShell`
-          default = flakeboxLib.mkDevShell {
-            packages = [ ];
-          };
+        devShells = flakeboxLib.mkShells {};
 
           # ... 
-
-        };
-
-      # ...
 
       }
 ```
