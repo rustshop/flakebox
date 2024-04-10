@@ -8,6 +8,10 @@
 , mergeArgs
 , universalLlvmConfig
 , targetLlvmConfigWrapper
+, defaultClang
+, defaultLibClang
+, defaultClangUnwrapped
+, defaultStdenv
 }:
 let
   defaultChannelName = config.toolchain.channel;
@@ -21,10 +25,10 @@ in
 , extraRustFlags ? ""
 , componentTargetsChannelName ? defaultChannelName
 , componentTargets ? [ ]
-, clang ? pkgs.llvmPackages_16.clang
-, libclang ? pkgs.llvmPackages_16.libclang.lib
-, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
-, stdenv ? pkgs.stdenv
+, clang ? defaultClang
+, libclang ? defaultLibClang
+, clang-unwrapped ? defaultClangUnwrapped
+, stdenv ? defaultStdenv
 , isLintShell ? false
 }:
 let

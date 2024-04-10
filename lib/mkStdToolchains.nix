@@ -5,11 +5,15 @@
 , system
 , fenix
 , android-nixpkgs
+, defaultClang
+, defaultLibClang
+, defaultClangUnwrapped
+, defaultStdenv
 }:
-{ clang ? pkgs.llvmPackages_16.clang
-, libclang ? pkgs.llvmPackages_16.libclang.lib
-, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
-, stdenv ? pkgs.stdenv
+{ clang ? defaultClang
+, libclang ? defaultLibClang
+, clang-unwrapped ? defaultClangUnwrapped
+, stdenv ? defaultStdenv
 , ...
 }@args:
 let
