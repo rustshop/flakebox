@@ -125,6 +125,30 @@ in
   craneMultiBuild = callPackage ./craneMultiBuild.nix { };
   universalLlvmConfig = callPackage ./universalLlvmConfig.nix { };
 
+  defaultClang =
+    if pkgs.stdenv.isDarwin
+    then
+      pkgs.llvmPackages.clang
+    else
+      pkgs.llvmPackages_16.clang;
+  defaultLibClang =
+    if pkgs.stdenv.isDarwin
+    then
+      pkgs.llvmPackages.libclang.lib
+    else
+      pkgs.llvmPackages_16.libclang.lib;
+  defaultClangUnwrapped =
+    if pkgs.stdenv.isDarwin
+    then
+      pkgs.llvmPackages.clang-unwrapped
+    else
+      pkgs.llvmPackages_16.clang-unwrapped;
+  defaultStdenv =
+    if pkgs.stdenv.isDarwin
+    then
+      pkgs.clang11Stdenv
+    else
+      pkgs.stdenv;
 
   mkTarget = callPackage ./mkTarget.nix { };
   mkAndroidTarget = callPackage ./mkAndroidTarget.nix { };

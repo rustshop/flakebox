@@ -4,11 +4,13 @@
 , android-nixpkgs
 , mkTarget
 , mergeArgs
+, defaultClang
+, defaultClangUnwrapped
 }:
 { target
-, clang ? pkgs.llvmPackages_16.clang
+, clang ? defaultClang
 , llvmConfigPkg ? clang
-, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
+, clang-unwrapped ? defaultClangUnwrapped
 , binPrefix ? ""
 , buildInputs ? [ ]
 , nativeBuildInputs ? [ ]

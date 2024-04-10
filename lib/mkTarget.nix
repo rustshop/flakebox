@@ -9,6 +9,10 @@
 , universalLlvmConfig
 , targetLlvmConfigWrapper
 , mkNativeTarget
+, defaultClang
+, defaultLibClang
+, defaultClangUnwrapped
+, defaultStdenv
 }:
 { target ? pkgs.stdenv.buildPlatform.config
 , args ? { }
@@ -27,9 +31,9 @@ if (isNativeTarget && !isCalledByMkNativeTarget) then
 else
 # a target is a function so it can be still overridden
   { extraRustFlags ? ""
-  , clang ? pkgs.llvmPackages_16.clang
-  , libclang ? pkgs.llvmPackages_16.libclang.lib
-  , clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
+  , clang ? defaultClang
+  , libclang ? defaultLibClang
+  , clang-unwrapped ? defaultClangUnwrapped
   }:
   let
     target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;

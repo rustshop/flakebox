@@ -4,6 +4,8 @@
 , mkTarget
 , mergeArgs
 , targetLlvmConfigWrapper
+, defaultClang
+, defaultClangUnwrapped
 }:
 { buildInputs ? [ ]
 , nativeBuildInputs ? [ ]
@@ -11,15 +13,14 @@
 , ...
 }@mkNativeTargetArgs:
 { extraRustFlags ? ""
-, clang ? pkgs.llvmPackages_16.clang
+, clang ? defaultClang
 , llvmConfigPkg ? clang
-, clang-unwrapped ? pkgs.llvmPackages_16.clang-unwrapped
+, clang-unwrapped ? defaultClangUnwrapped
 , ...
 }@args:
 let
   target = pkgs.stdenv.buildPlatform.config;
   target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
-  target_underscores_upper = lib.strings.toUpper target_underscores;
   nativeLlvmConfigPkg = targetLlvmConfigWrapper {
     clangPkg = clang;
     libClangPkg = clang-unwrapped.lib;
