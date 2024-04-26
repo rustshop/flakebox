@@ -123,7 +123,7 @@ craneLib.overrideScope (self: prev: {
       deps = self.buildDepsOnly (args // (lib.optionalAttrs (pname != null) {
         inherit pname;
       }) // {
-        buildPhaseCargoCommand = "cargoWithProfile build ${pkgsArgs}";
+        cargoExtraArgs = "${pkgsArgs}";
       });
     in
     self.buildPackage (args // (lib.optionalAttrs (pname != null) {
