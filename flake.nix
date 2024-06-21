@@ -9,7 +9,7 @@
     flake-utils.inputs.systems.follows = "systems";
 
     crane = {
-      url = "github:ipetkov/crane/?rev=7443df1c478947bf96a2e699209f53b2db26209d"; # https://github.com/ipetkov/crane/releases/tag/v0.17.1
+      url = "github:ipetkov/crane/?rev=b65673fce97d277934488a451724be94cc62499a"; # https://github.com/ipetkov/crane/releases/tag/v0.17.3
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
