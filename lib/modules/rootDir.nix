@@ -61,12 +61,12 @@ in
   options = {
     rootDirPackage = mkOption {
       type = types.package;
-      description = lib.mdDoc "Derivation containing all rootDir files/symlinks";
+      description = "Derivation containing all rootDir files/symlinks";
     };
 
     rootDir = mkOption {
       default = { };
-      description = lib.mdDoc ''
+      description = ''
         Set of files that will be generated as as "Flakebox Root Dir".
       '';
 
@@ -78,7 +78,7 @@ in
             enable = mkOption {
               type = types.bool;
               default = true;
-              description = lib.mdDoc ''
+              description = ''
                 Whether this root dir file should be generated. This
                 option allows specific root dir files to be disabled.
               '';
@@ -86,7 +86,7 @@ in
 
             target = mkOption {
               type = types.str;
-              description = lib.mdDoc ''
+              description = ''
                 Name of symlink (relative to root dir). Defaults to the attribute name.
               '';
             };
@@ -94,18 +94,18 @@ in
             text = mkOption {
               default = null;
               type = types.nullOr types.lines;
-              description = lib.mdDoc "Text of the file.";
+              description = "Text of the file.";
             };
 
             source = mkOption {
               type = types.path;
-              description = lib.mdDoc "Path of the source file.";
+              description = "Path of the source file.";
             };
 
             mode = mkOption {
               type = types.str;
               default = "symlink";
-              description = lib.mdDoc ''
+              description = ''
                 If set to something else than `symlink`,
                 the file is copied instead of symlinked, with the given
                 file mode.

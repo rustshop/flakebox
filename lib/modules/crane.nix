@@ -7,7 +7,7 @@ in
 {
   options.craneLib = mkOption {
     type = types.attrs;
-    description = lib.mdDoc ''
+    description = ''
       craneLib to use by default
 
       Default value is craneLib initialized with `config.toolchain.channel` toolchain with `config.toolchain.components`

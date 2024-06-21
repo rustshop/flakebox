@@ -9,7 +9,7 @@ in
   options.toolchain = {
     components = mkOption {
       type = types.listOf types.str;
-      description = lib.mdDoc ''
+      description = ''
         Components to include in the default toolchains
       '';
 
@@ -23,7 +23,7 @@ in
     };
 
     channel = mkOption {
-      description = lib.mdDoc ''
+      description = ''
         The channel to source the default toolchain from
 
         Defaults to the the value of the stable channel.
@@ -34,7 +34,7 @@ in
 
     rustfmt = mkOption {
       type = lib.types.package;
-      description = lib.mdDoc ''
+      description = ''
         rustfmt package to use in the shell and lints
 
         Separate from the toolchain as it's common to want a custom (nightly) version,

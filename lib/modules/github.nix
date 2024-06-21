@@ -5,31 +5,31 @@ in
 {
   options.github = {
     ci = {
-      enable = lib.mkEnableOption (lib.mdDoc "just integration") // {
+      enable = lib.mkEnableOption "just integration" // {
         default = true;
       };
 
       cachixRepo = lib.mkOption {
         type = types.nullOr types.str;
-        description = lib.mdDoc "Name of the cachix repository to use for cache";
+        description = "Name of the cachix repository to use for cache";
         default = null;
       };
 
       runsOn = lib.mkOption {
         type = types.anything;
-        description = lib.mdDoc "Value of a runs-on to use for default Linu workflows (lint, self-check, etc.)";
+        description = "Value of a runs-on to use for default Linu workflows (lint, self-check, etc.)";
         default = "ubuntu-latest";
       };
 
       buildOutputs = lib.mkOption {
         type = types.listOf types.str;
-        description = lib.mdDoc "List of outputs to build";
+        description = "List of outputs to build";
         default = [ ];
       };
 
       buildMatrix = lib.mkOption {
         type = types.attrs;
-        description = lib.mdDoc "Build matrix to use in the workflow `strategy.matrix` of `build` job";
+        description = "Build matrix to use in the workflow `strategy.matrix` of `build` job";
         default = {
           host = [ "macos-x86_64" "macos-aarch64" "linux" ];
           include = [
@@ -54,13 +54,13 @@ in
 
       buildMatrixExtra = lib.mkOption {
         type = types.attrs;
-        description = lib.mdDoc "Additional build matrix to deep merge with `buildMatrix`";
+        description = "Additional build matrix to deep merge with `buildMatrix`";
         default = { };
       };
 
       workflows = lib.mkOption {
         default = { };
-        description = lib.mdDoc ''
+        description = ''
           Set of workflows to generate in `.github/workflows/`".
         '';
 
@@ -72,7 +72,7 @@ in
               enable = lib.mkOption {
                 type = types.bool;
                 default = true;
-                description = lib.mdDoc ''
+                description = ''
                   Whether this workflow file should be generated. This
                   option allows specific workflow files to be disabled.
                 '';
@@ -81,7 +81,7 @@ in
               content = lib.mkOption {
                 default = null;
                 type = types.attrsOf types.anything;
-                description = lib.mdDoc "Content of the workflow";
+                description = "Content of the workflow";
               };
             };
           }

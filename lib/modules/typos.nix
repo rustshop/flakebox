@@ -2,12 +2,12 @@
 {
 
   options.typos = {
-    enable = lib.mkEnableOption (lib.mdDoc "typos integration") // {
+    enable = lib.mkEnableOption "typos integration" // {
       default = true;
     };
 
     pre-commit = {
-      enable = lib.mkEnableOption (lib.mdDoc "typos git pre-commit hook") // {
+      enable = lib.mkEnableOption "typos git pre-commit hook" // {
         default = true;
       };
     };

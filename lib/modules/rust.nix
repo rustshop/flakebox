@@ -6,21 +6,21 @@ in
 
   options.rust = {
     pre-commit = {
-      leftover-dbg.enable = lib.mkEnableOption (lib.mdDoc "leftover `dbg!` check in pre-commit hook") // {
+      leftover-dbg.enable = lib.mkEnableOption "leftover `dbg!` check in pre-commit hook" // {
         default = true;
       };
-      clippy.enable = lib.mkEnableOption (lib.mdDoc "clippy check in pre-commit hook") // {
+      clippy.enable = lib.mkEnableOption "clippy check in pre-commit hook" // {
         default = false;
       };
     };
 
     rustfmt = {
-      enable = lib.mkEnableOption (lib.mdDoc "generation of .rustfmt.toml") // {
+      enable = lib.mkEnableOption "generation of .rustfmt.toml" // {
         default = true;
       };
 
       content = lib.mkOption {
-        description = lib.mdDoc "The content of the file";
+        description = "The content of the file";
         type = types.str;
       };
     };
