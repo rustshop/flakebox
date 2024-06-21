@@ -146,7 +146,7 @@ in
   defaultStdenv =
     if pkgs.stdenv.isDarwin
     then
-      pkgs.clang11Stdenv
+      pkgs.clang12Stdenv
     else
       pkgs.stdenv;
 
