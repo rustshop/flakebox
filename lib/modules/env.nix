@@ -6,7 +6,7 @@ in
   options.env = {
     shellPackages = lib.mkOption {
       type = types.listOf types.package;
-      description = lib.mdDoc ''
+      description = ''
         Packages to include in all dev shells
       '';
       default = [ ];
@@ -14,7 +14,7 @@ in
 
     shellHooks = lib.mkOption {
       type = types.listOf types.str;
-      description = lib.mdDoc ''
+      description = ''
         List of init hooks to execute when shell is entered
       '';
       default = [ "" ];

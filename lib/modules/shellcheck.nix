@@ -2,12 +2,12 @@
 {
 
   options.shellcheck = {
-    enable = lib.mkEnableOption (lib.mdDoc "shellcheck integration") // {
+    enable = lib.mkEnableOption "shellcheck integration" // {
       default = true;
     };
 
     pre-commit = {
-      enable = lib.mkEnableOption (lib.mdDoc "shellcheck git pre-commit hook") // {
+      enable = lib.mkEnableOption "shellcheck git pre-commit hook" // {
         default = true;
       };
     };

@@ -7,12 +7,12 @@ in
 
   options.flakebox = {
     lint = {
-      enable = lib.mkEnableOption (lib.mdDoc "the flakebox binary integration") // {
+      enable = lib.mkEnableOption "the flakebox binary integration" // {
         default = true;
       };
     };
     init = {
-      enable = lib.mkEnableOption (lib.mdDoc "the `flakebox init` in dev shells") // {
+      enable = lib.mkEnableOption "the `flakebox init` in dev shells" // {
         default = true;
       };
     };

@@ -2,7 +2,7 @@
 let
 
   toolchainArgs = {
-    stdenv = pkgs.clang11Stdenv;
+    stdenv = pkgs.clang12Stdenv;
     clang = pkgs.llvmPackages_12.clang;
     libclang = pkgs.llvmPackages_12.libclang.lib;
     clang-unwrapped = pkgs.llvmPackages_12.clang-unwrapped;
@@ -30,7 +30,7 @@ let
             src = ./.;
             buildPhaseCargoCommand = ''
               set -x
-              if [[ "$(${pkgs.which}/bin/which cc)" != *clang-wrapper-11* ]]; then
+              if [[ "$(${pkgs.which}/bin/which cc)" != *clang-wrapper-12* ]]; then
                 set +x
                 exit 1
               fi

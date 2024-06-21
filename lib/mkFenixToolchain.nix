@@ -71,7 +71,7 @@ let
     } else { };
 
   # this can't be a method on `craneLib` because it basically constructs the `craneLib`
-  craneLib = (enhanceCrane (crane.lib.${system}.overrideToolchain toolchain)).overrideArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; });
+  craneLib = (enhanceCrane ((crane.mkLib pkgs).overrideToolchain toolchain)).overrideArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; });
 in
 {
   inherit toolchain;

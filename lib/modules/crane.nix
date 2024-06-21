@@ -7,11 +7,11 @@ in
 {
   options.craneLib = mkOption {
     type = types.attrs;
-    description = lib.mdDoc ''
+    description = ''
       craneLib to use by default
 
       Default value is craneLib initialized with `config.toolchain.channel` toolchain with `config.toolchain.components`
     '';
-    default = crane.lib.${system}.overrideToolchain (fenix.packages.${system}.${config.toolchain.channel}.withComponents config.toolchain.components);
+    default = (crane.mkLib pkgs).overrideToolchain (fenix.packages.${system}.${config.toolchain.channel}.withComponents config.toolchain.components);
   };
 }

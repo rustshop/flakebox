@@ -4,14 +4,14 @@ let
 in
 {
   options.motd = {
-    enable = lib.mkEnableOption (lib.mdDoc "message of a day") // {
+    enable = lib.mkEnableOption "message of a day" // {
       default = false;
     };
 
     command = lib.mkOption {
       type = types.str;
       default = "";
-      description = lib.mdDoc ''
+      description = ''
         Command to execute to display motd
       '';
     };

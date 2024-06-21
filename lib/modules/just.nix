@@ -4,14 +4,14 @@ let
 in
 {
   options.just = {
-    enable = lib.mkEnableOption (lib.mdDoc "just integration") // {
+    enable = lib.mkEnableOption "just integration" // {
       default = true;
     };
 
     importPaths = lib.mkOption {
       type = types.listOf types.str;
       default = [ ];
-      description = lib.mdDoc "List of files to generate `import ...` statement for (as a strings in `import` Justfile directive)";
+      description = "List of files to generate `import ...` statement for (as a strings in `import` Justfile directive)";
     };
 
     rules = lib.mkOption {
@@ -21,7 +21,7 @@ in
             enable = lib.mkOption {
               type = types.bool;
               default = true;
-              description = lib.mdDoc ''
+              description = ''
                 Whether this rule should be generated. This
                 option allows specific rules to be disabled.
               '';
@@ -30,7 +30,7 @@ in
             content = lib.mkOption {
               type = types.either types.str types.path;
               default = 1000;
-              description = lib.mdDoc ''
+              description = ''
                 Order of this rule in relation to the others ones.
                 The semantics are the same as with `lib.mkOrder`. Smaller values have
                 a greater priority.
@@ -40,7 +40,7 @@ in
             priority = lib.mkOption {
               type = types.int;
               default = 1000;
-              description = lib.mdDoc ''
+              description = ''
                 Order of this rule in relation to the others ones.
                 The semantics are the same as with `lib.mkOrder`. Smaller values have
                 a greater priority.
@@ -49,7 +49,7 @@ in
           };
         }));
 
-      description = lib.mdDoc ''
+      description = ''
         Attrset of section of justfile (possibly with multiple rules)
 
         Notably the name is used only for config identification (e.g. disabling) and actual
