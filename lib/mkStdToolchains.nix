@@ -55,6 +55,16 @@ in
         nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.aarch64-multiplatform;
     };
   });
+  aarch64-linux-musl = mkFenixToolchain (args // {
+    defaultTarget = "aarch64-unknown-linux-musl";
+    targets = {
+      default = stdTargets.aarch64-linux-musl;
+    };
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.aarch64-multiplatform-musl;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.aarch64-multiplatform-musl;
+    };
+  });
   x86_64-linux = mkFenixToolchain (args // {
     defaultTarget = "x86_64-unknown-linux-gnu";
     targets = {
@@ -65,6 +75,16 @@ in
         nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.gnu64;
     };
   });
+  x86_64-linux-musl = mkFenixToolchain (args // {
+    defaultTarget = "x86_64-unknown-linux-musl";
+    targets = {
+      x86_64-linux-musl = stdTargets.x86_64-linux-musl;
+    };
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.musl64;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.musl64;
+    };
+  });
   i686-linux = mkFenixToolchain (args // {
     defaultTarget = "i686-unknown-linux-gnu";
     targets = {
@@ -73,6 +93,16 @@ in
     craneArgs = {
         buildInputs = buildInputs pkgs.pkgsCross.gnu32;
         nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.gnu32;
+    };
+  });
+  i686-linux-musl = mkFenixToolchain (args // {
+    defaultTarget = "i686-unknown-linux-musl";
+    targets = {
+      i686-linux = stdTargets.i686-linux-musl;
+    };
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.musl32;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.musl32;
     };
   });
   riscv64-linux = mkFenixToolchain (args // {

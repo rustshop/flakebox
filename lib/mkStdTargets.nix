@@ -34,6 +34,23 @@
     };
   };
 
+  aarch64-linux-musl = mkClangTarget {
+    target = "aarch64-unknown-linux-musl";
+    clang = pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang;
+    binPrefix = "aarch64-unknown-linux-musl-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_aarch64_unknown_linux_musl = "-I ${pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_aarch64_unknown_linux_musl = "-I ${pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_aarch64_unknown_linux_musl = "-I ${pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_musl = "-I ${pkgs.pkgsCross.aarch64-multiplatform-musl.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+    };
+  };
+
   x86_64-linux = mkClangTarget {
     target = "x86_64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang;
@@ -53,6 +70,23 @@
     };
   };
 
+  x86_64-linux-musl = mkClangTarget {
+    target = "x86_64-unknown-linux-musl";
+    clang = pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang;
+    binPrefix = "x86_64-unknown-linux-musl-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_x86_64_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_x86_64_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_x86_64_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+    };
+  };
+
   i686-linux = mkClangTarget {
     target = "i686-unknown-linux-gnu";
     clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang;
@@ -67,6 +101,23 @@
       CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
       CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
       BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+    };
+  };
+
+  i686-linux-musl = mkClangTarget {
+    target = "i686-unknown-linux-musl";
+    clang = pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang;
+    binPrefix = "i686-unknown-linux-musl-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_i686_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_i686_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_i686_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_musl = "-I ${pkgs.pkgsCross.musl32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
 
