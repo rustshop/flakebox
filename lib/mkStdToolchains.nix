@@ -187,8 +187,10 @@ in
     targets = {
       aarch64-darwin = stdTargets.aarch64-darwin;
     };
-    # cross compilation is broken for apple-darwin
-    craneArgs = {};
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.aarch64-darwin;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.aarch64-darwin;
+    };
   });
 
 } // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "x86_64-apple-darwin") {
@@ -197,7 +199,9 @@ in
     targets = {
       x86_64-darwin = stdTargets.x86_64-darwin;
     };
-    # cross compilation is broken for apple-darwin
-    craneArgs = {};
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.x86_64-darwin;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.x86_64-darwin;
+    };
   });
 }
