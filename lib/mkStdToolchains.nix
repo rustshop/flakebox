@@ -115,6 +115,20 @@ in
         nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.riscv64;
     };
   });
+  windows64 = mkFenixToolchain (args // {
+    defaultTarget = "x86_64-pc-windows-gnu";
+    targets = {
+      windows64 = stdTargets.windows64;
+    };
+    craneArgs = {
+        buildInputs = buildInputs pkgs.pkgsCross.mingwW64;
+        nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.mingwW64;
+        depsBuildBuild = [
+            pkgs.pkgsCross.mingwW64.stdenv.cc
+            pkgs.pkgsCross.mingwW64.windows.pthreads
+        ];
+    };
+  });
 } // {
 
   wasm32-unknown = mkFenixToolchain (args // {

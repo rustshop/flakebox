@@ -137,6 +137,25 @@
       BINDGEN_EXTRA_CLANG_ARGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
     };
   };
+
+  windows64 = mkClangTarget rec {
+    target = "x86_64-pc-windows-gnu";
+    clang = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang;
+    binPrefix = "x86_64-w64-mingw32-";
+    llvmConfigPkg = targetLlvmConfigWrapper {
+      clangPkg = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped;
+      libClangPkg = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped.lib;
+    };
+
+    args = {
+      CFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CPPFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CXXFLAGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_pc_windows_gnu = "-I ${pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      # compressed debug section support only when building on Linux
+      CARGO_TARGET_X86_64_PC_WINDOWS_GNU_RUSTFLAGS = "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl";
+    };
+  };
 } // {
   wasm32-unknown = { extraRustFlags, ... }@args: mkTarget
     {
