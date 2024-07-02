@@ -30,6 +30,7 @@ in
 , clang-unwrapped ? defaultClangUnwrapped
 , stdenv ? defaultStdenv
 , isLintShell ? false
+, craneArgs ? { }
 }:
 let
   mergeTargets = targetFn: prev:
@@ -71,7 +72,7 @@ let
     } else { };
 
   # this can't be a method on `craneLib` because it basically constructs the `craneLib`
-  craneLib = (enhanceCrane ((crane.mkLib pkgs).overrideToolchain toolchain)).overrideArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; });
+  craneLib = (enhanceCrane ((crane.mkLib pkgs).overrideToolchain toolchain)).overrideArgs ((mergeArgs ((mergeArgs commonArgs buildArgs) // { inherit stdenv; }) craneArgs));
 in
 {
   inherit toolchain;
