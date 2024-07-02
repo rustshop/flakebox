@@ -138,7 +138,7 @@
     };
   };
 
-  windows64 = mkClangTarget rec {
+  mingw64 = mkClangTarget rec {
     target = "x86_64-pc-windows-gnu";
     clang = pkgs.pkgsCross.mingwW64.buildPackages.llvmPackages.clang;
     binPrefix = "x86_64-w64-mingw32-";
