@@ -28,6 +28,8 @@ Create a new project:
 Since we don't have a dev shell yet, initialize new project using `cargo` from nixpkgs:
 
 ```
+> git init .
+Initialized empty Git repository in /home/dpc/tmp/testcargoinit/.git/
 > nix run nixpkgs#cargo -- init
      Created binary (application) package
 ```
