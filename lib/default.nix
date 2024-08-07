@@ -41,7 +41,8 @@ let
 
   optionsDocMd =
     pkgs.runCommand "options-doc.md" { } ''
-      cat ${optionsDoc.optionsCommonMark} >> $out
+      mkdir $out -p
+      cat ${optionsDoc.optionsCommonMark} >> $out/options-doc.md
     '';
 in
 lib.makeScope pkgs.newScope (self:
@@ -72,7 +73,7 @@ in
       # symlink our generated docs into the correct folder before generating
       buildPhase = ''
         rm -f ./nixos-options.md
-        ln -s ${optionsDocMd} "./nixos-options.md"
+        ln -s ${optionsDocMd}/options-doc.md "./nixos-options.md"
         # generate the site
         mdbook build
       '';
