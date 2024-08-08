@@ -35,7 +35,7 @@ let
   ];
 in
 {
-  lint = mkLintShell { packages = lintPackages; };
+  lint = mkLintShell { packages = cleanedArgs.packages ++ lintPackages; };
   default = mkDevShell (cleanedArgs // {
     inherit toolchain;
   });
