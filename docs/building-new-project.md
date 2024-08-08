@@ -46,7 +46,7 @@ wrote: /home/dpc/tmp/flakebox-tutorial/flake.nix
 Commit the results as a good starting point:
 
 ```
-> git add *
+> git add -A
 > git commit -a -m "Empty project"
 [master (root-commit) 01e823b] Empty project
  3 files changed, 22 insertions(+)
@@ -61,28 +61,28 @@ you like.
 
 ```
 > hx flake.nix
-> git diff HEAD
+> git diff
 ```
 
 ```diff
 diff --git a/flake.nix b/flake.nix
-index a96aa14..25ce16f 100644
+index c7a9a1c..615d404 100644
 --- a/flake.nix
 +++ b/flake.nix
-@@ -1,7 +1,16 @@
- {
+@@ -2,10 +2,15 @@
    description = "A very basic flake";
  
--  outputs = { self, nixpkgs }: {
-+  inputs = {
-+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+   inputs = {
+-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
++    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.05";
 +
 +    flakebox = {
 +      url = "github:rustshop/flakebox";
 +      inputs.nixpkgs.follows = "nixpkgs";
 +    };
-+  };
-+
+   };
+
+-  outputs = { self, nixpkgs }: {
 +  outputs = { self, nixpkgs, flakebox }: {
  
      packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
@@ -91,7 +91,7 @@ index a96aa14..25ce16f 100644
 Check if everything is OK, then commit it if that's the case:
 
 ```
- > nix flake check .#
+ > nix flake check
 warning: Git tree '/home/dpc/tmp/flakebox-tutorial' is dirty
 > git commit -a -m "Flake inputs"
 [master ea52e46] Flake inputs
@@ -124,24 +124,20 @@ We still don't have even `cargo` for our project, so let's do that next:
 
 ```diff
 diff --git a/flake.nix b/flake.nix
-index a96aa14..bce12c5 100644
+index 615d404..860927a 100644
 --- a/flake.nix
 +++ b/flake.nix
-@@ -1,11 +1,25 @@
- {
-   description = "A very basic flake";
- 
--  outputs = { self, nixpkgs }: {
-+  inputs = {
-+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
- 
+@@ -8,13 +8,23 @@
+       url = "github:rustshop/flakebox";
+       inputs.nixpkgs.follows = "nixpkgs";
+     };
+-  };
+-
+-  outputs = { self, nixpkgs, flakebox }: {
+-
 -    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
 -
 -    packages.x86_64-linux.default = self.packages.x86_64-linux.hello;
-+    flakebox = {
-+      url = "github:rustshop/flakebox";
-+      inputs.nixpkgs.follows = "nixpkgs";
-+    };
  
 +    flake-utils.url = "github:numtide/flake-utils";
    };
@@ -157,7 +153,6 @@ index a96aa14..bce12c5 100644
 +        };
 +      });
  }
-
 ```
  
 Since that's a bit handful, let me paste the whole content:
@@ -171,7 +166,7 @@ Since that's a bit handful, let me paste the whole content:
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.05";
 
     flakebox = {
       url = "github:rustshop/flakebox";
@@ -282,28 +277,21 @@ Commit the changes:
 
 ```
 > git commit -a -m "Setup flakebox dev shell"
-Skipping semgrep check: .config/semgrep.yaml empty
-tail: error reading 'standard input': Is a directory
-error: the lock file /home/dpc/tmp/flakebox-tutorial/Cargo.lock needs to be updated but --locked was passed to prevent this
-If you want to try to generate the lock file without accessing the network, remove the --locked flag and use --offline instead.
+Skipping semgrep check: .config/semgrep.yaml doesn't exist
+FAIL  -  first line doesn't match `<type>[optional scope]: <description>`  Setup flakebox dev shell
+Please follow conventional commits(https://www.conventionalcommits.org)
+Use git commit <args> to fix your commit
 ```
 
-Oh. It's the dev shell already doing its work. It detected that `Cargo.lock` is not up to date,
-which is not a state we want to commit.
+Oh. It's the dev shell already doing its work. It detected that the commit message does not follow conventional commits.
 
 Fix it and try again:
 
 ```
-> cargo build
-   Compiling flakebox-tutorial v0.1.0 (/home/dpc/tmp/flakebox-tutorial)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.46s
-> git add .gitignore Cargo.lock❄️ 
-> git commit -a -m "Setup flakebox dev shell"
-Skipping semgrep check: .config/semgrep.yaml empty
-tail: error reading 'standard input': Is a directory
-[master f387a84] Setup flakebox dev shell
- 11 files changed, 390 insertions(+)
- create mode 120000 .config/flakebox/current
+> git commit -a -m "build: Setup flakebox dev shell"
+Skipping semgrep check: .config/semgrep.yaml doesn't exist
+[main a3cfda7] build: Setup flakebox dev shell
+ 12 files changed, 483 insertions(+)
 # ... skipped for brevity
 ```
 
@@ -317,12 +305,12 @@ The easiest and most versatile way to build Rust with Flakebox is using
 
 
 ```
-> git diff HEAD
+> git diff
 ```
 
 ```diff
 diff --git a/flake.nix b/flake.nix
-index f09763b..a65ba7a 100644
+index cb41316..08c8f65 100644
 --- a/flake.nix
 +++ b/flake.nix
 @@ -16,8 +16,38 @@
@@ -343,33 +331,45 @@ index f09763b..a65ba7a 100644
 +          ];
 +        };
 +
-+        outputs =
-+          (flakeboxLib.craneMultiBuild { }) (craneLib':
-+            let
-+              craneLib = (craneLib'.overrideArgs {
-+                pname = "flexbox-multibuild";
-+                src = rustSrc;
-+              });
-+            in
-+            rec {
-+              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
-+              workspaceBuild = craneLib.buildWorkspace {
-+                cargoArtifacts = workspaceDeps;
-+              };
-+              flakebox-tutorial = craneLib.buildPackage { };
++        legacyPackages = (flakeboxLib.craneMultiBuild { }) (craneLib':
++          let
++            craneLib = (craneLib'.overrideArgs {
++              pname = "flakebox-tutorial";
++              src = rustSrc;
 +            });
++          in
++          rec {
++            workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
++            workspaceBuild = craneLib.buildWorkspace {
++              cargoArtifacts = workspaceDeps;
++            };
++            flakebox-tutorial = craneLib.buildPackage { };
++          });
        in
        {
-+        legacyPackages = outputs;
++        inherit legacyPackages;
++        packages.default = legacyPackages.flakebox-tutorial;
          devShells = flakeboxLib.mkShells {
            packages = [ ];
+         };
 ```
 
-Let's check if it works:
+Verify the Nix code is still OK:
 
 ```
 > nix flake check
 ```
+
+Now there is one thing missing: since we want reproduceable builds it is mandatory that we supply a `Cargo.lock` file to the build process to make sure we are know which versions of the dependencies to compile.
+
+```
+> cargo update
+> git add -N Cargo.lock
+```
+
+`git add -N <pathspec>` records the intend to add this file to a commit in the future, adding it to gits view. This is needed as nix only looks for files that git is aware of.
+
+Let's check if it works:
 
 ```
 > nix build .#dev.flakebox-tutorial
@@ -392,12 +392,11 @@ Good time to add `result/` to `.gitignore`:
 ```
 
 Commit the current state and I can explain in more details what is
-this new Nix code doing and what else you can do with it (spoiler: cross-compilation and different cargo build profiles!).
+this new Nix code is doing and what else you can do with it (spoiler: cross-compilation and different cargo build profiles!).
 
 
 ```
-> git add *
-> git commit -a -m "Add initial build system"
+> git commit -a -m "build: Add initial build system"
 Skipping semgrep check: .config/semgrep.yaml empty
 [master e681b24] Add initial build system
  1 file changed, 30 insertions(+)
@@ -421,6 +420,8 @@ defined in the flake, `flakebox.lib.${system}` is
 the library output it exposes for the current `system`.
 `flakebox.lib.${system} { }` is a function call, where
 `{ }` are the arguments (empty set, defaults).
+
+This is where you can enable/disable/configure various features of flakebox. A list of config options can be found [here](./nixos-options.md)
 
 The next binding is:
 
@@ -455,21 +456,20 @@ will be explained elsewhere in the documentation.
 The last name binding is:
 
 ```nix
-        outputs =
-          (flakeboxLib.craneMultiBuild { }) (craneLib':
-            let
-              craneLib = (craneLib'.overrideArgs {
-                pname = "flexbox-multibuild";
-                src = rustSrc;
-              });
-            in
-            rec {
-              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
-              workspaceBuild = craneLib.buildWorkspace {
-                cargoArtifacts = workspaceDeps;
-              };
-              flakebox-tutorial = craneLib.buildPackage { };
+        legacyPackages = (flakeboxLib.craneMultiBuild { }) (craneLib':
+          let
+            craneLib = (craneLib'.overrideArgs {
+              pname = "flakebox-tutorial";
+              src = rustSrc;
             });
+          in
+          rec {
+            workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+            workspaceBuild = craneLib.buildWorkspace {
+              cargoArtifacts = workspaceDeps;
+            };
+            flakebox-tutorial = craneLib.buildPackage { };
+          });
 ```
 
 
@@ -537,7 +537,7 @@ the resulting `./target/` doesn't need to get rebuild unless
 project dependencies changed, which improves the caching by a lot.
 
 
-The result of this whole call to `craneMultiBuild` is bound in `outputs` name
+The result of this whole call to `craneMultiBuild` is bound in `legacyPackages` name
 and conceptually contains a matrix of all supported cargo build profiles and
 supported toolchains:
 
@@ -560,10 +560,18 @@ Please be aware that some of these toolchains will take a very long time to actu
 Finally
 
 ```nix
-        legacyPackages = outputs;
+        inherit legacyPackages;
 ```
 
 exposes all these outputs as a "legacy packages" in our Flake. It's a bit of a hack, but will work for now.
+
+This
+
+```nix
+        packages.default = legacyPackages.flakebox-tutorial;
+```
+
+can be used to expose select outputs as normal flake packages.
 
 ## Building Rust code with Flakebox - practice
 
