@@ -24,6 +24,7 @@ in
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
+    "packages"
     "targets"
   ];
 in
@@ -42,7 +43,7 @@ let
 
   args = mergeArgs cleanedArgs {
     packages =
-      [
+      packages ++ [
         flakeboxBin
 
 
