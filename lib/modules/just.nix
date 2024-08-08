@@ -158,7 +158,6 @@ in
               if [ ! -f Cargo.toml ]; then
                 cd {{invocation_directory()}}
               fi
-              cargo test --doc
               just test
           '';
         };
