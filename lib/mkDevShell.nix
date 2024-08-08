@@ -24,7 +24,6 @@ in
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
-    "packages"
     "targets"
   ];
 in
