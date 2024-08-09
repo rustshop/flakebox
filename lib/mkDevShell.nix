@@ -43,7 +43,7 @@ let
 
   args = mergeArgs cleanedArgs {
     packages =
-      [
+      packages ++ [
         flakeboxBin
 
 

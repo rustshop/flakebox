@@ -38,7 +38,6 @@ final-check: lint clippy
   if [ ! -f Cargo.toml ]; then
     cd {{invocation_directory()}}
   fi
-  cargo test --doc
   just test
 
 
@@ -50,7 +49,7 @@ format:
     cd {{invocation_directory()}}
   fi
   cargo fmt --all
-  nixpkgs-fmt $(echo **.nix)
+  nixpkgs-fmt $(git ls-files | grep "\.nix$")
 
 
 # run lints (git pre-commit hook)
