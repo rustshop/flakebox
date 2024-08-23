@@ -22,8 +22,16 @@ let
     "scripts"
   ];
 
+  buildInputs = pkgs: [
+    pkgs.openssl
+  ];
+  
+  nativeBuildInputs = pkgs: [
+    pkgs.pkgsBuildTarget.pkg-config
+  ];
+
   multiOutput =
-    (flakeboxLib.craneMultiBuild { })
+    (flakeboxLib.craneMultiBuild { inherit buildInputs; inherit nativeBuildInputs; })
       (craneLib':
         let
           src = flakeboxLib.filterSubPaths {
@@ -35,14 +43,6 @@ let
             pname = "workspace-cross-compile";
             version = "0.0.1";
             inherit src;
-
-            buildInputs = [
-              pkgs.openssl
-            ];
-
-            nativeBuildInputs = [
-              pkgs.pkg-config
-            ];
           }).overrideArgsDepsOnly {
             cargoVendorDir = craneLib'.vendorCargoDeps {
               inherit src;
@@ -119,9 +119,13 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
   ] ++
   lib.optionals (full && pkgs.stdenv.isLinux) [
     multiOutput.aarch64-linux.ci.workspaceBuild
+    multiOutput.aarch64-linux-musl.ci.workspaceBuild
     multiOutput.x86_64-linux.ci.workspaceBuild
+    multiOutput.x86_64-linux-musl.ci.workspaceBuild
     multiOutput.i686-linux.ci.workspaceBuild
+    multiOutput.i686-linux-musl.ci.workspaceBuild
     multiOutput.riscv64-linux.ci.workspaceBuild
+    multiOutput.mingw64.ci.workspaceBuild
   ] ++
     # in full mode, when supported, test all android targets
   lib.optionals (full && multiOutput ? aarch64-android) [

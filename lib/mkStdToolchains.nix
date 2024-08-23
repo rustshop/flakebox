@@ -149,9 +149,12 @@ in
     targets = {
       aarch64-android = stdTargets.aarch64-android;
     };
+    # FIXME: crossPkgs for aarch64-android-prebuilt are broken for certain packages (e.g. openssl)
+    # https://github.com/NixOS/nixpkgs/issues/319863
+    # we use native pkgs as a fallback
     craneArgs = {
-      buildInputs = buildInputs pkgs.pkgsCross.aarch64-android-prebuilt;
-      nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.aarch64-android-prebuilt;
+      buildInputs = buildInputs pkgs;
+      nativeBuildInputs = nativeBuildInputs pkgs;
     };
   };
   x86_64-android = mkFenixToolchain {
@@ -159,25 +162,35 @@ in
     targets = {
       x86_64-android = stdTargets.x86_64-android;
     };
-    # no crossPkgs available
-    craneArgs = { };
+    # FIXME: no crossPkgs available
+    # we use native pkgs as a fallback
+    craneArgs = {
+      buildInputs = buildInputs pkgs;
+      nativeBuildInputs = nativeBuildInputs pkgs;
+    };
   };
   i686-android = mkFenixToolchain {
     defaultTarget = "i686-linux-android";
     targets = {
       i686-android = stdTargets.i686-android;
     };
-    # no crossPkgs available
-    craneArgs = { };
+    # FIXME: no crossPkgs available, use native pkgs as a fallback
+    craneArgs = {
+      buildInputs = buildInputs pkgs;
+      nativeBuildInputs = nativeBuildInputs pkgs;
+    };
   };
   armv7-android = mkFenixToolchain {
     defaultTarget = "armv7-linux-androideabi";
     targets = {
       armv7-android = stdTargets.armv7-android;
     };
+    # FIXME: crossPkgs for armv7a-android-prebuilt are broken for certain packages (e.g. openssl)
+    # https://github.com/NixOS/nixpkgs/issues/319863
+    # we use native pkgs as a fallback
     craneArgs = {
-      buildInputs = buildInputs pkgs.pkgsCross.armv7-android-prebuilt;
-      nativeBuildInputs = nativeBuildInputs pkgs.pkgsCross.armv7-android-prebuilt;
+      buildInputs = buildInputs pkgs;
+      nativeBuildInputs = nativeBuildInputs pkgs;
     };
   };
 
