@@ -109,32 +109,32 @@
 } // lib.optionalAttrs ((mkStdTargetsArgs ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
   aarch64-android = mkAndroidTarget {
     arch = "aarch64";
-    androidVer = 31;
+    androidVer = 35;
     target = "aarch64-linux-android";
   };
 
   arm-android = mkAndroidTarget {
     arch = "arm";
-    androidVer = 31;
+    androidVer = 35;
     target = "arm-linux-androideabi";
   };
 
   armv7-android = mkAndroidTarget {
     arch = "arm";
-    androidVer = 31;
+    androidVer = 35;
     target = "armv7-linux-androideabi";
     androidTarget = "arm-linux-androideabi";
   };
 
   x86_64-android = mkAndroidTarget {
     arch = "x86_64";
-    androidVer = 31;
+    androidVer = 35;
     target = "x86_64-linux-android";
   };
 
   i686-android = mkAndroidTarget {
     arch = "i386";
-    androidVer = 31;
+    androidVer = 35;
     target = "i686-linux-android";
   };
 

@@ -28,7 +28,7 @@ let
       platforms-android-33
       emulator
       ndk-bundle
-      ndk-23-1-7779620
+      ndk-27-1-12297006
       cmake-3-22-1
       patcher-v4
       tools

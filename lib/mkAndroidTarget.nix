@@ -8,9 +8,9 @@ let
   defaultAndroidSdk =
     android-nixpkgs.sdk."${system}" (sdkPkgs: with sdkPkgs; [
       cmdline-tools-latest
-      build-tools-32-0-0
+      build-tools-35-0-0
       platform-tools
-      platforms-android-31
+      platforms-android-35
       emulator
       ndk-bundle
     ]);
@@ -18,7 +18,7 @@ in
 { target
 , androidTarget ? target
 , arch
-, androidVer ? 31
+, androidVer ? 35
 , ...
 }:
 let defaultAndroidVer = androidVer; in
