@@ -1,5 +1,6 @@
-{ pkgs
-, system
+{
+  pkgs,
+  system,
 }:
 # Create a package that contains only one `bin`ary from an input `pkg`
 #

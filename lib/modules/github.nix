@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) types;
 in
@@ -31,7 +36,11 @@ in
         type = types.attrs;
         description = "Build matrix to use in the workflow `strategy.matrix` of `build` job";
         default = {
-          host = [ "macos-x86_64" "macos-aarch64" "linux" ];
+          host = [
+            "macos-x86_64"
+            "macos-aarch64"
+            "linux"
+          ];
           include = [
             {
               host = "linux";
@@ -64,28 +73,35 @@ in
           Set of workflows to generate in `.github/workflows/`".
         '';
 
-        type = types.attrsOf (types.submodule (
-          { name, config, options, ... }:
-          {
-            options = {
+        type = types.attrsOf (
+          types.submodule (
+            {
+              name,
+              config,
+              options,
+              ...
+            }:
+            {
+              options = {
 
-              enable = lib.mkOption {
-                type = types.bool;
-                default = true;
-                description = ''
-                  Whether this workflow file should be generated. This
-                  option allows specific workflow files to be disabled.
-                '';
-              };
+                enable = lib.mkOption {
+                  type = types.bool;
+                  default = true;
+                  description = ''
+                    Whether this workflow file should be generated. This
+                    option allows specific workflow files to be disabled.
+                  '';
+                };
 
-              content = lib.mkOption {
-                default = null;
-                type = types.attrsOf types.anything;
-                description = "Content of the workflow";
+                content = lib.mkOption {
+                  default = null;
+                  type = types.attrsOf types.anything;
+                  description = "Content of the workflow";
+                };
               };
-            };
-          }
-        ));
+            }
+          )
+        );
 
         apply = value: lib.filterAttrs (n: v: v.enable == true) value;
       };
@@ -100,106 +116,122 @@ in
         uses = "DeterminateSystems/magic-nix-cache-action@v2";
       };
 
-      cachixCacheStep = { name }: {
-        uses = "cachix/cachix-action@v12";
-        "with" = {
-          inherit name;
-          authToken = "\${{ secrets.CACHIX_AUTH_TOKEN }}";
-        };
-        continue-on-error = true;
-      };
-
-      flakebox-ci = { buildCmd, buildMatrix, cacheStep ? magicNixCacheStep }: {
-        name = "CI";
-
-        on = {
-          push = {
-            branches = [ "master" "main" ];
-            tags = [ "v*" ];
+      cachixCacheStep =
+        { name }:
+        {
+          uses = "cachix/cachix-action@v12";
+          "with" = {
+            inherit name;
+            authToken = "\${{ secrets.CACHIX_AUTH_TOKEN }}";
           };
-          pull_request = {
-            branches = [ "master" "main" ];
-          };
-          merge_group = {
-            branches = [ "master" "main" ];
-          };
-          workflow_dispatch = { };
+          continue-on-error = true;
         };
 
-        jobs = {
-          flake = {
-            name = "Flake self-check";
-            runs-on = config.github.ci.runsOn;
-            steps = [
-              { uses = "actions/checkout@v4"; }
-              {
-                name = "Check Nix flake inputs";
-                uses = "DeterminateSystems/flake-checker-action@v5";
-                "with" = {
-                  fail-mode = true;
-                };
-              }
-            ];
-          };
+      flakebox-ci =
+        {
+          buildCmd,
+          buildMatrix,
+          cacheStep ? magicNixCacheStep,
+        }:
+        {
+          name = "CI";
 
-          lint = {
-            name = "Lint";
-            runs-on = config.github.ci.runsOn;
-            steps = [
-              { uses = "actions/checkout@v4"; }
-
-              {
-                name = "Install Nix";
-                uses = "DeterminateSystems/nix-installer-action@v4";
-              }
-
-              cacheStep
-
-              {
-                name = "Cargo Cache";
-                uses = "actions/cache@v3";
-                "with" = {
-                  path = "~/.cargo";
-                  key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
-                };
-              }
-
-              {
-                name = "Commit Check";
-                run = ''
-                  # run the same check that git `pre-commit` hook does
-                  nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
-                '';
-              }
-            ];
-          };
-
-
-          build = {
-            name = "Build";
-            strategy = {
-              matrix = buildMatrix;
+          on = {
+            push = {
+              branches = [
+                "master"
+                "main"
+              ];
+              tags = [ "v*" ];
             };
-            runs-on = "\${{ matrix.runs-on }}";
-            timeout-minutes = "\${{ matrix.timeout }}";
-            steps = [
-              { uses = "actions/checkout@v4"; }
+            pull_request = {
+              branches = [
+                "master"
+                "main"
+              ];
+            };
+            merge_group = {
+              branches = [
+                "master"
+                "main"
+              ];
+            };
+            workflow_dispatch = { };
+          };
 
-              {
-                name = "Install Nix";
-                uses = "DeterminateSystems/nix-installer-action@v4";
-              }
+          jobs = {
+            flake = {
+              name = "Flake self-check";
+              runs-on = config.github.ci.runsOn;
+              steps = [
+                { uses = "actions/checkout@v4"; }
+                {
+                  name = "Check Nix flake inputs";
+                  uses = "DeterminateSystems/flake-checker-action@v5";
+                  "with" = {
+                    fail-mode = true;
+                  };
+                }
+              ];
+            };
 
-              cacheStep
+            lint = {
+              name = "Lint";
+              runs-on = config.github.ci.runsOn;
+              steps = [
+                { uses = "actions/checkout@v4"; }
 
-              {
-                name = "Build on \${{ matrix.host }}";
-                run = buildCmd;
-              }
-            ];
+                {
+                  name = "Install Nix";
+                  uses = "DeterminateSystems/nix-installer-action@v4";
+                }
+
+                cacheStep
+
+                {
+                  name = "Cargo Cache";
+                  uses = "actions/cache@v3";
+                  "with" = {
+                    path = "~/.cargo";
+                    key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
+                  };
+                }
+
+                {
+                  name = "Commit Check";
+                  run = ''
+                    # run the same check that git `pre-commit` hook does
+                    nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
+                  '';
+                }
+              ];
+            };
+
+            build = {
+              name = "Build";
+              strategy = {
+                matrix = buildMatrix;
+              };
+              runs-on = "\${{ matrix.runs-on }}";
+              timeout-minutes = "\${{ matrix.timeout }}";
+              steps = [
+                { uses = "actions/checkout@v4"; }
+
+                {
+                  name = "Install Nix";
+                  uses = "DeterminateSystems/nix-installer-action@v4";
+                }
+
+                cacheStep
+
+                {
+                  name = "Build on \${{ matrix.host }}";
+                  run = buildCmd;
+                }
+              ];
+            };
           };
         };
-      };
       flakebox-flakehub-publish = {
         name = "Publish to Flakehub";
 
@@ -217,7 +249,6 @@ in
             };
           };
         };
-
 
         jobs = {
           flakehub-publish = {
@@ -253,17 +284,21 @@ in
         };
       };
 
-      recursiveMerge = attrList:
+      recursiveMerge =
+        attrList:
         let
-          f = attrPath:
-            lib.zipAttrsWith (n: values:
-              if lib.tail values == [ ]
-              then lib.head values
-              else if lib.all lib.isList values
-              then lib.unique (lib.concatLists values)
-              else if lib.all lib.isAttrs values
-              then f (attrPath ++ [ n ]) values
-              else lib.last values
+          f =
+            attrPath:
+            lib.zipAttrsWith (
+              n: values:
+              if lib.tail values == [ ] then
+                lib.head values
+              else if lib.all lib.isList values then
+                lib.unique (lib.concatLists values)
+              else if lib.all lib.isAttrs values then
+                f (attrPath ++ [ n ]) values
+              else
+                lib.last values
             );
         in
         f [ ] attrList;
@@ -278,10 +313,15 @@ in
               if builtins.length config.github.ci.buildOutputs == 0 then
                 ''
                   nix flake check -L .#
-                '' else
-                lib.strings.concatStringsSep "\n" (builtins.map (output: "nix build -L ${output}") config.github.ci.buildOutputs)
-            ;
-            buildMatrix = recursiveMerge [ config.github.ci.buildMatrix config.github.ci.buildMatrixExtra ];
+                ''
+              else
+                lib.strings.concatStringsSep "\n" (
+                  builtins.map (output: "nix build -L ${output}") config.github.ci.buildOutputs
+                );
+            buildMatrix = recursiveMerge [
+              config.github.ci.buildMatrix
+              config.github.ci.buildMatrixExtra
+            ];
             cacheStep =
               if config.github.ci.cachixRepo != null then
                 cachixCacheStep { name = config.github.ci.cachixRepo; }
@@ -294,22 +334,20 @@ in
         };
       };
 
-      rootDir = lib.mapAttrs'
-        (k: v:
-          let
-            rawYamlFile = writeYaml k v.content;
-          in
-          lib.nameValuePair
-            ".github/workflows/${k}.yml"
-            {
-              text = ''
-                # THIS FILE IS AUTOGENERATED FROM FLAKEBOX CONFIGURATION
+      rootDir = lib.mapAttrs' (
+        k: v:
+        let
+          rawYamlFile = writeYaml k v.content;
+        in
+        lib.nameValuePair ".github/workflows/${k}.yml" {
+          text = ''
+            # THIS FILE IS AUTOGENERATED FROM FLAKEBOX CONFIGURATION
 
-                ${builtins.readFile rawYamlFile}
+            ${builtins.readFile rawYamlFile}
 
-                # THIS FILE IS AUTOGENERATED FROM FLAKEBOX CONFIGURATION
-              '';
-            })
-        config.github.ci.workflows;
+            # THIS FILE IS AUTOGENERATED FROM FLAKEBOX CONFIGURATION
+          '';
+        }
+      ) config.github.ci.workflows;
     };
 }

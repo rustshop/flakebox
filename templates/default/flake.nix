@@ -7,8 +7,15 @@
     flakebox.url = "github:rustshop/flakebox";
   };
 
-  outputs = { self, nixpkgs, flake-utils, flakebox }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      flakebox,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         projectName = "flakebox-project";
 
@@ -32,18 +39,21 @@
           paths = buildPaths;
         };
 
-        multiBuild =
-          (flakeboxLib.craneMultiBuild { }) (craneLib':
-            let
-              craneLib = (craneLib'.overrideArgs {
+        multiBuild = (flakeboxLib.craneMultiBuild { }) (
+          craneLib':
+          let
+            craneLib = (
+              craneLib'.overrideArgs {
                 pname = projectName;
                 src = buildSrc;
                 nativeBuildInputs = [ ];
-              });
-            in
-            {
-              ${projectName} = craneLib.buildPackage { };
-            });
+              }
+            );
+          in
+          {
+            ${projectName} = craneLib.buildPackage { };
+          }
+        );
       in
       {
         packages.default = multiBuild.${projectName};

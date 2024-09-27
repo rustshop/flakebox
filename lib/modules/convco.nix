@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 {
 
   options.convco = {
@@ -12,7 +17,6 @@
       };
     };
   };
-
 
   config = lib.mkIf config.convco.enable {
     env.shellPackages = [

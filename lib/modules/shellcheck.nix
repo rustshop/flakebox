@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 {
 
   options.shellcheck = {
@@ -12,7 +17,6 @@
       };
     };
   };
-
 
   config = lib.mkIf config.shellcheck.enable {
     git.pre-commit.hooks = {

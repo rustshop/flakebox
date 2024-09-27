@@ -21,29 +21,30 @@ let
     "scripts"
   ];
 
-  multiOutput =
-    (flakeboxLib.craneMultiBuild { })
-      (craneLib':
-        let
-          src = flakeboxLib.filterSubPaths {
-            root = rootDir;
-            paths = buildPaths;
-          };
+  multiOutput = (flakeboxLib.craneMultiBuild { }) (
+    craneLib':
+    let
+      src = flakeboxLib.filterSubPaths {
+        root = rootDir;
+        paths = buildPaths;
+      };
 
-          craneLib = (craneLib'.overrideArgs {
-            pname = "workspace-sanity";
-            version = "0.0.1";
-            buildInputs = [
-              pkgs.openssl
-            ];
+      craneLib =
+        (craneLib'.overrideArgs {
+          pname = "workspace-sanity";
+          version = "0.0.1";
+          buildInputs = [
+            pkgs.openssl
+          ];
 
-            nativeBuildInputs = [
-              pkgs.pkg-config
-            ];
+          nativeBuildInputs = [
+            pkgs.pkg-config
+          ];
 
-            inherit src;
+          inherit src;
 
-          }).overrideArgsDepsOnly {
+        }).overrideArgsDepsOnly
+          {
             cargoVendorDir = craneLib'.vendorCargoDeps {
               inherit src;
             };
@@ -59,30 +60,31 @@ let
               '';
             };
           };
-        in
-        rec {
-          workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
-          workspaceBuild = craneLib.buildWorkspace {
-            cargoArtifacts = workspaceDeps;
-          };
-          workspace-sanity = craneLib.buildPackage { };
-          workspace-sanity-lib = craneLib.buildPackageGroup {
-            packages = [ "workspace-sanity-lib" ];
-          };
+    in
+    rec {
+      workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+      workspaceBuild = craneLib.buildWorkspace {
+        cargoArtifacts = workspaceDeps;
+      };
+      workspace-sanity = craneLib.buildPackage { };
+      workspace-sanity-lib = craneLib.buildPackageGroup {
+        packages = [ "workspace-sanity-lib" ];
+      };
 
-          workspace-sanity-test = craneLib.buildCommand {
-            cargoArtifacts = workspaceBuild;
-            cmd = ''
-              patchShebangs ./scripts/
-              ./scripts/e2e-tests.sh
-            '';
+      workspace-sanity-test = craneLib.buildCommand {
+        cargoArtifacts = workspaceBuild;
+        cmd = ''
+          patchShebangs ./scripts/
+          ./scripts/e2e-tests.sh
+        '';
 
-            src = flakeboxLib.filterSubPaths {
-              root = rootDir;
-              paths = testPaths;
-            };
-          };
-        });
+        src = flakeboxLib.filterSubPaths {
+          root = rootDir;
+          paths = testPaths;
+        };
+      };
+    }
+  );
 in
 pkgs.linkFarmFromDrvs "workspace-sanity" [
   multiOutput.ci.workspaceBuild

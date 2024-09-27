@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 {
 
   options.typos = {
@@ -12,7 +17,6 @@
       };
     };
   };
-
 
   config = lib.mkIf config.typos.enable {
     git.pre-commit.hooks = lib.mkIf config.typos.pre-commit.enable {

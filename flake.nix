@@ -23,11 +23,25 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { flake-utils, nixpkgs, crane, fenix, android-nixpkgs, ... }:
+  outputs =
+    {
+      flake-utils,
+      nixpkgs,
+      crane,
+      fenix,
+      android-nixpkgs,
+      ...
+    }:
     let
-      mkLib = pkgs: import ./lib
-        {
-          inherit pkgs crane fenix android-nixpkgs;
+      mkLib =
+        pkgs:
+        import ./lib {
+          inherit
+            pkgs
+            crane
+            fenix
+            android-nixpkgs
+            ;
         };
     in
     {
@@ -37,8 +51,9 @@
           description = "Flakebox default project template";
         };
       };
-    } //
-    flake-utils.lib.eachDefaultSystem (system:
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
@@ -70,35 +85,36 @@
           ];
         };
 
-        outputs =
-          (flakeboxLib.craneMultiBuild { }) (craneLib':
-            let
-              craneLib = (craneLib'.overrideArgs {
+        outputs = (flakeboxLib.craneMultiBuild { }) (
+          craneLib':
+          let
+            craneLib = (
+              craneLib'.overrideArgs {
                 pname = "flexbox";
                 nativeBuildInputs = [
                   pkgs.mold
                 ];
                 inherit src;
-              });
-            in
-            rec {
-              workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
-              workspaceBuild = craneLib.buildWorkspace {
-                cargoArtifacts = workspaceDeps;
-              };
-              flakebox = craneLib.buildPackage { };
-              flakeboxGroup = craneLib.buildPackageGroup {
-                packages = [ "flakebox" ];
-                mainProgram = "flakebox";
-              };
-            });
+              }
+            );
+          in
+          rec {
+            workspaceDeps = craneLib.buildWorkspaceDepsOnly { };
+            workspaceBuild = craneLib.buildWorkspace {
+              cargoArtifacts = workspaceDeps;
+            };
+            flakebox = craneLib.buildPackage { };
+            flakeboxGroup = craneLib.buildPackageGroup {
+              packages = [ "flakebox" ];
+              mainProgram = "flakebox";
+            };
+          }
+        );
 
-
-        checks =
-          pkgs.callPackages ./checks {
-            inherit pkgs;
-            mkLib = mkLib;
-          };
+        checks = pkgs.callPackages ./checks {
+          inherit pkgs;
+          mkLib = mkLib;
+        };
       in
       {
 
@@ -125,5 +141,6 @@
           packages = [ pkgs.mdbook ];
         };
 
-      });
+      }
+    );
 }

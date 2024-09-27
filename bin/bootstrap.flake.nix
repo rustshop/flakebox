@@ -8,8 +8,15 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, flakebox }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      flakebox,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         flakeboxLib = flakebox.lib.${system} { };
       in

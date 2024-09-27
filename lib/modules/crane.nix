@@ -1,4 +1,11 @@
-{ lib, config, pkgs, crane, fenix, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  crane,
+  fenix,
+  ...
+}:
 
 let
   system = pkgs.system;
@@ -12,6 +19,8 @@ in
 
       Default value is craneLib initialized with `config.toolchain.channel` toolchain with `config.toolchain.components`
     '';
-    default = (crane.mkLib pkgs).overrideToolchain (fenix.packages.${system}.${config.toolchain.channel}.withComponents config.toolchain.components);
+    default = (crane.mkLib pkgs).overrideToolchain (
+      fenix.packages.${system}.${config.toolchain.channel}.withComponents config.toolchain.components
+    );
   };
 }

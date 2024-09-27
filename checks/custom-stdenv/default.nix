@@ -8,15 +8,14 @@ let
     clang-unwrapped = pkgs.llvmPackages_12.clang-unwrapped;
   };
 
-  toolchainsStd =
-    flakeboxLib.mkStdFenixToolchains toolchainArgs;
-
+  toolchainsStd = flakeboxLib.mkStdFenixToolchains toolchainArgs;
 
   multiOutput =
     (flakeboxLib.craneMultiBuild {
       toolchains = toolchainsStd;
     })
-      (craneLib':
+      (
+        craneLib':
         let
           target_underscores_upper = pkgs.stdenv.buildPlatform.rust.cargoEnvVarTarget;
         in
@@ -42,7 +41,8 @@ let
             '';
             doCheck = false;
           };
-        });
+        }
+      );
 in
 pkgs.linkFarmFromDrvs "custom-stdenv" [
   multiOutput.ci.checkStdenv

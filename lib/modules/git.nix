@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 let
   inherit (lib) types;
@@ -101,15 +106,16 @@ in
       '';
     })
 
-
     (lib.mkIf config.git.commit-msg.enable {
       rootDir."misc/git-hooks/commit-msg" =
         let
-          content =
-            (lib.removeSuffix "\n" (builtins.concatStringsSep "\n\n"
-              (lib.mapAttrsToList
-                (rawName: value: value)
-                config.git.commit-msg.hooks)));
+          content = (
+            lib.removeSuffix "\n" (
+              builtins.concatStringsSep "\n\n" (
+                lib.mapAttrsToList (rawName: value: value) config.git.commit-msg.hooks
+              )
+            )
+          );
         in
         {
           # Note: using `writeScript` instead of `writeShellScript` as we want the current-env `bash`
@@ -117,10 +123,8 @@ in
           source = pkgs.writeScript "commit-msg" ''
             #!/usr/bin/env bash
             ${content}
-          ''
-          ;
+          '';
         };
-
 
       env.shellHooks = [
         ''
@@ -134,13 +138,13 @@ in
         ''
       ];
 
-
     })
 
     (lib.mkIf config.git.pre-commit.enable {
       rootDir."misc/git-hooks/pre-commit" =
         let
-          indentString = str: numSpaces:
+          indentString =
+            str: numSpaces:
             let
               spaces = lib.strings.fixedWidthString numSpaces " " "";
               lines = lib.strings.splitString "\n" str;
@@ -148,14 +152,17 @@ in
             in
             builtins.concatStringsSep "\n" indentedLines;
 
-          replaceNonAlphaNum = str:
+          replaceNonAlphaNum =
+            str:
             lib.concatStrings (
-              builtins.map (ch: if builtins.match "[a-zA-Z0-9]" ch != null then ch else "_")
-                (lib.stringToCharacters str)
+              builtins.map (ch: if builtins.match "[a-zA-Z0-9]" ch != null then ch else "_") (
+                lib.stringToCharacters str
+              )
             );
 
-          hooksFns = builtins.concatStringsSep "\n" (lib.mapAttrsToList
-            (rawName: rawValue:
+          hooksFns = builtins.concatStringsSep "\n" (
+            lib.mapAttrsToList (
+              rawName: rawValue:
               let
                 name = replaceNonAlphaNum rawName;
                 value = indentString rawValue 4;
@@ -168,14 +175,17 @@ in
                 }
                 export -f check_${name}
               ''
-            )
-            config.git.pre-commit.hooks);
-          hookNames = builtins.concatStringsSep "\n" (lib.mapAttrsToList
-            (rawName: value:
-              let name = replaceNonAlphaNum rawName; in
+            ) config.git.pre-commit.hooks
+          );
+          hookNames = builtins.concatStringsSep "\n" (
+            lib.mapAttrsToList (
+              rawName: value:
+              let
+                name = replaceNonAlphaNum rawName;
+              in
               "    check_${name} \\"
-            )
-            config.git.pre-commit.hooks);
+            ) config.git.pre-commit.hooks
+          );
         in
         {
           # Note: using `writeScript` instead of `writeShellScript` as we want the current-env `bash`
@@ -190,7 +200,6 @@ in
               check_nothing
           '';
         };
-
 
       env.shellHooks = [
         ''
