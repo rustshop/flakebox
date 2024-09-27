@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 {
 
   options.semgrep = {
@@ -21,7 +26,7 @@
           >&2 echo "Skipping semgrep check: not available"
           return 0
         fi
-      
+
         if [ ! -f .config/semgrep.yaml ] ; then
           >&2 echo "Skipping semgrep check: .config/semgrep.yaml doesn't exist"
           return 0

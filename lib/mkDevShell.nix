@@ -1,26 +1,28 @@
-{ pkgs
-, flakeboxBin
-, config
-, root
-, docs
-, mkFenixToolchain
-, mkStdTargets
-, lib
-, mergeArgs
+{
+  pkgs,
+  flakeboxBin,
+  config,
+  root,
+  docs,
+  mkFenixToolchain,
+  mkStdTargets,
+  lib,
+  mergeArgs,
 }:
 let
   rustfmt = config.toolchain.rustfmt;
 in
-{ packages ? [ ]
-, stdenv ? pkgs.stdenv
-, targets ? lib.getAttrs [ "default" ] (mkStdTargets { })
-, toolchain ? mkFenixToolchain {
+{
+  packages ? [ ],
+  stdenv ? pkgs.stdenv,
+  targets ? lib.getAttrs [ "default" ] (mkStdTargets { }),
+  toolchain ? mkFenixToolchain {
     channel = config.toolchain.channel;
     components = config.toolchain.components;
     inherit targets;
-  }
-, ...
-} @ args:
+  },
+  ...
+}@args:
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
@@ -30,22 +32,20 @@ let
 in
 let
   mkShell =
-    if toolchain ? stdenv then
-      pkgs.mkShell.override { stdenv = toolchain.stdenv; }
-    else
-      pkgs.mkShell;
+    if toolchain ? stdenv then pkgs.mkShell.override { stdenv = toolchain.stdenv; } else pkgs.mkShell;
   flakeboxInit =
-    if config.flakebox.init.enable
-    then ''
-      flakebox init
-    ''
-    else "";
+    if config.flakebox.init.enable then
+      ''
+        flakebox init
+      ''
+    else
+      "";
 
   args = mergeArgs cleanedArgs {
     packages =
-      packages ++ [
+      packages
+      ++ [
         flakeboxBin
-
 
         (toolchain.toolchain)
 
@@ -57,21 +57,31 @@ let
         # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
         (pkgs.hiPrio pkgs.bashInteractive)
 
-      ] ++ config.env.shellPackages ++ (builtins.attrValues {
+      ]
+      ++ config.env.shellPackages
+      ++ (builtins.attrValues {
         # Core & generic
-        inherit (pkgs) git coreutils parallel shellcheck;
+        inherit (pkgs)
+          git
+          coreutils
+          parallel
+          shellcheck
+          ;
         # Nix
-        inherit (pkgs) nixpkgs-fmt nil;
+        inherit (pkgs) nixfmt-rfc-style nil;
         # Rust tools
         inherit (pkgs) cargo-watch;
         # TODO: make conditional on `config.just.enable`
         inherit (pkgs) just;
-      }) ++ toolchain.toolchain.packages or [ ];
+      })
+      ++ toolchain.toolchain.packages or [ ];
 
-    buildInputs = lib.optionals pkgs.stdenv.isDarwin [
-      pkgs.libiconv
-      pkgs.darwin.apple_sdk.frameworks.Security
-    ] ++ toolchain.toolchain.buildInputs or [ ];
+    buildInputs =
+      lib.optionals pkgs.stdenv.isDarwin [
+        pkgs.libiconv
+        pkgs.darwin.apple_sdk.frameworks.Security
+      ]
+      ++ toolchain.toolchain.buildInputs or [ ];
 
     nativeBuildInputs = toolchain.toolchain.nativeBuildInputs or [ ];
 
@@ -94,6 +104,4 @@ let
     '';
   };
 in
-mkShell (
-  mergeArgs (mergeArgs toolchain.commonArgs toolchain.shellArgs) args
-)
+mkShell (mergeArgs (mergeArgs toolchain.commonArgs toolchain.shellArgs) args)

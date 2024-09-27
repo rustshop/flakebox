@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
   inherit (lib) types;
 in
@@ -15,39 +20,43 @@ in
     };
 
     rules = lib.mkOption {
-      type = types.attrsOf (types.submodule
-        ({ config, options, ... }: {
-          options = {
-            enable = lib.mkOption {
-              type = types.bool;
-              default = true;
-              description = ''
-                Whether this rule should be generated. This
-                option allows specific rules to be disabled.
-              '';
-            };
+      type = types.attrsOf (
+        types.submodule (
+          { config, options, ... }:
+          {
+            options = {
+              enable = lib.mkOption {
+                type = types.bool;
+                default = true;
+                description = ''
+                  Whether this rule should be generated. This
+                  option allows specific rules to be disabled.
+                '';
+              };
 
-            content = lib.mkOption {
-              type = types.either types.str types.path;
-              default = 1000;
-              description = ''
-                Order of this rule in relation to the others ones.
-                The semantics are the same as with `lib.mkOrder`. Smaller values have
-                a greater priority.
-              '';
-            };
+              content = lib.mkOption {
+                type = types.either types.str types.path;
+                default = 1000;
+                description = ''
+                  Order of this rule in relation to the others ones.
+                  The semantics are the same as with `lib.mkOrder`. Smaller values have
+                  a greater priority.
+                '';
+              };
 
-            priority = lib.mkOption {
-              type = types.int;
-              default = 1000;
-              description = ''
-                Order of this rule in relation to the others ones.
-                The semantics are the same as with `lib.mkOrder`. Smaller values have
-                a greater priority.
-              '';
+              priority = lib.mkOption {
+                type = types.int;
+                default = 1000;
+                description = ''
+                  Order of this rule in relation to the others ones.
+                  The semantics are the same as with `lib.mkOrder`. Smaller values have
+                  a greater priority.
+                '';
+              };
             };
-          };
-        }));
+          }
+        )
+      );
 
       description = ''
         Attrset of section of justfile (possibly with multiple rules)
@@ -60,10 +69,10 @@ in
     };
   };
 
-
   config =
     let
-      pathDeref = pathOrStr: if builtins.typeOf pathOrStr == "path" then builtins.readFile pathOrStr else pathOrStr;
+      pathDeref =
+        pathOrStr: if builtins.typeOf pathOrStr == "path" then builtins.readFile pathOrStr else pathOrStr;
     in
     lib.mkIf config.just.enable {
       just.rules = {
@@ -152,7 +161,9 @@ in
           priority = 100;
           content = ''
             # run all checks recommended before opening a PR
-            final-check: lint ${if config.just.rules ? clippy && config.just.rules.clippy.enable then "clippy" else "" }
+            final-check: lint ${
+              if config.just.rules ? clippy && config.just.rules.clippy.enable then "clippy" else ""
+            }
               #!/usr/bin/env bash
               set -euo pipefail
               if [ ! -f Cargo.toml ]; then
@@ -173,7 +184,7 @@ in
                 cd {{invocation_directory()}}
               fi
               cargo fmt --all
-              nixpkgs-fmt $(git ls-files | grep "\.nix$")
+              nixfmt $(git ls-files | grep "\.nix$")
           '';
         };
       };
@@ -186,22 +197,25 @@ in
 
       rootDir."justfile" =
         let
-          raw_content = (builtins.concatStringsSep "\n\n"
-            (builtins.map (v: v.content)
-              (lib.sort (a: b: if a.priority == b.priority then (a.k < b.k) else a.priority < b.priority)
-                (lib.mapAttrsToList
-                  (k: v: {
+          raw_content = (
+            builtins.concatStringsSep "\n\n" (
+              builtins.map (v: v.content) (
+                lib.sort (a: b: if a.priority == b.priority then (a.k < b.k) else a.priority < b.priority) (
+                  lib.mapAttrsToList (k: v: {
                     inherit k;
                     priority = v.priority;
                     content = pathDeref v.content;
-                  })
-                  config.just.rules))));
+                  }) config.just.rules
+                )
+              )
+            )
+          );
 
-          imports_content = builtins.concatStringsSep "\n" (map
-            (pathStr: ''
+          imports_content = builtins.concatStringsSep "\n" (
+            map (pathStr: ''
               import "${pathStr}"
-            '')
-            config.just.importPaths);
+            '') config.just.importPaths
+          );
         in
         {
           source = pkgs.writeText "flakebox-justfile" ''
@@ -213,4 +227,3 @@ in
         };
     };
 }
-

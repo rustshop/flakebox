@@ -1,26 +1,28 @@
-{ pkgs
-, config
-, docs
-, mkFenixToolchain
-, lib
-, mergeArgs
-, mkStdTargets
+{
+  pkgs,
+  config,
+  docs,
+  mkFenixToolchain,
+  lib,
+  mergeArgs,
+  mkStdTargets,
 }:
 let
   rustfmt = config.toolchain.rustfmt;
 in
 
-{ packages ? [ ]
-, stdenv ? pkgs.stdenv
-, targets ? lib.getAttrs [ "default" ] (mkStdTargets { })
-, toolchain ? mkFenixToolchain {
+{
+  packages ? [ ],
+  stdenv ? pkgs.stdenv,
+  targets ? lib.getAttrs [ "default" ] (mkStdTargets { }),
+  toolchain ? mkFenixToolchain {
     inherit targets stdenv;
     channel = config.toolchain.channel;
     components = config.toolchain.components;
     isLintShell = true;
-  }
-, ...
-} @ args:
+  },
+  ...
+}@args:
 let
   cleanedArgs = removeAttrs args [
     "toolchain"
@@ -29,20 +31,25 @@ let
 in
 let
   mkShell =
-    if toolchain ? stdenv then
-      pkgs.mkShell.override { stdenv = toolchain.stdenv; }
-    else
-      pkgs.mkShell;
+    if toolchain ? stdenv then pkgs.mkShell.override { stdenv = toolchain.stdenv; } else pkgs.mkShell;
   args = cleanedArgs // {
     packages =
-      packages ++ [
+      packages
+      ++ [
         toolchain.toolchain
         rustfmt
-      ] ++ config.env.shellPackages ++ (builtins.attrValues {
+      ]
+      ++ config.env.shellPackages
+      ++ (builtins.attrValues {
         # Core & generic
-        inherit (pkgs) git coreutils parallel shellcheck;
+        inherit (pkgs)
+          git
+          coreutils
+          parallel
+          shellcheck
+          ;
         # Nix
-        inherit (pkgs) nixpkgs-fmt;
+        inherit (pkgs) nixfmt-rfc-style;
         # TODO: make conditional on `config.just.enable`
         inherit (pkgs) just;
       });
@@ -55,6 +62,4 @@ let
     '';
   };
 in
-mkShell (
-  mergeArgs toolchain.shellArgs args
-)
+mkShell (mergeArgs toolchain.shellArgs args)

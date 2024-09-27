@@ -1,4 +1,10 @@
-{ lib, config, pkgs, fenix, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  fenix,
+  ...
+}:
 
 let
   system = pkgs.system;
