@@ -42,7 +42,7 @@ let
         # Core & generic
         inherit (pkgs) git coreutils parallel shellcheck;
         # Nix
-        inherit (pkgs) nixpkgs-fmt;
+        inherit (pkgs) nixfmt-rfc-style;
         # TODO: make conditional on `config.just.enable`
         inherit (pkgs) just;
       });

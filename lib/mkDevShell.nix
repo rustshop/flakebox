@@ -61,7 +61,7 @@ let
         # Core & generic
         inherit (pkgs) git coreutils parallel shellcheck;
         # Nix
-        inherit (pkgs) nixpkgs-fmt nil;
+        inherit (pkgs) nixfmt-rfc-style nil;
         # Rust tools
         inherit (pkgs) cargo-watch;
         # TODO: make conditional on `config.just.enable`

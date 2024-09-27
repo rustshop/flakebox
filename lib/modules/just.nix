@@ -173,7 +173,7 @@ in
                 cd {{invocation_directory()}}
               fi
               cargo fmt --all
-              nixpkgs-fmt $(git ls-files | grep "\.nix$")
+              nixfmt $(git ls-files | grep "\.nix$")
           '';
         };
       };
