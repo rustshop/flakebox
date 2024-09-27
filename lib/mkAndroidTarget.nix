@@ -1,9 +1,9 @@
-{
-  lib,
-  pkgs,
-  system,
-  android-nixpkgs,
-  mkTarget,
+{ lib
+, pkgs
+, system
+, android-nixpkgs
+, mkTarget
+,
 }:
 let
   defaultAndroidSdk = android-nixpkgs.sdk."${system}" (
@@ -11,27 +11,25 @@ let
       cmdline-tools-latest
       build-tools-32-0-0
       platform-tools
-      platforms-android-31
+      platforms-android-32
       emulator
-      ndk-bundle
+      ndk-25-2-9519653
     ]
   );
 in
-{
-  target,
-  androidTarget ? target,
-  arch,
-  androidVer ? 31,
-  ...
+{ target
+, androidTarget ? target
+, arch
+, androidVer ? 32
+, ...
 }:
 let
   defaultAndroidVer = androidVer;
 in
-{
-  extraRustFlags ? "",
-  androidVer ? defaultAndroidVer,
-  androidSdk ? defaultAndroidSdk,
-  ...
+{ extraRustFlags ? ""
+, androidVer ? defaultAndroidVer
+, androidSdk ? defaultAndroidSdk
+, ...
 }@mkTargetArgs:
 let
   target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
@@ -44,12 +42,12 @@ let
     '';
   androidSdkPrebuilt =
     if system == "x86_64-linux" then
-      "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64"
+      "${androidSdk}/share/android-sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64"
     else if system == "x86_64-darwin" then
-      "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64"
+      "${androidSdk}/share/android-sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64"
     else if system == "aarch64-darwin" then
-      # uses the x86_64 binaries, as aarch64 are not available (yet?)
-      "${androidSdk}/share/android-sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64"
+    # uses the x86_64 binaries, as aarch64 are not available (yet?)
+      "${androidSdk}/share/android-sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64"
     else
       throw "Missing mapping for ${target} toolchain on ${system}, PRs welcome";
 
@@ -71,9 +69,10 @@ let
   #   ${androidSdkPrebuilt}/bin/llvm-config --ldflags > $out
   # '');
   # but in practice it doesn't
-  ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/12.0.5/lib/linux/${arch}/";
+  ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/14.0.7/lib/linux/${arch}/";
 in
-mkTarget {
+mkTarget
+{
   inherit target;
   canUseMold = false;
   args = {
@@ -96,4 +95,5 @@ mkTarget {
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
   };
-} mkTargetArgs
+}
+  mkTargetArgs

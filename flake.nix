@@ -2,7 +2,7 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
@@ -19,18 +19,17 @@
     };
 
     android-nixpkgs = {
-      url = "github:tadfisher/android-nixpkgs?rev=7fa1348249564e43185d3053f579f9fa923d46cc"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
+      url = "github:tadfisher/android-nixpkgs?rev=522d86121cbd413aff922c54f38106ecf8740107"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs =
-    {
-      flake-utils,
-      nixpkgs,
-      crane,
-      fenix,
-      android-nixpkgs,
-      ...
+    { flake-utils
+    , nixpkgs
+    , crane
+    , fenix
+    , android-nixpkgs
+    , ...
     }:
     let
       mkLib =
