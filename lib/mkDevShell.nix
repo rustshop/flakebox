@@ -44,6 +44,7 @@ let
   args = mergeArgs cleanedArgs {
     packages =
       packages
+      ++ cleanedArgs.packages or []
       ++ [
         flakeboxBin
 
@@ -77,13 +78,14 @@ let
       ++ toolchain.toolchain.packages or [ ];
 
     buildInputs =
+      cleanedArgs.buildInputs or [] ++
       lib.optionals pkgs.stdenv.isDarwin [
         pkgs.libiconv
         pkgs.darwin.apple_sdk.frameworks.Security
       ]
       ++ toolchain.toolchain.buildInputs or [ ];
 
-    nativeBuildInputs = toolchain.toolchain.nativeBuildInputs or [ ];
+    nativeBuildInputs = cleanedArgs.nativeBuildInputs or [] ++ toolchain.toolchain.nativeBuildInputs or [ ];
 
     JUST_UNSTABLE = "true";
 
