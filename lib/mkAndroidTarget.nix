@@ -94,6 +94,7 @@ mkTarget
     # TODO: not clear if this belongs here, especially in presence of mixed android toolchains, this could fall apart
     ANDROID_SDK_ROOT = "${androidSdk}/share/android-sdk/";
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
+    ANDROID_NDK_ROOT = "${androidSdk}/share/android-sdk/ndk/25.2.9519653/";
   };
 }
   mkTargetArgs
