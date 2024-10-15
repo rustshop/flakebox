@@ -37,7 +37,7 @@ let
   ];
 in
 {
-  lint = mkLintShell { packages = cleanedArgs.packages ++ lintPackages; };
+  lint = mkLintShell { packages = cleanedArgs.packages or [] ++ lintPackages; };
   default = mkDevShell (
     cleanedArgs
     // {
