@@ -10,6 +10,7 @@
 pkgs.stdenv.mkDerivation {
   inherit system;
   name = bin;
+  pname = bin;
 
   dontUnpack = true;
   # just don't mess with it
