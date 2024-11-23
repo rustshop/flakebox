@@ -46,15 +46,6 @@ function check_cargo_lock() {
 }
 export -f check_cargo_lock
 
-function check_check_nixfmt() {
-    set -euo pipefail
-
-    # we actually rely on word splitting here
-    # shellcheck disable=SC2046
-    nixfmt -c $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep "\.nix$")
-}
-export -f check_check_nixfmt
-
 function check_leftover_dbg() {
     set -euo pipefail
 
@@ -72,6 +63,15 @@ function check_leftover_dbg() {
     fi
 }
 export -f check_leftover_dbg
+
+function check_nixfmt() {
+    set -euo pipefail
+
+    # we actually rely on word splitting here
+    # shellcheck disable=SC2046
+    nixfmt -c $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep "\.nix$")
+}
+export -f check_nixfmt
 
 function check_semgrep() {
     set -euo pipefail
@@ -162,8 +162,8 @@ parallel \
 ::: \
     check_cargo_fmt \
     check_cargo_lock \
-    check_check_nixfmt \
     check_leftover_dbg \
+    check_nixfmt \
     check_semgrep \
     check_shellcheck \
     check_trailing_newline \

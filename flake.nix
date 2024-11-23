@@ -24,12 +24,13 @@
     };
   };
   outputs =
-    { flake-utils
-    , nixpkgs
-    , crane
-    , fenix
-    , android-nixpkgs
-    , ...
+    {
+      flake-utils,
+      nixpkgs,
+      crane,
+      fenix,
+      android-nixpkgs,
+      ...
     }:
     let
       mkLib =

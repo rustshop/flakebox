@@ -1,9 +1,9 @@
-{ lib
-, pkgs
-, system
-, android-nixpkgs
-, mkTarget
-,
+{
+  lib,
+  pkgs,
+  system,
+  android-nixpkgs,
+  mkTarget,
 }:
 let
   defaultAndroidSdk = android-nixpkgs.sdk."${system}" (
@@ -17,19 +17,21 @@ let
     ]
   );
 in
-{ target
-, androidTarget ? target
-, arch
-, androidVer ? 32
-, ...
+{
+  target,
+  androidTarget ? target,
+  arch,
+  androidVer ? 32,
+  ...
 }:
 let
   defaultAndroidVer = androidVer;
 in
-{ extraRustFlags ? ""
-, androidVer ? defaultAndroidVer
-, androidSdk ? defaultAndroidSdk
-, ...
+{
+  extraRustFlags ? "",
+  androidVer ? defaultAndroidVer,
+  androidSdk ? defaultAndroidSdk,
+  ...
 }@mkTargetArgs:
 let
   target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
@@ -46,7 +48,7 @@ let
     else if system == "x86_64-darwin" then
       "${androidSdk}/share/android-sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64"
     else if system == "aarch64-darwin" then
-    # uses the x86_64 binaries, as aarch64 are not available (yet?)
+      # uses the x86_64 binaries, as aarch64 are not available (yet?)
       "${androidSdk}/share/android-sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/darwin-x86_64"
     else
       throw "Missing mapping for ${target} toolchain on ${system}, PRs welcome";
@@ -71,8 +73,7 @@ let
   # but in practice it doesn't
   ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/14.0.7/lib/linux/${arch}/";
 in
-mkTarget
-{
+mkTarget {
   inherit target;
   canUseMold = false;
   args = {
@@ -96,5 +97,4 @@ mkTarget
     ANDROID_HOME = "${androidSdk}/share/android-sdk/";
     ANDROID_NDK_ROOT = "${androidSdk}/share/android-sdk/ndk/25.2.9519653/";
   };
-}
-  mkTargetArgs
+} mkTargetArgs
