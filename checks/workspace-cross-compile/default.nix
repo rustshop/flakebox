@@ -58,7 +58,7 @@ let
               inherit src;
               extraDummyScript = ''
                 # not actually needed anymore, but just trying `overrideArgsDepsOnly`
-                # # temporary workaround: https://github.com/ipetkov/crane/issues/312#issuecomment-1601827484
+                temporary workaround: https://github.com/ipetkov/crane/issues/312#issuecomment-1601827484
                 # # rm -f $(find $out | grep bin/crane-dummy/main.rs)
                 true
               '';
