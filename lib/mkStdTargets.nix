@@ -1,16 +1,16 @@
-{ pkgs
-, system
-, config
-, fenix
-, lib
-, mkAndroidTarget
-, mkIOSTarget
-, targetLlvmConfigWrapper
-, mkClangTarget
-, mkNativeTarget
-, mkTarget
-, android-nixpkgs
-,
+{
+  pkgs,
+  system,
+  config,
+  fenix,
+  lib,
+  mkAndroidTarget,
+  mkIOSTarget,
+  targetLlvmConfigWrapper,
+  mkClangTarget,
+  mkNativeTarget,
+  mkTarget,
+  android-nixpkgs,
 }:
 { ... }@mkStdTargetsArgs:
 {
@@ -93,65 +93,63 @@
 // {
   wasm32-unknown =
     { extraRustFlags, ... }@args:
-    mkTarget
-      {
-        target = "wasm32-unknown-unknown";
-        # mold doesn't work for wasm at all
-        canUseMold = false;
-        args = (
-          let
-            target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN";
-          in
-          {
-            CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
-            # -Wno-macro-redefined fixes ring building
-            CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
-            # leave these as defaults
-            "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
-            "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
-          }
-          // lib.optionalAttrs pkgs.stdenv.isDarwin {
-            AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
-          }
-        );
-      }
-      args;
+    mkTarget {
+      target = "wasm32-unknown-unknown";
+      # mold doesn't work for wasm at all
+      canUseMold = false;
+      args = (
+        let
+          target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN";
+        in
+        {
+          CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+          # -Wno-macro-redefined fixes ring building
+          CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+          # leave these as defaults
+          "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
+          "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
+        }
+        // lib.optionalAttrs pkgs.stdenv.isDarwin {
+          AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+        }
+      );
+    } args;
 }
 //
-lib.optionalAttrs ((mkStdTargetsArgs ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk))
-  {
-    aarch64-android = mkAndroidTarget {
-      arch = "aarch64";
-      androidVer = 32;
-      target = "aarch64-linux-android";
-    };
+  lib.optionalAttrs ((mkStdTargetsArgs ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk))
+    {
+      aarch64-android = mkAndroidTarget {
+        arch = "aarch64";
+        androidVer = 32;
+        target = "aarch64-linux-android";
+      };
 
-    arm-android = mkAndroidTarget {
-      arch = "arm";
-      androidVer = 32;
-      target = "arm-linux-androideabi";
-    };
+      arm-android = mkAndroidTarget {
+        arch = "arm";
+        androidVer = 32;
+        target = "arm-linux-androideabi";
+      };
 
-    armv7-android = mkAndroidTarget {
-      arch = "arm";
-      androidVer = 32;
-      target = "armv7-linux-androideabi";
-      androidTarget = "arm-linux-androideabi";
-    };
+      armv7-android = mkAndroidTarget {
+        arch = "arm";
+        androidVer = 32;
+        target = "armv7-linux-androideabi";
+        androidTarget = "arm-linux-androideabi";
+      };
 
-    x86_64-android = mkAndroidTarget {
-      arch = "x86_64";
-      androidVer = 32;
-      target = "x86_64-linux-android";
-    };
+      x86_64-android = mkAndroidTarget {
+        arch = "x86_64";
+        androidVer = 32;
+        target = "x86_64-linux-android";
+      };
 
-    i686-android = mkAndroidTarget {
-      arch = "i386";
-      androidVer = 32;
-      target = "i686-linux-android";
-    };
+      i686-android = mkAndroidTarget {
+        arch = "i386";
+        androidVer = 32;
+        target = "i686-linux-android";
+      };
 
-  }
+    }
 // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "aarch64-apple-darwin") {
   aarch64-darwin = mkClangTarget {
     target = "aarch64-apple-darwin";
@@ -189,7 +187,7 @@ lib.optionalAttrs ((mkStdTargetsArgs ? androidSdk) || (builtins.hasAttr system a
     };
   };
 }
-  // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+// lib.optionalAttrs (pkgs.stdenv.isDarwin) {
   aarch64-ios = mkIOSTarget ({
     target = "aarch64-apple-ios";
   });

@@ -167,11 +167,12 @@ in
                 name = replaceNonAlphaNum rawName;
                 value = indentString rawValue 4;
               in
+              # Note: that weird intendation on value is expected
               ''
                 function check_${name}() {
                     set -euo pipefail
 
-                ${value}
+                    ${lib.strings.trim value}
                 }
                 export -f check_${name}
               ''
