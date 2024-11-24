@@ -30,10 +30,10 @@
     };
 
     args = {
-      CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 
@@ -49,10 +49,10 @@
     };
 
     args = {
-      CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 
@@ -66,10 +66,10 @@
     };
 
     args = {
-      CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 
@@ -83,10 +83,10 @@
     };
 
     args = {
-      CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 }
@@ -161,10 +161,10 @@
     };
 
     args = {
-      CFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.aarch64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 
@@ -180,10 +180,10 @@
     };
 
     args = {
-      CFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CPPFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      CXXFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/16/include/";
+      CFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CPPFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      CXXFLAGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
+      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_darwin_gnu = "-I ${pkgs.pkgsCross.x86_64-darwin.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
     };
   };
 }
