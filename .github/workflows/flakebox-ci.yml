@@ -28,7 +28,7 @@ jobs:
           runs-on: ubuntu-latest
           timeout: 60
         - host: macos-x86_64
-          runs-on: macos-12
+          runs-on: macos-13
           timeout: 60
         - host: macos-aarch64
           runs-on: macos-14
