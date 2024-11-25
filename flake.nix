@@ -19,7 +19,7 @@
     };
 
     android-nixpkgs = {
-      url = "github:tadfisher/android-nixpkgs?rev=290a7978765e4dac72687261bf3617c2b9412f87"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
+      url = "github:tadfisher/android-nixpkgs?rev=4ecd9e0da0a955a180a429196f59a8716d1dd138"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
