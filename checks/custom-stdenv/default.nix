@@ -2,10 +2,10 @@
 let
 
   toolchainArgs = {
-    stdenv = pkgs.clang12Stdenv;
-    clang = pkgs.llvmPackages_12.clang;
-    libclang = pkgs.llvmPackages_12.libclang.lib;
-    clang-unwrapped = pkgs.llvmPackages_12.clang-unwrapped;
+    stdenv = pkgs.clang18Stdenv;
+    clang = pkgs.llvmPackages_18.clang;
+    libclang = pkgs.llvmPackages_18.libclang.lib;
+    clang-unwrapped = pkgs.llvmPackages_18.clang-unwrapped;
   };
 
   toolchainsStd = flakeboxLib.mkStdFenixToolchains toolchainArgs;
@@ -29,11 +29,11 @@ let
             src = ./.;
             buildPhaseCargoCommand = ''
               set -x
-              if [[ "$(${pkgs.which}/bin/which cc)" != *clang-wrapper-12* ]]; then
+              if [[ "$(${pkgs.which}/bin/which cc)" != *clang-wrapper-18* ]]; then
                 set +x
                 exit 1
               fi
-              if [[ "$CARGO_TARGET_${target_underscores_upper}_LINKER" != *clang-wrapper-12* ]]; then
+              if [[ "$CARGO_TARGET_${target_underscores_upper}_LINKER" != *clang-wrapper-18* ]]; then
                 set +x
                 exit 1
               fi

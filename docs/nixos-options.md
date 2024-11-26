@@ -584,7 +584,7 @@ attribute set
     }
     {
       host = "macos-x86_64";
-      runs-on = "macos-12";
+      runs-on = "macos-13";
       timeout = 60;
     }
     {

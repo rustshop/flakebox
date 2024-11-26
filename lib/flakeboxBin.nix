@@ -18,7 +18,7 @@ pkgs.rustPlatform.buildRustPackage {
   inherit src;
 
   pname = "flakebox";
-  version = "0.0.1";
+  version = "0.1.0";
 
-  cargoSha256 = "sha256-IuHjeSfaRlxc4dJh7zHXVASPIYsThFajq3GZJmjSXMM=";
+  cargoSha256 = "sha256-hsHGZAxZube9xpdVp4xxZu6c+9s0mLO1GpZlPIwJ348=";
 }
