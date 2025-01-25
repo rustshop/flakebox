@@ -51,7 +51,8 @@ let
     "LD_${target_underscores}" = "/usr/bin/cc";
 
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "/usr/bin/clang";
-    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "-C link-arg=-fuse-ld=/usr/bin/ld ${extraRustFlags}";
+    "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
+      "-C link-arg=-fuse-ld=/usr/bin/ld ${extraRustFlags}";
 
     nativeBuildInputs = [ target-clang-wrapper ];
   } (mkClangTargetArgs.args or { });
