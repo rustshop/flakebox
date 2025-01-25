@@ -80,7 +80,7 @@ mkTarget {
     # For bindgen, through universal-llvm-config
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";
 
-    # `cc` crate wants these  
+    # `cc` crate wants these
     "CC_${target_underscores}" = "${androidSdkPrebuilt}/bin/clang";
     "CFLAGS_${target_underscores}" = cflags;
     "CXXFLAGS_${target_underscores}" = cppflags;
@@ -89,7 +89,8 @@ mkTarget {
     "LDFLAGS_${target_underscores}" = ldflags;
 
     # cargo needs this
-    "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
+    "CARGO_TARGET_${target_underscores_upper}_LINKER" =
+      "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
 
     # TODO: not clear if this belongs here, especially in presence of mixed android toolchains, this could fall apart
