@@ -38,8 +38,6 @@ let
   optionsDoc = pkgs.nixosOptionsDoc {
     inherit (evalModules) options;
     documentType = "none";
-    allowDocBook = false;
-    markdownByDefault = true;
   };
 
   optionsDocMd = pkgs.runCommand "options-doc.md" { } ''
