@@ -87,8 +87,8 @@ in
         for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
 
           # extra branches for clarity
-          if [ ! -s "$path" ]; then
-             # echo "$path is empty"
+          if [ ! -f "$path" ] || [ ! -s "$path" ]; then
+             # echo "$path is not a file or is empty"
              true
           elif [ -z "$(tail -c 1 < "$path")" ]; then
              # echo "$path ends with a newline or with a null byte"

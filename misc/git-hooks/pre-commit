@@ -24,9 +24,18 @@ if [ -z "${NO_STASH:-}" ] && [ $is_unclean -ne 0 ]; then
 fi
 
 export FLAKEBOX_GIT_LS
-FLAKEBOX_GIT_LS="$(git ls-files)"
+if [ -z "${FLAKEBOX_GIT_LS_IGNORE:-}" ]; then
+  FLAKEBOX_GIT_LS="$(git ls-files)"
+else
+  FLAKEBOX_GIT_LS="$(git ls-files | grep -v -E "${FLAKEBOX_GIT_LS_IGNORE}")"
+fi
+
 export FLAKEBOX_GIT_LS_TEXT
-FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)\$")"
+if [ -z "${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]; then
+  FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)\$")"
+else
+  FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)\$" | grep -v -E "${FLAKEBOX_GIT_LS_TEXT_IGNORE}")"
+fi
 
 
 function check_nothing() {
@@ -123,8 +132,8 @@ function check_trailing_newline() {
     for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
 
       # extra branches for clarity
-      if [ ! -s "$path" ]; then
-         # echo "$path is empty"
+      if [ ! -f "$path" ] || [ ! -s "$path" ]; then
+         # echo "$path is not a file or is empty"
          true
       elif [ -z "$(tail -c 1 < "$path")" ]; then
          # echo "$path ends with a newline or with a null byte"
