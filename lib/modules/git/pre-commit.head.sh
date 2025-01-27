@@ -22,9 +22,9 @@ fi
 
 export FLAKEBOX_GIT_LS
 if [ -z "${FLAKEBOX_GIT_LS_IGNORE:-}" ]; then
-  FLAKEBOX_GIT_LS="$(git ls-files)"
+  FLAKEBOX_GIT_LS="$(git ls-files | while read -r file; do [ ! -L "$file" ] && echo "$file"; done)"
 else
-  FLAKEBOX_GIT_LS="$(git ls-files | grep -v -E "${FLAKEBOX_GIT_LS_IGNORE}")"
+  FLAKEBOX_GIT_LS="$(git ls-files | grep -v -E "${FLAKEBOX_GIT_LS_IGNORE}" | while read -r file; do [ ! -L "$file" ] && echo "$file"; done)"
 fi
 
 export FLAKEBOX_GIT_LS_TEXT
