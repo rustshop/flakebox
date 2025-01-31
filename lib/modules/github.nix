@@ -20,6 +20,12 @@ in
         default = null;
       };
 
+      flakeSelfCheck = {
+        enable = lib.mkEnableOption "flake self-check" // {
+          default = true;
+        };
+      };
+
       runsOn = lib.mkOption {
         type = types.anything;
         description = "Value of a runs-on to use for default Linu workflows (lint, self-check, etc.)";
@@ -159,78 +165,82 @@ in
             workflow_dispatch = { };
           };
 
-          jobs = {
-            flake = {
-              name = "Flake self-check";
-              runs-on = config.github.ci.runsOn;
-              steps = [
-                { uses = "actions/checkout@v4"; }
-                {
-                  name = "Check Nix flake inputs";
-                  uses = "DeterminateSystems/flake-checker-action@v5";
-                  "with" = {
-                    fail-mode = true;
-                  };
-                }
-              ];
-            };
-
-            lint = {
-              name = "Lint";
-              runs-on = config.github.ci.runsOn;
-              steps = [
-                { uses = "actions/checkout@v4"; }
-
-                {
-                  name = "Install Nix";
-                  uses = "DeterminateSystems/nix-installer-action@v4";
-                }
-
-                cacheStep
-
-                {
-                  name = "Cargo Cache";
-                  uses = "actions/cache@v3";
-                  "with" = {
-                    path = "~/.cargo";
-                    key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
-                  };
-                }
-
-                {
-                  name = "Commit Check";
-                  run = ''
-                    # run the same check that git `pre-commit` hook does
-                    nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
-                  '';
-                }
-              ];
-            };
-
-            build = {
-              name = "Build";
-              strategy = {
-                matrix = buildMatrix;
+          jobs = lib.mkMerge [
+            (lib.mkIf config.github.ci.flakeSelfCheck.enable {
+              flake = {
+                name = "Flake self-check";
+                runs-on = config.github.ci.runsOn;
+                steps = [
+                  { uses = "actions/checkout@v4"; }
+                  {
+                    name = "Check Nix flake inputs";
+                    uses = "DeterminateSystems/flake-checker-action@v5";
+                    "with" = {
+                      fail-mode = true;
+                    };
+                  }
+                ];
               };
-              runs-on = "\${{ matrix.runs-on }}";
-              timeout-minutes = "\${{ matrix.timeout }}";
-              steps = [
-                { uses = "actions/checkout@v4"; }
+            })
 
-                {
-                  name = "Install Nix";
-                  uses = "DeterminateSystems/nix-installer-action@v4";
-                }
+            {
+              lint = {
+                name = "Lint";
+                runs-on = config.github.ci.runsOn;
+                steps = [
+                  { uses = "actions/checkout@v4"; }
 
-                cacheStep
+                  {
+                    name = "Install Nix";
+                    uses = "DeterminateSystems/nix-installer-action@v4";
+                  }
 
-                {
-                  name = "Build on \${{ matrix.host }}";
-                  run = buildCmd;
-                }
-              ];
-            };
-          };
+                  cacheStep
+
+                  {
+                    name = "Cargo Cache";
+                    uses = "actions/cache@v3";
+                    "with" = {
+                      path = "~/.cargo";
+                      key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
+                    };
+                  }
+
+                  {
+                    name = "Commit Check";
+                    run = ''
+                      # run the same check that git `pre-commit` hook does
+                      nix develop --ignore-environment .#lint --command ./misc/git-hooks/pre-commit
+                    '';
+                  }
+                ];
+              };
+
+              build = {
+                name = "Build";
+                strategy = {
+                  matrix = buildMatrix;
+                };
+                runs-on = "\${{ matrix.runs-on }}";
+                timeout-minutes = "\${{ matrix.timeout }}";
+                steps = [
+                  { uses = "actions/checkout@v4"; }
+
+                  {
+                    name = "Install Nix";
+                    uses = "DeterminateSystems/nix-installer-action@v4";
+                  }
+
+                  cacheStep
+
+                  {
+                    name = "Build on \${{ matrix.host }}";
+                    run = buildCmd;
+                  }
+                ];
+              };
+            }
+          ];
         };
       flakebox-flakehub-publish = {
         name = "Publish to Flakehub";
