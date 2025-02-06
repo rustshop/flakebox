@@ -2,11 +2,11 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
 
     crane = {
-      url = "github:dpc/crane?rev=afdf9ab92ed2880c4e39aba5106677e3385717f4";
+      url = "github:dpc/crane?rev=72e2d02dbac80c8c86bf6bf3e785536acf8ee926";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

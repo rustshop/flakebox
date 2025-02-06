@@ -29,7 +29,7 @@ in
   rustfmt = fenixToolchainRustfmt;
 
   # craneLib from `crane` package - for building Rust packages with Nix
-  craneLib = crane.lib.${system}.overrideToolchain self.toolchain;
+  craneLib = (crane.mkLib pkgs).overrideToolchain self.toolchain;
 
   # common args for crane, used for building internal Rust binaries
   # not meant to be modified as part of downstream customizations
