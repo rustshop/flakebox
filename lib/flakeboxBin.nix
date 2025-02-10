@@ -20,5 +20,5 @@ pkgs.rustPlatform.buildRustPackage {
   pname = "flakebox";
   version = "0.1.0";
 
-  cargoSha256 = "sha256-hsHGZAxZube9xpdVp4xxZu6c+9s0mLO1GpZlPIwJ348=";
+  cargoHash = "sha256-hsHGZAxZube9xpdVp4xxZu6c+9s0mLO1GpZlPIwJ348=";
 }
