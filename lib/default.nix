@@ -98,7 +98,7 @@ lib.makeScope pkgs.newScope (
         mv id $out/.config/flakebox/
       '';
 
-    craneLib = self.enhanceCrane self.config.craneLib;
+    craneMkLib = pkgs: self.enhanceCrane (self.config.craneMkLib pkgs);
 
     # wrapper over `mkShell` setting up flakebox env
     mkDevShell = callPackage ./mkDevShell.nix { };
