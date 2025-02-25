@@ -1,13 +1,14 @@
 {
   mkFenixToolchain,
-  craneLib,
+  craneMkLib,
   mapWithToolchains,
   mkTarget,
   mkStdToolchains,
   lib,
+  pkgs,
 }:
 let
-  craneLib' = craneLib;
+  craneLib' = craneMkLib pkgs;
 in
 {
   toolchains ? mkStdToolchains { },
