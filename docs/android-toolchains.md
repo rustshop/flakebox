@@ -1,6 +1,6 @@
 # Android toolchains
 
-Android toolchains uses [`android-nixpkgs`](https://github.com/tadfisher/android-nixpkgs`) to
+Android toolchains uses [`android-nixpkgs`](https://github.com/tadfisher/android-nixpkgs) to
 source precompiled Android toolchains.
 
 Toolchain short-names:
