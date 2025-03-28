@@ -873,7 +873,7 @@ scratch, but it's outside of the scope of this tutorial.
 Project can define multiple (cross-) dev shells, that include
 different tools and toolchains for different tasks. It's common
 that web-developers would only be interested in wasm toolchain,
-and mobile developers in 
+and mobile developers would only be interested in the Android toolchains.
 
 ## Summary
 
