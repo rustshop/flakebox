@@ -10,7 +10,6 @@
 
     crane = {
       url = "github:ipetkov/crane/?rev=19de14aaeb869287647d9461cbd389187d8ecdb7";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     fenix = {
