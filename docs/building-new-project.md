@@ -797,7 +797,7 @@ Yes, it does!
 Commit:
 
 ```
-> git ci -a -m "Add some some dependencies"
+> git commit -a -m "Add some some dependencies"
 ```
 
 
