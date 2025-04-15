@@ -19,6 +19,7 @@ let
 in
 {
   target,
+  targetBinPrefix ? target,
   androidTarget ? target,
   arch,
   androidVer ? 32,
@@ -31,6 +32,7 @@ in
   extraRustFlags ? "",
   androidVer ? defaultAndroidVer,
   androidSdk ? defaultAndroidSdk,
+  androidApiLevel ? 24,
   ...
 }@mkTargetArgs:
 let
@@ -66,12 +68,7 @@ let
     ''
   );
 
-  # in theory `llvm-config` should work better than manually set paths
-  # ldflags = readFileNoNewline (pkgs.runCommand "llvm-config-ldflags" { } ''
-  #   ${androidSdkPrebuilt}/bin/llvm-config --ldflags > $out
-  # '');
-  # but in practice it doesn't
-  ldflags = "--sysroot ${androidSdkPrebuilt}/sysroot -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget}/${toString androidVer}/ -L ${androidSdkPrebuilt}/sysroot/usr/lib/${androidTarget} -L ${androidSdkPrebuilt}/lib64/clang/14.0.7/lib/linux/${arch}/";
+  ldflags = "";
 in
 mkTarget {
   inherit target;
@@ -81,16 +78,23 @@ mkTarget {
     "LLVM_CONFIG_PATH_${target_underscores}" = "${androidSdkPrebuilt}/bin/llvm-config";
 
     # `cc` crate wants these
-    "CC_${target_underscores}" = "${androidSdkPrebuilt}/bin/clang";
+    "CC_${target_underscores}" =
+      "${androidSdkPrebuilt}/bin/${targetBinPrefix}${toString androidApiLevel}-clang";
     "CFLAGS_${target_underscores}" = cflags;
     "CXXFLAGS_${target_underscores}" = cppflags;
-    "CXX_${target_underscores}" = "${androidSdkPrebuilt}/bin/clang++";
-    "LD_${target_underscores}" = "${androidSdkPrebuilt}/bin/ld";
+    "CXX_${target_underscores}" =
+      "${androidSdkPrebuilt}/bin/${targetBinPrefix}${toString androidApiLevel}-clang++";
+    # "LD_${target_underscores}" = "${androidSdkPrebuilt}/bin/ld";
+    "LD_${target_underscores}" =
+      "${androidSdkPrebuilt}/bin/${targetBinPrefix}${toString androidApiLevel}-clang";
+
     "LDFLAGS_${target_underscores}" = ldflags;
 
-    # cargo needs this
+    # This used to be needed needed
+    # # "CARGO_TARGET_${target_underscores_upper}_LINKER" =
+    # #   "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
     "CARGO_TARGET_${target_underscores_upper}_LINKER" =
-      "${ldLinkerWrapper "${androidSdkPrebuilt}/bin/ld" ldflags}/bin/ld";
+      "${androidSdkPrebuilt}/bin/${targetBinPrefix}${toString androidApiLevel}-clang";
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
 
     # TODO: not clear if this belongs here, especially in presence of mixed android toolchains, this could fall apart
