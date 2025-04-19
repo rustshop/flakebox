@@ -134,6 +134,7 @@
         arch = "arm";
         androidVer = 32;
         target = "armv7-linux-androideabi";
+        targetBinPrefix = "armv7a-linux-androideabi";
         androidTarget = "arm-linux-androideabi";
       };
 
