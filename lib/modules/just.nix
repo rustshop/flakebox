@@ -36,11 +36,20 @@ in
 
               content = lib.mkOption {
                 type = types.either types.str types.path;
-                default = 1000;
+                example = ''
+                  # run tests
+                  test: build
+                    #!/usr/bin/env bash
+                    set -euo pipefail
+                    if [ ! -f Cargo.toml ]; then
+                      cd {{invocation_directory()}}
+                    fi
+                    cargo test
+                '';
                 description = ''
-                  Order of this rule in relation to the others ones.
-                  The semantics are the same as with `lib.mkOrder`. Smaller values have
-                  a greater priority.
+                  Full just rule declaration. (can be path to a file)
+
+                  Note that the full declaration defines the actual justfile rule name
                 '';
               };
 
