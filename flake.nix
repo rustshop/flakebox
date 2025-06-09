@@ -2,14 +2,14 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
 
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils.inputs.systems.follows = "systems";
 
     crane = {
-      url = "github:ipetkov/crane/?rev=19de14aaeb869287647d9461cbd389187d8ecdb7";
+      url = "github:ipetkov/crane/?rev=efd36682371678e2b6da3f108fdb5c613b3ec598";
     };
 
     fenix = {
@@ -18,7 +18,7 @@
     };
 
     android-nixpkgs = {
-      url = "github:tadfisher/android-nixpkgs?rev=4ecd9e0da0a955a180a429196f59a8716d1dd138"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
+      url = "github:tadfisher/android-nixpkgs?rev=7dc07be20c7a516cc7490969c4072ff692fb1b27"; # stable channel https://github.com/tadfisher/android-nixpkgs/tree/stable
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
