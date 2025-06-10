@@ -39,7 +39,9 @@ else
     clang-unwrapped ? defaultClangUnwrapped,
   }:
   let
-    target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] target;
+    # https://github.com/NixOS/nixpkgs/blob/f7ac75f242ca29f9160b97917dec8ebd4dfbe008/doc/release-notes/rl-2505.section.md?plain=1#L90
+    fixedTarget = if target == "arm64-apple-darwin" then "aarch64-apple-darwin" else target;
+    target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] fixedTarget;
     target_underscores_upper = lib.strings.toUpper target_underscores;
 
     nativeLLvmConfigPkg = targetLlvmConfigWrapper {
