@@ -59,7 +59,12 @@ let
   toolchain = fenix.packages.${system}.combine (
     (map (component: fenix.packages.${system}.${channel}.${component}) components)
     ++ (map (
-      target: fenix.packages.${system}.targets.${target}.${componentTargetsChannelName}.rust-std
+      target:
+      let
+        # https://github.com/NixOS/nixpkgs/blob/f7ac75f242ca29f9160b97917dec8ebd4dfbe008/doc/release-notes/rl-2505.section.md?plain=1#L90
+        fixedTarget = if target == "arm64-apple-darwin" then "aarch64-apple-darwin" else target;
+      in
+      fenix.packages.${system}.targets.${fixedTarget}.${componentTargetsChannelName}.rust-std
     ) mergedTargets.componentTargets)
   );
 
