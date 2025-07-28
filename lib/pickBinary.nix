@@ -15,6 +15,7 @@ pkgs.stdenv.mkDerivation {
   inherit system;
   name = if name != null then name else bin;
   pname = if name != null then name else bin;
+  version = pkg.version;
 
   dontUnpack = true;
   # just don't mess with it
