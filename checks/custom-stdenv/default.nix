@@ -2,7 +2,7 @@
 let
 
   toolchainArgs = {
-    stdenv = pkgs.clang18Stdenv;
+    stdenv = p: p.clang18Stdenv;
     clang = pkgs.llvmPackages_18.clang;
     libclang = pkgs.llvmPackages_18.libclang.lib;
     clang-unwrapped = pkgs.llvmPackages_18.clang-unwrapped;

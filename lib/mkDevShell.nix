@@ -32,7 +32,12 @@ let
 in
 let
   mkShell =
-    if toolchain ? stdenv then pkgs.mkShell.override { stdenv = toolchain.stdenv; } else pkgs.mkShell;
+    if toolchain ? stdenv then
+      pkgs.mkShell.override {
+        stdenv = if lib.isFunction toolchain.stdenv then toolchain.stdenv pkgs else toolchain.stdenv;
+      }
+    else
+      pkgs.mkShell;
   flakeboxInit =
     if config.flakebox.init.enable then
       ''
