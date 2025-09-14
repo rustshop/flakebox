@@ -50,6 +50,10 @@
           description = "Flakebox default project template";
         };
       };
+
+      lib = {
+        inherit mkLib;
+      };
     }
     // flake-utils.lib.eachDefaultSystem (
       system:
@@ -116,9 +120,7 @@
         };
       in
       {
-
         inherit checks;
-        lib = mkLib pkgs;
 
         packages = {
           bootstrap = pkgs.writeShellScriptBin "flakebox-bootstrap" "exec ${pkgs.bash}/bin/bash ${./bin/bootstrap.sh} ${./bin/bootstrap.flake.nix} \"$@\"";
