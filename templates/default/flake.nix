@@ -19,7 +19,8 @@
       let
         projectName = "flakebox-project";
 
-        flakeboxLib = flakebox.lib.${system} {
+        pkgs = nixpkgs.legacyPackages.${system};
+        flakeboxLib = flakebox.lib.mkLib pkgs {
           config = {
             github.ci.buildOutputs = [ ".#ci.${projectName}" ];
           };
