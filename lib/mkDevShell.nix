@@ -64,7 +64,7 @@ let
 
         # This is required to prevent a mangled bash shell in nix develop
         # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
-        (pkgs.hiPrio pkgs.bashInteractive)
+        (pkgs.lib.hiPrio pkgs.bashInteractive)
 
       ]
       ++ config.env.shellPackages
