@@ -109,15 +109,15 @@
           target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN";
         in
         {
-          CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+          CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_20.clang-unwrapped}/bin/clang-20";
           # -Wno-macro-redefined fixes ring building
-          CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+          CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_20.libclang.lib}/lib/clang/20/include/ -Wno-macro-redefined";
           # leave these as defaults
           "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
           "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
         }
         // lib.optionalAttrs pkgs.stdenv.isDarwin {
-          AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+          AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_20.llvm}/bin/llvm-ar";
         }
       );
     } args;
