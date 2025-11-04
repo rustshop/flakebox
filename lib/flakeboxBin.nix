@@ -21,5 +21,4 @@ pkgs.rustPlatform.buildRustPackage {
   version = "0.1.0";
 
   cargoHash = "sha256-L0UAVv+JUuADoMH2RiYUCnyOKNMBVMlgz6m0zxOcep4=";
-  useFetchCargoVendor = true;
 }
