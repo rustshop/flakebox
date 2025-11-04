@@ -14,8 +14,9 @@
 }:
 { ... }@mkStdTargetsArgs:
 {
-  default = mkNativeTarget { };
-
+  default = mkNativeTarget {
+    canUseWild = true;
+  };
 }
 // lib.optionalAttrs pkgs.stdenv.isLinux {
   aarch64-linux = mkClangTarget {
@@ -28,6 +29,8 @@
       clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
+
+    canUseWild = true;
 
     args = {
       CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
@@ -47,6 +50,7 @@
       clangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
+    canUseWild = true;
 
     args = {
       CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
@@ -81,6 +85,9 @@
       clangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
+
+    # seems like "soon", but WIP
+    # canUseWild = true;
 
     args = {
       CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";

@@ -31,13 +31,17 @@ let
   ];
 in
 let
-  mkShell =
-    if toolchain ? stdenv then
-      pkgs.mkShell.override {
-        stdenv = if lib.isFunction toolchain.stdenv then toolchain.stdenv pkgs else toolchain.stdenv;
-      }
-    else
-      pkgs.mkShell;
+  mkShell = pkgs.mkShell.override {
+    stdenv =
+      if lib.isFunction toolchain.stdenv then
+        toolchain.stdenv pkgs
+      else if pkgs.stdenv.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
+        pkgs.useWildLinker pkgs.stdenv
+      else if pkgs.stdenv.isLinux && config.linker.mold.enable && pkgs.stdenvAdapters ? useMoldLinker then
+        pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv
+      else
+        pkgs.stdenv;
+  };
   flakeboxInit =
     if config.flakebox.init.enable then
       ''

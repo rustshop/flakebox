@@ -12,6 +12,7 @@
   buildInputs ? [ ],
   nativeBuildInputs ? [ ],
   args ? { },
+  canUseWild ? false,
   ...
 }@mkNativeTargetArgs:
 {
@@ -47,7 +48,7 @@ let
   } (mkNativeTargetArgs.args or { });
 in
 mkTarget {
-  inherit target;
+  inherit target canUseWild;
   args = combinedArgs;
   isCalledByMkNativeTarget = true;
 } args

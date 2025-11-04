@@ -2,7 +2,8 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    # TODO: use nixos-25.11 when available
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
@@ -14,6 +15,11 @@
 
     fenix = {
       url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    wild = {
+      url = "github:davidlattimore/wild/0.7.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -30,7 +36,7 @@
       fenix,
       android-nixpkgs,
       ...
-    }:
+    }@inputs:
     let
       mkLib =
         pkgs:
@@ -40,6 +46,7 @@
             crane
             fenix
             android-nixpkgs
+            nixpkgs
             ;
         };
     in
@@ -58,7 +65,7 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = nixpkgs.legacyPackages.${system}.extend (import inputs.wild);
 
         flakeboxLib = mkLib pkgs {
           config = {
