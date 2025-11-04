@@ -55,7 +55,7 @@ lib.makeScope pkgs.newScope (
     inherit pkgs;
     inherit crane fenix android-nixpkgs nixpkgs;
 
-    system = pkgs.system;
+    system = pkgs.stdenv.hostPlatform.system;
 
     config = finalConfig;
 

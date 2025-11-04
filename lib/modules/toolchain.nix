@@ -7,7 +7,7 @@
 }:
 
 let
-  system = pkgs.system;
+  system = pkgs.stdenv.hostPlatform.system;
   inherit (lib) types mkOption;
 in
 {
