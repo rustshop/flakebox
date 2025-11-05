@@ -10,7 +10,7 @@
     flake-utils.inputs.systems.follows = "systems";
 
     crane = {
-      url = "github:ipetkov/crane/?rev=efd36682371678e2b6da3f108fdb5c613b3ec598";
+      url = "github:ipetkov/crane/v0.21.1";
     };
 
     fenix = {
