@@ -28,7 +28,8 @@ craneLib.overrideScope (
       let
         mergedArgs = {
           CARGO_PROFILE = self.cargoProfile;
-        } // (mergeArgs self.args args);
+        }
+        // (mergeArgs self.args args);
 
         argsWithBuildTarget =
           mergedArgs
@@ -49,7 +50,8 @@ craneLib.overrideScope (
       let
         mergedArgs = {
           CARGO_PROFILE = self.cargoProfile;
-        } // mergeArgs (mergeArgs self.args self.argsDepsOnly) args;
+        }
+        // mergeArgs (mergeArgs self.args self.argsDepsOnly) args;
       in
       prev.buildDepsOnly (
         # get rid of `warning: buildDepsOnly will ignore `src` when `dummySrc` is specified` warning,

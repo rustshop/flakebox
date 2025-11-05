@@ -24,11 +24,10 @@ in
 
   config = {
     rootDir.".config/flakebox/shellHook.sh" = {
-      text =
-        ''
-          #!/usr/bin/env bash
-        ''
-        + builtins.concatStringsSep "\n" config.env.shellHooks;
+      text = ''
+        #!/usr/bin/env bash
+      ''
+      + builtins.concatStringsSep "\n" config.env.shellHooks;
     };
     rootDir.".config/flakebox/.gitignore" = {
       text = ''
