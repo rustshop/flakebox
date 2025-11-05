@@ -98,7 +98,7 @@ let
 in
 pkgs.linkFarmFromDrvs "workspace-non-rust" (
 
-  # if Android is supported, test at leasat one cross-compilation target to android
+  # if Android is supported, test at least one cross-compilation target to android
   lib.optionals (multiOutput ? aarch64-android) [
     # rocksdb only on aarch64, most probably work on other ones
     multiOutput.aarch64-android.ci.workspaceBuild
