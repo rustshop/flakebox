@@ -31,13 +31,17 @@ let
   ];
 in
 let
-  mkShell =
-    if toolchain ? stdenv then
-      pkgs.mkShell.override {
-        stdenv = if lib.isFunction toolchain.stdenv then toolchain.stdenv pkgs else toolchain.stdenv;
-      }
-    else
-      pkgs.mkShell;
+  mkShell = pkgs.mkShell.override {
+    stdenv =
+      if lib.isFunction toolchain.stdenv then
+        toolchain.stdenv pkgs
+      else if pkgs.stdenv.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
+        pkgs.useWildLinker pkgs.stdenv
+      else if pkgs.stdenv.isLinux && config.linker.mold.enable && pkgs.stdenvAdapters ? useMoldLinker then
+        pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv
+      else
+        pkgs.stdenv;
+  };
   flakeboxInit =
     if config.flakebox.init.enable then
       ''
@@ -60,7 +64,7 @@ let
 
         # This is required to prevent a mangled bash shell in nix develop
         # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
-        (pkgs.hiPrio pkgs.bashInteractive)
+        (pkgs.lib.hiPrio pkgs.bashInteractive)
 
       ]
       ++ config.env.shellPackages
@@ -84,7 +88,7 @@ let
     buildInputs =
       lib.optionals pkgs.stdenv.isDarwin [
         pkgs.libiconv
-        pkgs.darwin.apple_sdk.frameworks.Security
+        # pkgs.darwin.apple-sdk.frameworks.Security
       ]
       ++ toolchain.toolchain.buildInputs or [ ];
 

@@ -14,8 +14,9 @@
 }:
 { ... }@mkStdTargetsArgs:
 {
-  default = mkNativeTarget { };
-
+  default = mkNativeTarget {
+    canUseWild = true;
+  };
 }
 // lib.optionalAttrs pkgs.stdenv.isLinux {
   aarch64-linux = mkClangTarget {
@@ -28,6 +29,8 @@
       clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
+
+    canUseWild = true;
 
     args = {
       CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
@@ -47,6 +50,7 @@
       clangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
+    canUseWild = true;
 
     args = {
       CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
@@ -82,6 +86,9 @@
       libClangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib;
     };
 
+    # seems like "soon", but WIP
+    # canUseWild = true;
+
     args = {
       CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CPPFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
@@ -102,15 +109,15 @@
           target_underscores_upper = "WASM32_UNKNOWN_UNKNOWN";
         in
         {
-          CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.clang-unwrapped}/bin/clang-15";
+          CC_wasm32_unknown_unknown = "${pkgs.llvmPackages_20.clang-unwrapped}/bin/clang-20";
           # -Wno-macro-redefined fixes ring building
-          CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_15.libclang.lib}/lib/clang/15.0.7/include/ -Wno-macro-redefined";
+          CFLAGS_wasm32_unknown_unknown = "-I ${pkgs.llvmPackages_20.libclang.lib}/lib/clang/20/include/ -Wno-macro-redefined";
           # leave these as defaults
           "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
           "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
         }
         // lib.optionalAttrs pkgs.stdenv.isDarwin {
-          AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_15.llvm}/bin/llvm-ar";
+          AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_20.llvm}/bin/llvm-ar";
         }
       );
     } args;

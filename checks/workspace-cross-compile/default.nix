@@ -98,14 +98,14 @@ let
 in
 pkgs.linkFarmFromDrvs "workspace-non-rust" (
 
-  # if Android is supported, test at leasat one cross-compilation target to android
+  # if Android is supported, test at least one cross-compilation target to android
   lib.optionals (multiOutput ? aarch64-android) [
     # rocksdb only on aarch64, most probably work on other ones
     multiOutput.aarch64-android.ci.workspaceBuild
   ]
   ++
     # on Linux test all android cross-compilation
-    lib.optionals (pkgs.system == "x86_64-linux") [
+    lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
       # openssl & others, try on android
       multiOutput.x86_64-android.ci.lib
       multiOutput.i686-android.ci.lib
@@ -117,7 +117,7 @@ pkgs.linkFarmFromDrvs "workspace-non-rust" (
   ++
     # test native build on every platform, except x86 macos, where
     # it's broken for some reason
-    lib.optionals (pkgs.system != "x86_64-darwin") [
+    lib.optionals (pkgs.stdenv.hostPlatform.system != "x86_64-darwin") [
       multiOutput.ci.workspaceBuild
     ]
   ++

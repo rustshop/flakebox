@@ -2,6 +2,7 @@
   pkgs,
   crane,
   fenix,
+  nixpkgs,
   android-nixpkgs,
 }:
 {
@@ -18,20 +19,19 @@ let
       inherit fenix crane pkgs;
     };
 
-    modules =
-      [
-        {
-          imports = lib.mapAttrsToList (name: type: ./modules/${name}) (
-            lib.filterAttrs (name: type: lib.strings.hasSuffix ".nix" name) (builtins.readDir ./modules)
-          );
-        }
-      ]
-      ++ modules
-      ++ [
-        {
-          config = userConfig;
-        }
-      ];
+    modules = [
+      {
+        imports = lib.mapAttrsToList (name: type: ./modules/${name}) (
+          lib.filterAttrs (name: type: lib.strings.hasSuffix ".nix" name) (builtins.readDir ./modules)
+        );
+      }
+    ]
+    ++ modules
+    ++ [
+      {
+        config = userConfig;
+      }
+    ];
   };
   finalConfig = evalModules.config;
 
@@ -52,9 +52,14 @@ lib.makeScope pkgs.newScope (
   in
   {
     inherit pkgs;
-    inherit crane fenix android-nixpkgs;
+    inherit
+      crane
+      fenix
+      android-nixpkgs
+      nixpkgs
+      ;
 
-    system = pkgs.system;
+    system = pkgs.stdenv.hostPlatform.system;
 
     config = finalConfig;
 
@@ -99,6 +104,7 @@ lib.makeScope pkgs.newScope (
       '';
 
     craneMkLib = pkgs: self.enhanceCrane (self.config.craneMkLib pkgs);
+    flakeboxLib = self;
 
     # wrapper over `mkShell` setting up flakebox env
     mkDevShell = callPackage ./mkDevShell.nix { };

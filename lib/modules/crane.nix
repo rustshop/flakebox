@@ -20,7 +20,8 @@ in
     default =
       pkgs:
       (crane.mkLib pkgs).overrideToolchain (
-        fenix.packages.${pkgs.system}.${config.toolchain.channel}.withComponents config.toolchain.components
+        fenix.packages.${pkgs.stdenv.hostPlatform.system}.${config.toolchain.channel}.withComponents
+          config.toolchain.components
       );
   };
 }
