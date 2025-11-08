@@ -88,7 +88,7 @@ let
     buildInputs =
       lib.optionals pkgs.stdenv.isDarwin [
         pkgs.libiconv
-        pkgs.darwin.apple_sdk.frameworks.Security
+        # pkgs.darwin.apple-sdk.frameworks.Security
       ]
       ++ toolchain.toolchain.buildInputs or [ ];
 

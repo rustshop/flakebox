@@ -17,7 +17,7 @@ craneLib.overrideScope (
       strictDeps = true;
       buildInputs = lib.optionals pkgs.stdenv.isDarwin [
         pkgs.libiconv
-        pkgs.darwin.apple_sdk.frameworks.Security
+        # pkgs.darwin.apple-sdk.frameworks.Security
       ];
     };
 
