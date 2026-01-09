@@ -30,16 +30,15 @@ let
   ];
 in
 let
+  baseStdenv = if lib.isFunction toolchain.stdenv then toolchain.stdenv pkgs else pkgs.stdenv;
   mkShell = pkgs.mkShell.override {
     stdenv =
-      if lib.isFunction toolchain.stdenv then
-        toolchain.stdenv pkgs
-      else if pkgs.stdenv.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
-        pkgs.useWildLinker pkgs.stdenv
+      if pkgs.stdenv.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
+        pkgs.useWildLinker baseStdenv
       else if pkgs.stdenv.isLinux && config.linker.mold.enable && pkgs.stdenvAdapters ? useMoldLinker then
-        pkgs.stdenvAdapters.useMoldLinker pkgs.stdenv
+        pkgs.stdenvAdapters.useMoldLinker baseStdenv
       else
-        pkgs.stdenv;
+        baseStdenv;
   };
   args = cleanedArgs // {
     packages =
