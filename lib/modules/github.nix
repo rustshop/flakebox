@@ -43,7 +43,6 @@ in
         description = "Build matrix to use in the workflow `strategy.matrix` of `build` job";
         default = {
           host = [
-            "macos-x86_64"
             "macos-aarch64"
             "linux"
           ];
@@ -54,13 +53,8 @@ in
               timeout = 60;
             }
             {
-              host = "macos-x86_64";
-              runs-on = "macos-13";
-              timeout = 60;
-            }
-            {
               host = "macos-aarch64";
-              runs-on = "macos-14";
+              runs-on = "macos-15";
               timeout = 60;
             }
           ];
