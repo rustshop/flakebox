@@ -2,8 +2,7 @@
   description = "Toolkit for building Nix Flake development environments for Rust projects";
 
   inputs = {
-    # TODO: use nixos-25.11 when available
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
     systems.url = "github:nix-systems/default";
     flake-utils.url = "github:numtide/flake-utils";
