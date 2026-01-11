@@ -119,7 +119,7 @@ in
       cachixCacheStep =
         { name }:
         {
-          uses = "cachix/cachix-action@v12";
+          uses = "cachix/cachix-action@v16";
           "with" = {
             inherit name;
             authToken = "\${{ secrets.CACHIX_AUTH_TOKEN }}";
@@ -271,7 +271,7 @@ in
 
               {
                 name = "Install Nix";
-                uses = "DeterminateSystems/nix-installer-action@v4";
+                uses = "DeterminateSystems/nix-installer-action@v21";
               }
 
               {
