@@ -125,9 +125,9 @@ fn lint_cargo_toml_fix_ci_build_profile(opts: &Opts) -> AppResult<()> {
 fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
     let (path, cargo_toml) = load_root_cargo_toml(opts)?;
 
-    if let Some(toml_edit::Item::Table(ref workspace)) = cargo_toml.get("workspace") {
+    if let Some(toml_edit::Item::Table(workspace)) = cargo_toml.get("workspace") {
         match workspace.get("resolver") {
-            Some(toml_edit::Item::Value(toml_edit::Value::String(ref v))) if v.value() == "2" => {}
+            Some(toml_edit::Item::Value(toml_edit::Value::String(v))) if v.value() == "2" => {}
             _ => {
                 problems.push(LintItem {
                     path: path.clone(),
