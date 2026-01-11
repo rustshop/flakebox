@@ -67,7 +67,7 @@ let
           treefmt
           ;
         # Nix
-        inherit (pkgs) nixfmt-rfc-style;
+        inherit (pkgs) nixfmt;
         # TODO: make conditional on `config.just.enable`
         inherit (pkgs) just;
       });
