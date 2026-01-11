@@ -64,6 +64,7 @@ let
           coreutils
           parallel
           shellcheck
+          treefmt
           ;
         # Nix
         inherit (pkgs) nixfmt-rfc-style;
