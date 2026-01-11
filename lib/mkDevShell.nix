@@ -86,7 +86,7 @@ let
           treefmt
           ;
         # Nix
-        inherit (pkgs) nixfmt-rfc-style nil;
+        inherit (pkgs) nixfmt nil;
         # Rust tools
         inherit (pkgs) cargo-watch;
         # TODO: make conditional on `config.just.enable`

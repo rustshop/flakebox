@@ -192,8 +192,7 @@ in
               if [ ! -f Cargo.toml ]; then
                 cd {{invocation_directory()}}
               fi
-              cargo fmt --all
-              nixfmt $(git ls-files | grep "\.nix$")
+              treefmt
           '';
         };
       };
