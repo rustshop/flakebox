@@ -120,10 +120,14 @@
           }
         );
 
-        checks = pkgs.callPackages ./checks {
-          inherit pkgs;
-          mkLib = mkLib;
-        };
+        checks =
+          pkgs.callPackages ./checks {
+            inherit pkgs;
+            mkLib = mkLib;
+          }
+          // {
+            flakebox = flakeboxLib.flakeboxBin;
+          };
       in
       {
         inherit checks;
