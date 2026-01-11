@@ -1,6 +1,6 @@
 mod opts;
 
-use std::fs::{set_permissions, Permissions};
+use std::fs::{Permissions, set_permissions};
 use std::io;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
