@@ -145,7 +145,8 @@ index 615d404..860927a 100644
 +  outputs = { self, nixpkgs, flakebox, flake-utils }:
 +    flake-utils.lib.eachDefaultSystem (system:
 +      let
-+        flakeboxLib = flakebox.lib.${system} { };
++        pkgs = nixpkgs.legacyPackages.${system};
++        flakeboxLib = flakebox.lib.mkLib pkgs { };
 +      in
 +      {
 +        devShells = flakeboxLib.mkShells {
@@ -179,7 +180,8 @@ Since that's a bit handful, let me paste the whole content:
   outputs = { self, nixpkgs, flakebox, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        flakeboxLib = flakebox.lib.${system} { };
+        pkgs = nixpkgs.legacyPackages.${system};
+        flakeboxLib = flakebox.lib.mkLib pkgs { };
       in
       {
         devShells = flakeboxLib.mkShells {
@@ -316,7 +318,8 @@ index cb41316..08c8f65 100644
 @@ -16,8 +16,38 @@
      flake-utils.lib.eachDefaultSystem (system:
        let
-         flakeboxLib = flakebox.lib.${system} { };
++        pkgs = nixpkgs.legacyPackages.${system};
+         flakeboxLib = flakebox.lib.mkLib pkgs { };
 +
 +        rustSrc = flakeboxLib.filterSubPaths {
 +          root = builtins.path {
@@ -407,19 +410,24 @@ Skipping semgrep check: .config/semgrep.yaml empty
 Let's discuss each part of the code:
 
 ```
-        flakeboxLib = flakebox.lib.${system} { };
+        pkgs = nixpkgs.legacyPackages.${system};
+        flakeboxLib = flakebox.lib.mkLib pkgs { };
 ```
 
 `let ... in <expr>` in Nix is used to bind values
 to names, that can later be used in `<expr>` following
 in.
 
-Our first name binding is `flakeboxLib` which exposes all
+Our first name binding is `pkgs` which is the standard way to
+get the nixpkgs package set for the current `system`.
+
+Next is `flakeboxLib` which exposes all
 Flakebox APIs. `flakebox` is the name of the input
-defined in the flake, `flakebox.lib.${system}` is
-the library output it exposes for the current `system`.
-`flakebox.lib.${system} { }` is a function call, where
-`{ }` are the arguments (empty set, defaults).
+defined in the flake, `flakebox.lib.mkLib` is
+the function used to initialize the library.
+`flakebox.lib.mkLib pkgs { }` is a function call, where
+`pkgs` is the nixpkgs package set and `{ }` are the
+configuration arguments (empty set, defaults).
 
 This is where you can enable/disable/configure various features of flakebox. A list of config options can be found [here](./nixos-options.md)
 
@@ -714,11 +722,9 @@ index a65ba7a..f4c64d7 100644
      flake-utils.lib.eachDefaultSystem (system:
        let
 +
-+        pkgs = import nixpkgs {
-+          inherit system;
-+        };
++        pkgs = nixpkgs.legacyPackages.${system};
 +
-         flakeboxLib = flakebox.lib.${system} { };
+         flakeboxLib = flakebox.lib.mkLib pkgs { };
  
          rustSrc = flakeboxLib.filterSubPaths {
 @@ -36,6 +41,10 @@

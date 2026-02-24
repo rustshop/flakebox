@@ -48,8 +48,10 @@ Following modifications to `flake.nix` are needed:
         # Set project name
         projectName = "my-project";
 
+        pkgs = nixpkgs.legacyPackages.${system};
+
         # Set up the flakebox lib for your system
-        flakeboxLib = flakebox.lib.${system} {
+        flakeboxLib = flakebox.lib.mkLib pkgs {
           # customizations go here
           config = {
             typos.pre-commit.enable = false;

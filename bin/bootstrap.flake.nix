@@ -18,7 +18,8 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        flakeboxLib = flakebox.lib.${system} { };
+        pkgs = nixpkgs.legacyPackages.${system};
+        flakeboxLib = flakebox.lib.mkLib pkgs { };
       in
       {
         devShells = {

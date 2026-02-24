@@ -1,0 +1,12 @@
+[workspace]
+members = ["crate"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+
+[profile.ci]
+debug = "line-tables-only"
+inherits = "dev"
+incremental = false
+lto = "off"

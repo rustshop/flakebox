@@ -9,16 +9,11 @@
     flake-utils.inputs.systems.follows = "systems";
 
     crane = {
-      url = "github:ipetkov/crane/v0.21.1";
+      url = "github:ipetkov/crane/v0.23.1";
     };
 
     fenix = {
       url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    wild = {
-      url = "github:davidlattimore/wild/0.7.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -64,7 +59,7 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system}.extend (import inputs.wild);
+        pkgs = nixpkgs.legacyPackages.${system};
 
         flakeboxLib = mkLib pkgs {
           config = {

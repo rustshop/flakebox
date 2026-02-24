@@ -196,7 +196,7 @@ in
                     uses = "actions/cache@v3";
                     "with" = {
                       path = "~/.cargo";
-                      key = ''''${{ runner.os }}-''${{ hashFiles('Cargo.lock') }}'';
+                      key = "\${{ runner.os }}-\${{ hashFiles('Cargo.lock') }}";
                     };
                   }
 
