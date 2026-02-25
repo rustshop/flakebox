@@ -56,7 +56,7 @@ let
     ];
   src = flakeboxLib.filterSubPaths {
     inherit root;
-    paths = ;
+    paths = buildPaths;
   };
 in {
   #...
@@ -64,7 +64,7 @@ in {
     cargoArtifacts = workspaceBuild;
     src = flakeboxLib.filterSubPaths {
       inherit root;
-      paths = buildPaths + [ "scripts" ];
+      paths = buildPaths ++ [ "scripts" ];
     };
 
     cmd = ''

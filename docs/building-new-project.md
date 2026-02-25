@@ -74,7 +74,7 @@ index c7a9a1c..615d404 100644
  
    inputs = {
 -    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.05";
++    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
 +
 +    flakebox = {
 +      url = "github:rustshop/flakebox";
@@ -167,7 +167,7 @@ Since that's a bit handful, let me paste the whole content:
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.11";
 
     flakebox = {
       url = "github:rustshop/flakebox";
@@ -318,7 +318,7 @@ index cb41316..08c8f65 100644
 @@ -16,8 +16,38 @@
      flake-utils.lib.eachDefaultSystem (system:
        let
-+        pkgs = nixpkgs.legacyPackages.${system};
+         pkgs = nixpkgs.legacyPackages.${system};
          flakeboxLib = flakebox.lib.mkLib pkgs { };
 +
 +        rustSrc = flakeboxLib.filterSubPaths {
@@ -709,7 +709,7 @@ index a65ba7a..f4c64d7 100644
 --- a/flake.nix
 +++ b/flake.nix
 @@ -5,7 +5,7 @@
-     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
  
      flakebox = {
 -      url = "github:rustshop/flakebox";
@@ -721,9 +721,7 @@ index a65ba7a..f4c64d7 100644
    outputs = { self, nixpkgs, flakebox, flake-utils }:
      flake-utils.lib.eachDefaultSystem (system:
        let
-+
-+        pkgs = nixpkgs.legacyPackages.${system};
-+
+         pkgs = nixpkgs.legacyPackages.${system};
          flakeboxLib = flakebox.lib.mkLib pkgs { };
  
          rustSrc = flakeboxLib.filterSubPaths {
