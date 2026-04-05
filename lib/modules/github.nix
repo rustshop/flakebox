@@ -10,8 +10,8 @@ in
 {
   options.github = {
     ci = {
-      enable = lib.mkEnableOption "just integration" // {
-        default = true;
+      enable = lib.mkEnableOption "Github CI workflows generation" // {
+        default = false;
       };
 
       cachixRepo = lib.mkOption {
