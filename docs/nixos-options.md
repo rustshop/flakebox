@@ -149,6 +149,32 @@ boolean
 
 
 
+## config\.direnv\.helperHint\.enable
+
+
+
+Whether to enable shell hint about ` DIRENV_LOG_FORMAT="" ` for cleaner direnv output\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/zca72vihhy4kb03a90m7z8r105vz8c1m-source/lib/modules/direnv\.nix](file:///nix/store/zca72vihhy4kb03a90m7z8r105vz8c1m-source/lib/modules/direnv.nix)
+
+
+
 ## config\.env\.shellHooks
 
 
@@ -719,6 +745,32 @@ attribute set of anything
 
 
 Whether to enable just integration\.
+
+
+
+*Type:*
+boolean
+
+
+
+*Default:*
+` true `
+
+
+
+*Example:*
+` true `
+
+*Declared by:*
+ - [/nix/store/zca72vihhy4kb03a90m7z8r105vz8c1m-source/lib/modules/just\.nix](file:///nix/store/zca72vihhy4kb03a90m7z8r105vz8c1m-source/lib/modules/just.nix)
+
+
+
+## config\.just\.helperHint\.enable
+
+
+
+Whether to enable shell hint about available ` just ` helper recipes\.
 
 
 

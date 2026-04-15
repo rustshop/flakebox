@@ -13,6 +13,10 @@ in
       default = true;
     };
 
+    helperHint.enable = lib.mkEnableOption "shell hint about available `just` helper recipes" // {
+      default = true;
+    };
+
     importPaths = lib.mkOption {
       type = types.listOf types.str;
       default = [ ];
@@ -197,11 +201,15 @@ in
         };
       };
 
-      env.shellHooks = lib.mkAfter [
-        ''
-          >&2 echo "💡 Run 'just' for a list of available 'just ...' helper recipes"
-        ''
-      ];
+      env.shellHooks = lib.mkAfter (
+        lib.optionals config.just.helperHint.enable [
+          ''
+            if [[ "$-" == *i* ]] && [[ -t 2 ]]; then
+              >&2 echo "💡 Run 'just' for a list of available 'just ...' helper recipes"
+            fi
+          ''
+        ]
+      );
 
       rootDir."justfile" =
         let
