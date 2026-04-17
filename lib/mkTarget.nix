@@ -89,7 +89,7 @@ else
         if pkgs.stdenv.isLinux && config.linker.wild.enable && canUseWild && pkgs ? useWildLinker then
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-              "-C link-arg=--ld-path=${wild-wrapped}/bin/wild ${extraRustFlags}";
+              "-C link-arg=--ld-path=${wild-wrapped}/bin/wild -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
           }
         else if
           config.linker.mold.enable
@@ -100,13 +100,13 @@ else
           # mold only supported on Linux, and supports compressed debug sections
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-              "-C link-arg=-fuse-ld=${pkgs.mold-wrapped}/bin/mold -C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
+              "-C link-arg=-fuse-ld=${pkgs.mold-wrapped}/bin/mold -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
           }
         else if pkgs.stdenv.isLinux then
           # compressed debug sections, only supported on Linux
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-              "-C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
+              "-C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
           }
         else
           {
