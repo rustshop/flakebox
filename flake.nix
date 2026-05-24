@@ -33,6 +33,56 @@
       ...
     }@inputs:
     let
+      overlays.default = final: prev: {
+        wild-unwrapped =
+          let
+            version = "0.9.0";
+            src = prev.fetchFromGitHub {
+              owner = "wild-linker";
+              repo = "wild";
+              rev = version;
+              hash = "sha256-v4lPgZDPvRTAekkU9Vku9llgpOsaVtKt91VFUGrEeKw=";
+            };
+            cargo = fenix.packages.${final.system}.latest.cargo;
+            rustc = fenix.packages.${final.system}.latest.rustc;
+            rustPlatform = final.makeRustPlatform {
+              inherit cargo rustc;
+            };
+          in
+          prev.wild-unwrapped.overrideAttrs (old: {
+            inherit version src;
+            cargoDeps = rustPlatform.fetchCargoVendor {
+              inherit src;
+              name = "wild-unwrapped-${version}-vendor";
+              hash = "sha256-ADJLtTRXcVWcbvgwXvCs0wxcGp2XP1LZJUJ4hpuzVHQ=";
+            };
+            buildInputs = (old.buildInputs or [ ]) ++ [ final.zstd ];
+            postFixup = (old.postFixup or "") + ''
+              patchelf --add-rpath ${final.lib.makeLibraryPath [ final.zstd ]} $out/bin/wild
+            '';
+            nativeBuildInputs = [
+              cargo
+              rustc
+              rustPlatform.cargoSetupHook
+              rustPlatform.cargoBuildHook
+              rustPlatform.cargoInstallHook
+            ]
+            ++ final.lib.filter (
+              input:
+              let
+                inputString = toString input;
+              in
+              !(final.lib.hasInfix "cargo-setup-hook" inputString)
+              && !(final.lib.hasInfix "cargo-build-hook" inputString)
+              && !(final.lib.hasInfix "cargo-install-hook" inputString)
+            ) (old.nativeBuildInputs or [ ]);
+          });
+
+        wild = prev.wild.override {
+          bintools = final.wild-unwrapped;
+        };
+      };
+
       mkLib =
         pkgs:
         import ./lib {
@@ -46,6 +96,8 @@
         };
     in
     {
+      inherit overlays;
+
       templates = {
         default = {
           path = ./templates/default;
@@ -60,7 +112,10 @@
     // flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ overlays.default ];
+        };
 
         flakeboxLib = mkLib pkgs {
           config = {

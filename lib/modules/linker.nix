@@ -11,7 +11,7 @@ in
     };
     mold = {
       enable = lib.mkEnableOption "mold linker support" // {
-        default = true;
+        default = false;
       };
     };
   };
