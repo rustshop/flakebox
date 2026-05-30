@@ -68,7 +68,7 @@ let
 
         rustfmt
 
-        pkgs.nodePackages.bash-language-server
+        pkgs.bash-language-server
 
         # This is required to prevent a mangled bash shell in nix develop
         # see: https://discourse.nixos.org/t/interactive-bash-with-nix-develop-flake/15486
