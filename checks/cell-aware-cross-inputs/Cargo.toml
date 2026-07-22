@@ -1,0 +1,9 @@
+[package]
+name = "cell-aware-cross-inputs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+openssl = "0.10"
+
+[workspace]

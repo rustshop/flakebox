@@ -92,6 +92,76 @@ supported toolchains. A nested set with following keys:
 
 See [Tutorial: Flakebox in a New Project](./building-new-project.md) for more information.
 
+### Cell-aware common build arguments
+
+`craneMultiBuild` accepts an optional `argsFor` resolver for build arguments
+that depend on the selected toolchain/target cell:
+
+```nix
+(flakeboxLib.craneMultiBuild {
+  argsFor =
+    {
+      toolchainName,
+      packages,
+      capabilities,
+    }:
+    pkgs.lib.optionalAttrs capabilities.targetBuildInputs {
+      buildInputs = [ packages.buildInputs.openssl ];
+      nativeBuildInputs = [ packages.nativeBuildInputs.pkg-config ];
+    };
+}) (craneLib: {
+  app = craneLib.buildPackage {
+    inherit src;
+  };
+})
+```
+
+Flakebox evaluates `argsFor` once for each selected cell, before it maps that
+cell over Cargo profiles. The resolver receives:
+
+* `toolchainName`: the cell's key in `toolchains`.
+* `packages.buildInputs`: the package scope for target libraries.
+* `packages.nativeBuildInputs`: the package scope for build-host tools that
+  configure or emit artifacts for the target.
+* `packages.depsBuildBuild`: the package scope for build-host tools that emit
+  build-host artifacts.
+* `capabilities.targetBuildInputs`: whether the cell has a truthful Nixpkgs
+  target package universe.
+
+For ordinary Nixpkgs cross cells these roles map to `pkgsHostTarget`,
+`pkgsBuildHost`, and `pkgsBuildBuild`, respectively. Native cells expose the
+equivalent roles from the native package set.
+
+Android, `wasm32-unknown-unknown`, and other SDK or Rust-only cells do not
+pretend that native or WASI packages are target packages. Check
+`capabilities.targetBuildInputs` before selecting target dependencies.
+Accessing an unavailable role fails with the toolchain/cell name and the
+missing role. Custom toolchains may omit `dependencyContext` as long as their
+`argsFor` result does not access `packages`; role access then fails lazily.
+Custom toolchains that support role-scoped packages can provide:
+
+```nix
+dependencyContext = {
+  packages = {
+    depsBuildBuild = crossPkgs.pkgsBuildBuild;
+    nativeBuildInputs = crossPkgs.pkgsBuildHost;
+    buildInputs = crossPkgs.pkgsHostTarget;
+  };
+};
+```
+
+The merge order is: the cell's built-in target/common arguments, then the
+attrset returned by `argsFor`, then arguments passed to an individual Crane
+build call. All layers use the existing `overrideArgs`/`mergeArgs` behavior:
+`buildInputs`, `nativeBuildInputs`, and `packages` concatenate from left to
+right; `env` attrsets merge with later values winning; and every other
+attribute, including `depsBuildBuild`, uses the later value. Omitting `argsFor`
+preserves the existing build path.
+
+This API selects explicit artifacts for Flakebox's existing manual Cargo-cross
+model. It does not turn the root Rust derivation into a fully spliced Nixpkgs
+cross derivation.
+
 ## `flakeboxLib.cargoCrap`
 
 `flakeboxLib.cargoCrap` exposes flakebox's packaged `cargo-crap` derivation for
