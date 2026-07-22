@@ -20,9 +20,39 @@
 }@args:
 let
   stdTargets = mkStdTargets { };
+
+  dependencyContext = packageSet: {
+    packages = {
+      nativeBuildInputs = packageSet.pkgsBuildHost;
+      buildInputs = packageSet.pkgsHostTarget;
+      depsBuildBuild = packageSet.pkgsBuildBuild;
+    };
+  };
+
+  nativeDependencyContext = dependencyContext pkgs;
+  crossDependencyContext = dependencyContext;
+  dependencyContextFor =
+    packageSet:
+    if packageSet.stdenv.hostPlatform.config == pkgs.stdenv.buildPlatform.config then
+      nativeDependencyContext
+    else
+      crossDependencyContext packageSet;
+  unsupportedTargetDependencyContext = cellKind: {
+    packages.depsBuildBuild = pkgs.pkgsBuildBuild;
+    unavailablePackages = {
+      nativeBuildInputs = "this ${cellKind} cell has no truthful Nixpkgs package scope for build-host tools targeting the Cargo target";
+      buildInputs = "this ${cellKind} cell has no truthful target Nixpkgs package universe";
+    };
+  };
+  mkFenixToolchainWithContext =
+    dependencyContext: toolchainArgs:
+    mkFenixToolchain toolchainArgs
+    // {
+      inherit dependencyContext;
+    };
 in
 {
-  default = mkFenixToolchain (
+  default = mkFenixToolchainWithContext nativeDependencyContext (
     args
     // {
       targets = {
@@ -31,7 +61,7 @@ in
     }
   );
 
-  nightly = mkFenixToolchain (
+  nightly = mkFenixToolchainWithContext nativeDependencyContext (
     args
     // {
       targets = {
@@ -43,16 +73,18 @@ in
 
 }
 // lib.optionalAttrs pkgs.stdenv.isLinux {
-  aarch64-linux = mkFenixToolchain (
-    args
-    // {
-      defaultTarget = "aarch64-unknown-linux-gnu";
-      targets = {
-        default = stdTargets.aarch64-linux;
-      };
-    }
-  );
-  x86_64-linux = mkFenixToolchain (
+  aarch64-linux =
+    mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.aarch64-multiplatform)
+      (
+        args
+        // {
+          defaultTarget = "aarch64-unknown-linux-gnu";
+          targets = {
+            default = stdTargets.aarch64-linux;
+          };
+        }
+      );
+  x86_64-linux = mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.gnu64) (
     args
     // {
       defaultTarget = "x86_64-unknown-linux-gnu";
@@ -61,7 +93,7 @@ in
       };
     }
   );
-  i686-linux = mkFenixToolchain (
+  i686-linux = mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.gnu32) (
     args
     // {
       defaultTarget = "i686-unknown-linux-gnu";
@@ -70,7 +102,7 @@ in
       };
     }
   );
-  riscv64-linux = mkFenixToolchain (
+  riscv64-linux = mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.riscv64) (
     args
     // {
       defaultTarget = "riscv64gc-unknown-linux-gnu";
@@ -82,38 +114,40 @@ in
 }
 // {
 
-  wasm32-unknown = mkFenixToolchain (
-    args
-    // {
-      defaultTarget = "wasm32-unknown-unknown";
-      targets = {
-        wasm32-unknown = stdTargets.wasm32-unknown;
-      };
-    }
-  );
+  wasm32-unknown =
+    mkFenixToolchainWithContext (unsupportedTargetDependencyContext "wasm32-unknown-unknown")
+      (
+        args
+        // {
+          defaultTarget = "wasm32-unknown-unknown";
+          targets = {
+            wasm32-unknown = stdTargets.wasm32-unknown;
+          };
+        }
+      );
 
 }
 // lib.optionalAttrs ((args ? androidSdk) || (builtins.hasAttr system android-nixpkgs.sdk)) {
 
-  aarch64-android = mkFenixToolchain {
+  aarch64-android = mkFenixToolchainWithContext (unsupportedTargetDependencyContext "Android") {
     defaultTarget = "aarch64-linux-android";
     targets = {
       aarch64-android = stdTargets.aarch64-android;
     };
   };
-  x86_64-android = mkFenixToolchain {
+  x86_64-android = mkFenixToolchainWithContext (unsupportedTargetDependencyContext "Android") {
     defaultTarget = "x86_64-linux-android";
     targets = {
       x86_64-android = stdTargets.x86_64-android;
     };
   };
-  i686-android = mkFenixToolchain {
+  i686-android = mkFenixToolchainWithContext (unsupportedTargetDependencyContext "Android") {
     defaultTarget = "i686-linux-android";
     targets = {
       i686-android = stdTargets.i686-android;
     };
   };
-  armv7-android = mkFenixToolchain {
+  armv7-android = mkFenixToolchainWithContext (unsupportedTargetDependencyContext "Android") {
     defaultTarget = "armv7-linux-androideabi";
     targets = {
       armv7-android = stdTargets.armv7-android;
@@ -122,7 +156,7 @@ in
 
 }
 // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "aarch64-apple-darwin") {
-  aarch64-darwin = mkFenixToolchain (
+  aarch64-darwin = mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.aarch64-darwin) (
     args
     // {
       defaultTarget = "aarch64-apple-darwin";
@@ -134,7 +168,7 @@ in
 
 }
 // lib.optionalAttrs (pkgs.stdenv.buildPlatform.config == "x86_64-apple-darwin") {
-  x86_64-darwin = mkFenixToolchain (
+  x86_64-darwin = mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.x86_64-darwin) (
     args
     // {
       defaultTarget = "x86_64-apple-darwin";
