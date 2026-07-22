@@ -23,6 +23,7 @@
     target = "aarch64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang;
     binPrefix = "aarch64-unknown-linux-gnu-";
+    compressDebugSections = "zlib";
     llvmConfigPkg = targetLlvmConfigWrapper {
       # seems like it would be better, but it seems to pull in incompatible glibc
       # clangPkg = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang;
@@ -44,6 +45,7 @@
     target = "x86_64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang;
     binPrefix = "x86_64-unknown-linux-gnu-";
+    compressDebugSections = "zlib";
     llvmConfigPkg = targetLlvmConfigWrapper {
       # seems like it would be better, but it seems to pull in incompatible glibc
       # clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang;
@@ -64,6 +66,7 @@
     target = "i686-unknown-linux-gnu";
     clang = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang;
     binPrefix = "i686-unknown-linux-gnu-";
+    compressDebugSections = "zlib";
     llvmConfigPkg = targetLlvmConfigWrapper {
       clangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib;
@@ -81,6 +84,7 @@
     target = "riscv64gc-unknown-linux-gnu";
     clang = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang;
     binPrefix = "riscv64-unknown-linux-gnu-";
+    compressDebugSections = "zlib";
     llvmConfigPkg = targetLlvmConfigWrapper {
       clangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped;
       libClangPkg = pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib;

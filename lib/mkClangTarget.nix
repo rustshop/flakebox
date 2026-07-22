@@ -12,6 +12,7 @@
   buildInputs ? [ ],
   nativeBuildInputs ? [ ],
   llvmConfigPkg ? clang,
+  compressDebugSections ? "zstd",
   args ? { },
   ...
 }@mkClangTargetArgs:
@@ -32,7 +33,7 @@ let
     "LD_${target_underscores}" = "${clang}/bin/${binPrefix}clang";
     "CARGO_TARGET_${target_underscores_upper}_LINKER" = "${clang}/bin/${binPrefix}clang";
     "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-      "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
+      "-C link-arg=-fuse-ld=${clang}/bin/${binPrefix}ld -C link-arg=-Wl,--compress-debug-sections=${compressDebugSections} ${extraRustFlags}";
 
     inherit buildInputs nativeBuildInputs;
   } (mkClangTargetArgs.args or { });

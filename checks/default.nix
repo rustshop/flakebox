@@ -24,5 +24,8 @@ onlyDrvs (
       cargoCrapModule = callPackage ./cargo-crap-module.nix { inherit mkLib; };
       gitHooks = callPackage ./git-hooks.nix { inherit mkLib; };
     }
+    // lib.optionalAttrs (pkgs.stdenv.buildPlatform.system == "x86_64-linux") {
+      crossLinkerCompression = callPackage ./cross-linker-compression.nix { };
+    }
   )
 )
