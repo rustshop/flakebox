@@ -21,9 +21,16 @@
   config = lib.mkIf config.shellcheck.enable {
     git.pre-commit.hooks = {
       shellcheck = ''
-        for path in $(echo "$FLAKEBOX_GIT_LS_TEXT" | grep -E '.*\.sh$'); do
-          shellcheck --severity=warning "$path"
-        done
+        shellcheck_paths=()
+        while IFS= read -r path; do
+          if [[ "$path" == *.sh ]]; then
+            shellcheck_paths+=("$path")
+          fi
+        done <<< "$FLAKEBOX_GIT_LS_TEXT"
+
+        if [[ "''${#shellcheck_paths[@]}" -ne 0 ]]; then
+          shellcheck --severity=warning "''${shellcheck_paths[@]}"
+        fi
       '';
     };
 

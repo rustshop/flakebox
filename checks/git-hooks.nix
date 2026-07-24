@@ -64,6 +64,10 @@ let
     '';
   };
 
+  shellcheckHooks = mkHookFixture {
+    inherit (flakeboxLib.config.git.pre-commit.hooks) shellcheck;
+  };
+
   stashHooks = mkHookFixture {
     stash-probe = ''
       grep -qx staged tracked.txt
@@ -342,6 +346,50 @@ pkgs.runCommand "git-hooks-tests"
       bash ${backgroundHooks}/misc/git-hooks/pre-commit
     background_pid="$(cat "$FLAKEBOX_BACKGROUND_PID")"
     kill "$background_pid" 2>/dev/null || true
+    cd ..
+
+    # ShellCheck is skipped for an empty script set, then receives every tracked
+    # script in one argument-safe invocation. Its failure still fails the hook.
+    mkdir shellcheck-repo
+    cd shellcheck-repo
+    git init -q
+    mkdir fake-shellcheck-bin
+    cat > fake-shellcheck-bin/shellcheck <<'EOF'
+    #!${pkgs.bash}/bin/bash
+    printf 'invocation\n' >> "$FLAKEBOX_SHELLCHECK_LOG"
+    printf '%s\n' "$@" > "$FLAKEBOX_SHELLCHECK_ARGS"
+    exit "''${FLAKEBOX_SHELLCHECK_STATUS:-0}"
+    EOF
+    chmod +x fake-shellcheck-bin/shellcheck
+    export PATH="$PWD/fake-shellcheck-bin:$PATH"
+    export FLAKEBOX_SHELLCHECK_LOG="$PWD/shellcheck.log"
+    export FLAKEBOX_SHELLCHECK_ARGS="$PWD/shellcheck.args"
+
+    printf 'not a script\n' > tracked.txt
+    git add tracked.txt
+    NO_STASH=1 bash ${shellcheckHooks}/misc/git-hooks/pre-commit
+    [ ! -e "$FLAKEBOX_SHELLCHECK_LOG" ]
+
+    printf '#!/bin/sh\n' > 'alpha script.sh'
+    printf '#!/bin/sh\n' > 'literal[glob].sh'
+    # This untracked path makes an unsafe expansion of literal[glob].sh match.
+    printf '#!/bin/sh\n' > literalg.sh
+    git --literal-pathspecs add 'alpha script.sh' 'literal[glob].sh'
+    NO_STASH=1 bash ${shellcheckHooks}/misc/git-hooks/pre-commit
+    [ "$(grep -c '^invocation$' "$FLAKEBOX_SHELLCHECK_LOG")" -eq 1 ]
+    printf '%s\n' \
+      '--severity=warning' \
+      'alpha script.sh' \
+      'literal[glob].sh' > expected-shellcheck.args
+    cmp expected-shellcheck.args "$FLAKEBOX_SHELLCHECK_ARGS"
+
+    set +e
+    FLAKEBOX_SHELLCHECK_STATUS=23 NO_STASH=1 \
+      bash ${shellcheckHooks}/misc/git-hooks/pre-commit
+    shellcheck_failure_status=$?
+    set -e
+    [ "$shellcheck_failure_status" -ne 0 ]
+    [ "$(grep -c '^invocation$' "$FLAKEBOX_SHELLCHECK_LOG")" -eq 2 ]
     cd ..
 
     # Private patch restoration exposes indexed content to checks and restores
