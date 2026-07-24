@@ -22,8 +22,8 @@ let
     };
 
   baseline = mkFixtureSource (fixture + "/baseline");
-  excludedChange = mkFixtureSource (fixture + "/excluded-change");
-  selectedChange = mkFixtureSource (fixture + "/selected-change");
+  linkedSpecsEdit = mkFixtureSource (fixture + "/excluded-change");
+  selectedInputEdit = mkFixtureSource (fixture + "/selected-change");
 
   buildFiles = source.filesetFromPaths {
     root = fixture + "/baseline";
@@ -67,11 +67,11 @@ let
   fails = value: !(builtins.tryEval (builtins.deepSeq value true)).success;
 in
 assert lib.assertMsg (
-  toString baseline == toString excludedChange
-) "changes to excluded content must preserve the source store path";
+  toString baseline == toString linkedSpecsEdit
+) "Linked Specs edits must preserve the build source store path";
 assert lib.assertMsg (
-  toString baseline != toString selectedChange
-) "changes to selected content must alter the source store path";
+  toString baseline != toString selectedInputEdit
+) "selected build input edits must alter the build source store path";
 assert lib.assertMsg (
   !(source.filters.all [
     (_path: _type: false)

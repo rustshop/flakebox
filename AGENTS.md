@@ -1,5 +1,8 @@
 # Flakebox agent notes
 
+This project uses the Linked Specs convention; consult the `linked-specs`
+skill before working with specs or governed code.
+
 ## What this repo is
 
 - Flakebox is a Nix-based Rust dev-env toolkit.

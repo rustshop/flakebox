@@ -96,6 +96,7 @@
             nixpkgs
             ;
         };
+
     in
     {
       inherit overlays;
@@ -147,6 +148,7 @@
             ".cargo"
             "flakebox-bin"
           ];
+          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
         };
 
         outputs = (flakeboxLib.craneMultiBuild { }) (

@@ -28,6 +28,7 @@ let
       src = flakeboxLib.source.fromPaths {
         root = rootDir;
         paths = buildPaths;
+        filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
       };
 
       craneLib =
@@ -87,6 +88,7 @@ let
         src = flakeboxLib.source.fromPaths {
           root = rootDir;
           paths = testPaths;
+          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
         };
       };
     }

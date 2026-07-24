@@ -1,17 +1,16 @@
 {
-  lib,
   pkgs,
+  source,
 }:
 let
-  fs = lib.fileset;
-  fileSet = fs.unions [
-    ../Cargo.toml
-    ../Cargo.lock
-    ../flakebox-bin
-  ];
-  src = fs.toSource {
+  src = source.fromPaths {
     root = ../.;
-    fileset = fileSet;
+    paths = [
+      "Cargo.toml"
+      "Cargo.lock"
+      "flakebox-bin"
+    ];
+    filter = source.filters.excludeDirectoriesNamed [ "specs" ];
   };
 in
 pkgs.rustPlatform.buildRustPackage {

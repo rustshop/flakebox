@@ -29,7 +29,11 @@ let
             cargoArtifacts = null;
             cargoVendorDir = null;
             doInstallCargoArtifacts = false;
-            src = ./.;
+            src = flakeboxLib.source.fromFileset {
+              root = ./.;
+              fileset = ./default.nix;
+              filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
+            };
             buildPhaseCargoCommand = ''
               set -x
               if [[ "$(${pkgs.which}/bin/which cc)" != *clang-wrapper-${clangMajor}* ]]; then

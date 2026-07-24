@@ -65,7 +65,10 @@ lib.makeScope pkgs.newScope (
 
     docs = pkgs.stdenv.mkDerivation {
       name = "docs";
-      src = ../docs;
+      src = lib.sources.cleanSourceWith {
+        src = ../docs;
+        filter = self.source.filters.excludeDirectoriesNamed [ "specs" ];
+      };
 
       # Depend on the generated options reference used by the book.
       buildInputs = [ optionsDocMd ];

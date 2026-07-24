@@ -1,8 +1,14 @@
-{ pkgs }:
+{ pkgs, flakeboxLib }:
 pkgs.runCommand "ast-grep-rules"
   {
     nativeBuildInputs = [ pkgs.ast-grep ];
-    src = pkgs.lib.cleanSource ../.;
+    src = pkgs.lib.sources.cleanSourceWith {
+      src = ../.;
+      filter = flakeboxLib.source.filters.all [
+        pkgs.lib.sources.cleanSourceFilter
+        (flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ])
+      ];
+    };
   }
   ''
     cp -r "$src" source

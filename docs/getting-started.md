@@ -70,6 +70,7 @@ Following modifications to `flake.nix` are needed:
         buildSrc = flakeboxLib.source.fromPaths {
           root = ./.;
           paths = buildPaths;
+          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
         };
 
         # Add toolchain x profile build matrix
