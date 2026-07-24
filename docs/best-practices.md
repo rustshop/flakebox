@@ -130,3 +130,37 @@ Customize the generated `.cargo-crap.toml` by setting
 `cargo-crap.config.content`. Disable only that generated file with
 `cargo-crap.config.enable = false`, or disable the whole cargo-crap integration
 with `cargo-crap.enable = false`.
+
+
+## Enforce structural rules with ast-grep
+
+Flakebox installs [ast-grep](https://ast-grep.github.io/) and runs
+`ast-grep scan` from the generated pre-commit hook when the repository contains
+a non-empty `sgconfig.yml`. It also generates an `ast-grep` just recipe.
+
+Use ast-grep's standard project layout:
+
+```yaml
+# sgconfig.yml
+ruleDirs:
+  - .config/ast-grep/rules
+testConfigs:
+  - testDir: .config/ast-grep/rule-tests
+```
+
+Keeping `sgconfig.yml` at the repository root preserves ast-grep's automatic
+project discovery. Store the rules and their tests under
+`.config/ast-grep/` to avoid adding tool-specific directories at the root.
+Then run `just ast-grep` to scan the project or `ast-grep test` to test the
+rules.
+
+Projects can promote selected rules to commit-blocking errors:
+
+```nix
+ast-grep = {
+  pre-commit.args = [
+    "--error=complex-conditional"
+    "--error=deeply-nested-if"
+  ];
+};
+```
