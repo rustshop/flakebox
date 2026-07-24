@@ -12,6 +12,10 @@ in
 {
 
   options.git = {
+    enable = lib.mkEnableOption "Flakebox Git commit hooks and commit template integration" // {
+      default = true;
+    };
+
     pre-commit = {
       enable = lib.mkEnableOption "git pre-commit hook" // {
         default = true;
@@ -107,7 +111,7 @@ in
       '';
     })
 
-    (lib.mkIf config.git.commit-msg.enable {
+    (lib.mkIf (config.git.enable && config.git.commit-msg.enable) {
       rootDir."misc/git-hooks/commit-msg" =
         let
           content = (
@@ -168,7 +172,7 @@ in
 
     })
 
-    (lib.mkIf config.git.pre-commit.enable {
+    (lib.mkIf (config.git.enable && config.git.pre-commit.enable) {
       rootDir."misc/git-hooks/pre-commit" =
         let
           indentString =
@@ -280,7 +284,7 @@ in
 
     })
 
-    (lib.mkIf config.git.commit-template.enable {
+    (lib.mkIf (config.git.enable && config.git.commit-template.enable) {
       rootDir."misc/git-hooks/commit-template.txt" = {
         source = pkgs.writeText "commit-template" (
           lib.removeSuffix "\n" ''

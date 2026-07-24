@@ -159,7 +159,7 @@ in
           '';
         };
 
-        lint = {
+        lint = lib.mkIf (config.git.enable && config.git.pre-commit.enable) {
           priority = 100;
           content = ''
             # run lints (git pre-commit hook)
@@ -174,7 +174,7 @@ in
           priority = 100;
           content = ''
             # run all checks recommended before opening a PR
-            final-check: lint ${
+            final-check: ${lib.optionalString (config.git.enable && config.git.pre-commit.enable) "lint"} ${
               if config.just.rules ? clippy && config.just.rules.clippy.enable then "clippy" else ""
             }
               #!/usr/bin/env bash

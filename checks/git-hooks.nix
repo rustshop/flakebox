@@ -68,6 +68,32 @@ let
     inherit (flakeboxLib.config.git.pre-commit.hooks) shellcheck;
   };
 
+  gitDisabledLib = mkLib pkgs {
+    config = {
+      git.enable = false;
+      github.ci.enable = true;
+    };
+  };
+
+  preCommitDisabledLib = mkLib pkgs {
+    config = {
+      git.pre-commit.enable = false;
+      github.ci.enable = true;
+    };
+  };
+
+  commitMsgDisabledLib = mkLib pkgs {
+    config.git.commit-msg.enable = false;
+  };
+
+  commitTemplateDisabledLib = mkLib pkgs {
+    config.git.commit-template.enable = false;
+  };
+
+  gitEnabledCiLib = mkLib pkgs {
+    config.github.ci.enable = true;
+  };
+
   stashHooks = mkHookFixture {
     stash-probe = ''
       grep -qx staged tracked.txt
@@ -134,6 +160,23 @@ let
   emptyHooks = mkHookFixture { };
 in
 assert pkgs.lib.elem timer flakeboxLib.config.env.shellPackages;
+assert flakeboxLib.config.git.enable;
+assert gitDisabledLib.config.git.pre-commit.enable;
+assert gitDisabledLib.config.git.commit-msg.enable;
+assert gitDisabledLib.config.git.commit-template.enable;
+assert !(pkgs.lib.elem timer gitDisabledLib.config.env.shellPackages);
+assert
+  !(pkgs.lib.hasInfix "hooks/pre-commit" (
+    builtins.concatStringsSep "\n" gitDisabledLib.config.env.shellHooks
+  ));
+assert
+  !(pkgs.lib.hasInfix "hooks/commit-msg" (
+    builtins.concatStringsSep "\n" gitDisabledLib.config.env.shellHooks
+  ));
+assert
+  !(pkgs.lib.hasInfix "git config commit.template" (
+    builtins.concatStringsSep "\n" gitDisabledLib.config.env.shellHooks
+  ));
 pkgs.runCommand "git-hooks-tests"
   {
     nativeBuildInputs = [
@@ -177,6 +220,45 @@ pkgs.runCommand "git-hooks-tests"
       exit 1
     fi
     bash -n "$commit_msg"
+
+    [ -e "${flakeboxLib.root}/misc/git-hooks/commit-template.txt" ]
+    grep -q 'git config commit.template misc/git-hooks/commit-template.txt' \
+      "${flakeboxLib.root}/.config/flakebox/shellHook.sh"
+    grep -q 'hooks/pre-commit' "${flakeboxLib.root}/justfile"
+    grep -q 'misc/git-hooks/pre-commit' \
+      "${gitEnabledCiLib.root}/.github/workflows/flakebox-ci.yml"
+
+    # The grouped opt-out omits every generated commit integration artifact and
+    # every installer/configuration action and generated consumer.
+    [ ! -e ${gitDisabledLib.root}/misc/git-hooks/pre-commit ]
+    [ ! -e ${gitDisabledLib.root}/misc/git-hooks/commit-msg ]
+    [ ! -e ${gitDisabledLib.root}/misc/git-hooks/commit-template.txt ]
+    disabled_shell_hook="${gitDisabledLib.root}/.config/flakebox/shellHook.sh"
+    ! grep -q 'hooks/pre-commit' "$disabled_shell_hook"
+    ! grep -q 'hooks/commit-msg' "$disabled_shell_hook"
+    ! grep -q 'git config commit.template' "$disabled_shell_hook"
+    ! grep -q 'hooks/pre-commit' "${gitDisabledLib.root}/justfile"
+    ! grep -q 'misc/git-hooks/pre-commit' \
+      "${gitDisabledLib.root}/.github/workflows/flakebox-ci.yml"
+
+    # Existing granular options still suppress only their own integration, and
+    # pre-commit consumers follow the effective pre-commit setting.
+    [ ! -e ${preCommitDisabledLib.root}/misc/git-hooks/pre-commit ]
+    [ -e ${preCommitDisabledLib.root}/misc/git-hooks/commit-msg ]
+    [ -e ${preCommitDisabledLib.root}/misc/git-hooks/commit-template.txt ]
+    ! grep -q 'hooks/pre-commit' "${preCommitDisabledLib.root}/justfile"
+    ! grep -q 'misc/git-hooks/pre-commit' \
+      "${preCommitDisabledLib.root}/.github/workflows/flakebox-ci.yml"
+
+    [ -e ${commitMsgDisabledLib.root}/misc/git-hooks/pre-commit ]
+    [ ! -e ${commitMsgDisabledLib.root}/misc/git-hooks/commit-msg ]
+    [ -e ${commitMsgDisabledLib.root}/misc/git-hooks/commit-template.txt ]
+
+    [ -e ${commitTemplateDisabledLib.root}/misc/git-hooks/pre-commit ]
+    [ -e ${commitTemplateDisabledLib.root}/misc/git-hooks/commit-msg ]
+    [ ! -e ${commitTemplateDisabledLib.root}/misc/git-hooks/commit-template.txt ]
+    ! grep -q 'git config commit.template' \
+      "${commitTemplateDisabledLib.root}/.config/flakebox/shellHook.sh"
 
     # The timer preserves success, failures, errexit, signals, and byte-exact
     # ordinary output when no warning is emitted.

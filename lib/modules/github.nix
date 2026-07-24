@@ -184,7 +184,7 @@ in
             })
 
             {
-              lint = {
+              lint = lib.mkIf (config.git.enable && config.git.pre-commit.enable) {
                 name = "Lint";
                 runs-on = config.github.ci.runsOn;
                 steps = [
