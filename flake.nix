@@ -139,11 +139,8 @@
           };
         };
 
-        src = flakeboxLib.filterSubPaths {
-          root = builtins.path {
-            name = "flakebox";
-            path = ./.;
-          };
+        src = flakeboxLib.source.fromPaths {
+          root = ./.;
           paths = [
             "Cargo.toml"
             "Cargo.lock"

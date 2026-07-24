@@ -2,16 +2,12 @@
 let
   inherit (pkgs) lib;
 
-  rootDir = builtins.path {
-    name = "workspace-sanity";
-    path = ./.;
-  };
+  rootDir = ./.;
 
   # paths needed to build Rust code
   buildPaths = [
     "Cargo.toml"
     "Cargo.lock"
-    ".cargo"
     "bin"
     "lib"
   ];
@@ -24,7 +20,7 @@ let
   multiOutput = (flakeboxLib.craneMultiBuild { }) (
     craneLib':
     let
-      src = flakeboxLib.filterSubPaths {
+      src = flakeboxLib.source.fromPaths {
         root = rootDir;
         paths = buildPaths;
       };
@@ -78,7 +74,7 @@ let
           ./scripts/e2e-tests.sh
         '';
 
-        src = flakeboxLib.filterSubPaths {
+        src = flakeboxLib.source.fromPaths {
           root = rootDir;
           paths = testPaths;
         };

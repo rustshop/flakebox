@@ -35,11 +35,8 @@
           "src"
         ];
 
-        buildSrc = flakeboxLib.filterSubPaths {
-          root = builtins.path {
-            name = projectName;
-            path = ./.;
-          };
+        buildSrc = flakeboxLib.source.fromPaths {
+          root = ./.;
           paths = buildPaths;
         };
 

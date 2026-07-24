@@ -112,9 +112,7 @@ lib.makeScope pkgs.newScope (
 
     cargoCrap = callPackage ./pkgs/cargo-crap.nix { };
 
-    filter = callPackage ./filter { };
-
-    filterSubPaths = self.filter.filterSubPaths;
+    source = callPackage ./source { };
 
     pickBinary = callPackage ./pickBinary.nix { };
 
