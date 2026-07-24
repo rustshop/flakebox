@@ -107,19 +107,80 @@ fn lint_cargo_toml_fix_resolver_v2(opts: &Opts) -> AppResult<()> {
 fn lint_cargo_toml_fix_ci_build_profile(opts: &Opts) -> AppResult<()> {
     let (path, mut cargo_toml) = load_root_cargo_toml(opts)?;
 
-    if cargo_toml.get("profile").is_none() {
-        cargo_toml["profile"] = toml_edit::Item::Table(toml_edit::Table::new());
-    }
-
-    cargo_toml["profile"]["ci"] = toml_edit::Item::Table(toml_edit::Table::new());
-    cargo_toml["profile"]["ci"]["inherits"] = value("dev");
-    cargo_toml["profile"]["ci"]["incremental"] = value(false);
-    cargo_toml["profile"]["ci"]["debug"] = value("line-tables-only");
-    cargo_toml["profile"]["ci"]["lto"] = value("off");
+    set_cargo_profile_defaults(&mut cargo_toml);
 
     fs::write(path, cargo_toml.to_string()).change_context(AppError::IO)?;
 
     Ok(())
+}
+
+fn set_cargo_profile_defaults(cargo_toml: &mut toml_edit::DocumentMut) {
+    if cargo_toml.get("profile").is_none() {
+        cargo_toml["profile"] = toml_edit::Item::Table(toml_edit::Table::new());
+    }
+
+    let profiles = item_as_table_mut(&mut cargo_toml["profile"], "Cargo profiles must be a table");
+    if !profiles.contains_key("dev") {
+        profiles["dev"] = toml_edit::Item::Table(toml_edit::Table::new());
+    }
+    profiles["dev"]["debug"] = value(false);
+    set_dependency_debug_override(cargo_toml, "dev");
+
+    cargo_toml["profile"]["ci"] = toml_edit::Item::Table(toml_edit::Table::new());
+    cargo_toml["profile"]["ci"]["debug"] = value(false);
+    cargo_toml["profile"]["ci"]["inherits"] = value("dev");
+    cargo_toml["profile"]["ci"]["incremental"] = value(false);
+    cargo_toml["profile"]["ci"]["lto"] = value("off");
+    set_dependency_debug_override(cargo_toml, "ci");
+}
+
+fn set_dependency_debug_override(cargo_toml: &mut toml_edit::DocumentMut, profile: &str) {
+    let profile = item_as_table_mut(
+        &mut cargo_toml["profile"][profile],
+        "Cargo profile must be a table",
+    );
+    if !profile.contains_key("package") {
+        profile["package"] = toml_edit::Item::Table(toml_edit::Table::new());
+    }
+
+    let package = item_as_table_mut(
+        &mut profile["package"],
+        "Cargo profile package overrides must be a table",
+    );
+    if !package.contains_key("*") {
+        package["*"] = toml_edit::Item::Table(toml_edit::Table::new());
+    }
+
+    let dependency_override = item_as_table_mut(
+        &mut package["*"],
+        "Cargo dependency profile override must be a table",
+    );
+    dependency_override["debug"] = value(false);
+    dependency_override
+        .key_mut("debug")
+        .expect("debug was just inserted")
+        .leaf_decor_mut()
+        .set_prefix(
+            "# Keep dependencies without debug information if the workspace profile is\n\
+             # changed to \"line-tables-only\" for more useful workspace panic traces.\n",
+        );
+}
+
+fn item_as_table_mut<'item>(
+    item: &'item mut toml_edit::Item,
+    invalid_message: &str,
+) -> &'item mut toml_edit::Table {
+    if !item.is_table() {
+        let owned = std::mem::take(item);
+        *item = toml_edit::Item::Table(
+            owned
+                .into_table()
+                .unwrap_or_else(|_| panic!("{invalid_message}")),
+        );
+    }
+
+    item.as_table_mut()
+        .expect("item was already a table or was converted to one")
 }
 
 fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
@@ -308,4 +369,56 @@ fn init_logging() {
         .finish();
 
     tracing::subscriber::set_global_default(subscriber).expect("Failed to set tracing subscriber");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cargo_profile_defaults_disable_debug_info_and_preserve_inline_dev_settings() {
+        let mut cargo_toml = "profile = { dev = { package = { \"*\" = { opt-level = 1 } } } }\n"
+            .parse::<toml_edit::DocumentMut>()
+            .expect("valid test manifest");
+
+        set_cargo_profile_defaults(&mut cargo_toml);
+
+        assert_eq!(cargo_toml["profile"]["dev"]["debug"].as_bool(), Some(false));
+        assert_eq!(
+            cargo_toml["profile"]["dev"]["package"]["*"]["debug"].as_bool(),
+            Some(false)
+        );
+        assert_eq!(
+            cargo_toml["profile"]["dev"]["package"]["*"]["opt-level"].as_integer(),
+            Some(1)
+        );
+        assert_eq!(cargo_toml["profile"]["ci"]["debug"].as_bool(), Some(false));
+        assert_eq!(
+            cargo_toml["profile"]["ci"]["package"]["*"]["debug"].as_bool(),
+            Some(false)
+        );
+
+        let cargo_toml = cargo_toml.to_string();
+        assert!(cargo_toml.contains(
+            "[profile.dev.package.\"*\"]\n\
+             opt-level = 1\n\
+             # Keep dependencies without debug information if the workspace profile is\n\
+             # changed to \"line-tables-only\" for more useful workspace panic traces.\n\
+             debug = false"
+        ));
+        assert!(cargo_toml.contains(
+            "[profile.ci.package.\"*\"]\n\
+             # Keep dependencies without debug information if the workspace profile is\n\
+             # changed to \"line-tables-only\" for more useful workspace panic traces.\n\
+             debug = false"
+        ));
+        assert_eq!(
+            cargo_toml
+                .matches(
+                    "# changed to \"line-tables-only\" for more useful workspace panic traces."
+                )
+                .count(),
+            2
+        );
+    }
 }

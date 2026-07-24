@@ -9,12 +9,23 @@ license = "MIT"
 [dependencies]
 
 [profile.dev]
-debug = "line-tables-only"
+debug = false
 lto = "off"
 
+[profile.dev.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
+
 [profile.ci]
+debug = false
 inherits = "dev"
 incremental = false
+
+[profile.ci.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
 
 [profile.release]
 debug = "line-tables-only"

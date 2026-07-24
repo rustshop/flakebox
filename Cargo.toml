@@ -19,12 +19,23 @@ literal_string_with_formatting_args = "deny"
 dbg_macro = "deny"
 
 [profile.dev]
+debug = false
+
+[profile.dev.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
 
 [profile.ci]
-debug = "line-tables-only"
+debug = false
 inherits = "dev"
 incremental = false
 lto = "off"
+
+[profile.ci.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
 
 [profile.release]
 debug = "line-tables-only"
