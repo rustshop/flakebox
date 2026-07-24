@@ -1,83 +1,107 @@
 # `flakeboxLib` functions
 
-## `flakeboxLib.filterSubPaths`
+## `flakeboxLib.source`
 
-A recommended way to create a Nix path containing only selected list
-of files and directories.
+Use `flakeboxLib.source` to declare exactly which project files a build can
+read. Excluding unrelated files prevents their changes from invalidating Rust
+build derivations.
 
-This is very important to avoid Nix unnecessarily recompiling Rust
-code due to changes in irrelevant files.
-
-Since Nix does not understand
-`cargo` it has to assume that change to any input (e.g. file) used in a build
-step (derivation) could have caused the result to change. The only reason
-to avoid it is to not pass such files (filter them out).
-
-Notably `craneLib` already performs certain filtering, in particular for
-`*DepsOnly` functions, but for best results it's necessary to handle
-it manually.
-
-While Nix includes functions for that purposes, we've found the `filterSubPaths`
-an easy to use and maintain.
+The normal literal-path API validates every path and imports the selected
+files once:
 
 ```nix
 let
-  root = builtins.path {
-    name = "flakebox";
-    path = ./.;
-  };
-  src = flakeboxLib.filterSubPaths {
-    inherit root;
-    paths = [
-      "Cargo.toml"
-      "Cargo.lock"
-      ".cargo"
-      "flakebox-bin"
-    ];
+  buildPaths = [
+    "Cargo.toml"
+    "Cargo.lock"
+    ".cargo"
+    "flakebox-bin"
+  ];
+
+  src = flakeboxLib.source.fromPaths {
+    root = ./.;
+    paths = buildPaths;
   };
 in
-  ...
+# ...
 ```
 
-It's a good practice to concatenate list of paths when chaining
-post-build derivations.
+`root` must be a Nix path value, not a store-path string produced by
+`builtins.path`. Subpaths must be relative, non-empty, stay below `root`, and
+exist. Filesets preserve symlinks but omit empty directories.
+
+Reuse path lists when later build stages need extra inputs:
+
+```nix
+buildSrc = flakeboxLib.source.fromPaths {
+  root = ./.;
+  paths = buildPaths;
+};
+
+testSrc = flakeboxLib.source.fromPaths {
+  root = ./.;
+  paths = buildPaths ++ [ "scripts" ];
+};
+```
+
+Changes under `scripts` then invalidate tests without invalidating the Rust
+build. Include every build dependency, including build-script inputs,
+`include_*` macro inputs, generated-code inputs, assets, schemas, and fixtures.
+
+### Fileset composition
+
+`source.filesetFromPaths` returns a nixpkgs file set for composition with
+`pkgs.lib.fileset.union`, `unions`, `intersection`, and `difference`.
+`source.fromFileset` performs the final source import:
 
 ```nix
 let
-  root = builtins.path {
-    name = "flakebox";
-    path = ./.;
-  };
-  buildPaths = [
-      "Cargo.toml"
-      "Cargo.lock"
-      ".cargo"
-      "flakebox-bin"
-    ];
-  src = flakeboxLib.filterSubPaths {
-    inherit root;
+  fs = pkgs.lib.fileset;
+  source = flakeboxLib.source;
+  buildFiles = source.filesetFromPaths {
+    root = ./.;
     paths = buildPaths;
   };
 in {
-  #...
-  testXyz = craneLib.buildCommand {
-    cargoArtifacts = workspaceBuild;
-    src = flakeboxLib.filterSubPaths {
-      inherit root;
-      paths = buildPaths ++ [ "scripts" ];
-    };
-
-    cmd = ''
-      patchShebangs ./scripts
-      ./scripts/test-xyz.sh
-    '';
+  buildSrc = source.fromFileset {
+    root = ./.;
+    fileset = buildFiles;
+  };
+  testSrc = source.fromFileset {
+    root = ./.;
+    fileset = fs.union buildFiles ./scripts;
   };
 }
 ```
 
-Since `"scripts"` path is included only in the `src`
-for tests, changes to test files will not cause
-Rust code to rebuild.
+Use `fs.maybeMissing` when a selected path is intentionally optional.
+`fromFileset` rejects files outside `root`.
+
+### Directory-aware filters
+
+`fromPaths` and `fromFileset` accept a canonical Nix source predicate of
+`absolutePathString: type: bool`. Returning false for a directory prunes its
+whole subtree. Flakebox provides `source.filters.all`, `any`, `not`, and
+`excludeDirectoriesNamed` for composition:
+
+```nix
+buildSrc = flakeboxLib.source.fromPaths {
+  root = ./.;
+  paths = buildPaths;
+  filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
+};
+```
+
+A regular file named `specs` is retained; directories with that basename are
+pruned at any selected depth.
+
+### Glob filtering
+
+`source.fromGlobs` is an explicit native-traversal alternative for large trees.
+It supports nixpkgs `sourceByGlobs` inclusion patterns such as `src/**`, `*.py`,
+and `**/*.py`, and accepts the same optional `filter`. It retains matched empty
+directories and requires nixpkgs 26.05 or newer. Prefer literal paths and
+fileset composition unless measurements justify glob traversal.
 
 ## `flakeboxLib.craneMultiBuild `
 

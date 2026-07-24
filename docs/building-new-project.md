@@ -321,11 +321,8 @@ index cb41316..08c8f65 100644
          pkgs = nixpkgs.legacyPackages.${system};
          flakeboxLib = flakebox.lib.mkLib pkgs { };
 +
-+        rustSrc = flakeboxLib.filterSubPaths {
-+          root = builtins.path {
-+            name = "flakebox-tutorial";
-+            path = ./.;
-+          };
++        rustSrc = flakeboxLib.source.fromPaths {
++          root = ./.;
 +          paths = [
 +            "Cargo.toml"
 +            "Cargo.lock"
@@ -434,11 +431,8 @@ This is where you can enable, disable, and configure various Flakebox features. 
 The next binding is:
 
 ```nix
-        rustSrc = flakeboxLib.filterSubPaths {
-          root = builtins.path {
-            name = "flakebox-tutorial";
-            path = ./.;
-          };
+        rustSrc = flakeboxLib.source.fromPaths {
+          root = ./.;
           paths = [
             "Cargo.toml"
             "Cargo.lock"
@@ -448,7 +442,7 @@ The next binding is:
         };
 ```
 
-This `filterSubPaths` is a function exposed by
+This `source.fromPaths` function is exposed by
 `flakeboxLib` and is used for easy source code filtering.
 This is useful to avoid having to rebuild our Rust project
 when only irrelevant files changed. It's not strictly
@@ -724,7 +718,7 @@ index a65ba7a..f4c64d7 100644
          pkgs = nixpkgs.legacyPackages.${system};
          flakeboxLib = flakebox.lib.mkLib pkgs { };
  
-         rustSrc = flakeboxLib.filterSubPaths {
+         rustSrc = flakeboxLib.source.fromPaths {
 @@ -36,6 +41,10 @@
                craneLib = (craneLib'.overrideArgs {
                  pname = "flexbox-multibuild";

@@ -86,8 +86,8 @@ See [build profile Overrides section in The Cargo Book](https://doc.rust-lang.or
 Avoiding rebuilds is an important part of optimized Nix-based CI. It's especially
 important in slow to compile language like Rust.
 
-Flakebox provides `flakeboxLib.filterSubPaths` function for convenient
-source code filtering.
+Flakebox provides `flakeboxLib.source.fromPaths` for validated, composable source filtering.
+Pass a raw path such as `root = ./.` and list every build input explicitly.
 
 
 ### Use mold when possible

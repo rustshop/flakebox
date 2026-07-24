@@ -1,9 +1,6 @@
 { pkgs, flakeboxLib }:
 let
-  rootDir = builtins.path {
-    name = "nextest";
-    path = ./.;
-  };
+  rootDir = ./.;
 
   buildPaths = [
     "Cargo.toml"
@@ -14,7 +11,7 @@ let
   multiOutput = (flakeboxLib.craneMultiBuild { }) (
     craneLib':
     let
-      src = flakeboxLib.filterSubPaths {
+      src = flakeboxLib.source.fromPaths {
         root = rootDir;
         paths = buildPaths;
       };
