@@ -15,6 +15,9 @@ use std::time::{Duration, Instant};
 
 const WARNING_THRESHOLD: Duration = Duration::from_secs(1);
 const TIMER_ERROR_EXIT_CODE: i32 = 125;
+const COMPACT_WARNINGS_ARG: &str = "--compact-warnings";
+const COMPACT_WARNINGS_ENV: &str = "FLAKEBOX_COMPACT_GIT_HOOK_WARNINGS";
+const WARNING_MARKER: &[u8] = b"\x1eflakebox-git-hook-warning\x1e";
 
 #[cfg(unix)]
 const HANGUP_SIGNAL: i32 = 1;
@@ -140,6 +143,15 @@ fn main() {
     let Some(check_name) = args.next() else {
         timer_error("missing check name");
     };
+    if check_name == OsStr::new(COMPACT_WARNINGS_ARG) {
+        if args.next().is_some() {
+            timer_error("warning formatter does not accept arguments");
+        }
+        if compact_warning_spacing(io::stdin().lock(), io::stdout().lock()).is_err() {
+            process::exit(TIMER_ERROR_EXIT_CODE);
+        }
+        return;
+    }
     if args.next().is_some() {
         timer_error("expected exactly one check name");
     }
@@ -152,9 +164,16 @@ fn main() {
     if let Ok(check_result) = &check_result {
         if let Some(warning) = slow_check_warning(&check_name, check_result.elapsed) {
             // A diagnostic write failure must never replace the check's exit status.
-            // The leading newline keeps this record complete even if this or
-            // another concurrent check left stderr unterminated.
-            let warning_record = format!("\n{warning}\n");
+            let separator = if env::var_os(COMPACT_WARNINGS_ENV).as_deref() == Some(OsStr::new("1"))
+            {
+                std::str::from_utf8(WARNING_MARKER).expect("warning marker is UTF-8")
+            } else {
+                // Standalone use cannot inspect arbitrary inherited stderr
+                // portably. Prefer a complete record after unterminated output;
+                // generated hooks use the formatter to avoid blank lines.
+                "\n"
+            };
+            let warning_record = format!("{separator}{warning}\n");
             let _ = io::stderr().lock().write_all(warning_record.as_bytes());
         }
     }
@@ -162,6 +181,37 @@ fn main() {
     match check_result {
         Ok(check_result) => exit_like_check(check_result.status),
         Err(error) => timer_error(&format!("could not run check {check_name:?}: {error}")),
+    }
+}
+
+/// Streams hook stderr while replacing timer markers with a needed separator.
+fn compact_warning_spacing(mut input: impl io::Read, mut output: impl io::Write) -> io::Result<()> {
+    let mut pending = Vec::with_capacity(WARNING_MARKER.len());
+    let mut buffer = [0; 8192];
+    let mut last_output_byte = None;
+
+    loop {
+        let bytes_read = input.read(&mut buffer)?;
+        if bytes_read == 0 {
+            output.write_all(&pending)?;
+            return output.flush();
+        }
+
+        for &byte in &buffer[..bytes_read] {
+            pending.push(byte);
+            while !WARNING_MARKER.starts_with(&pending) {
+                output.write_all(&pending[..1])?;
+                last_output_byte = pending.first().copied();
+                pending.remove(0);
+            }
+            if pending == WARNING_MARKER {
+                if last_output_byte.is_some() && last_output_byte != Some(b'\n') {
+                    output.write_all(b"\n")?;
+                    last_output_byte = Some(b'\n');
+                }
+                pending.clear();
+            }
+        }
     }
 }
 
