@@ -38,11 +38,29 @@ and use them in the Nix-based CI to improve the CI times.
 Example:
 
 ```toml
+[profile.dev]
+debug = false
+
+[profile.dev.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
+
 [profile.ci]
+debug = false
 inherits = "dev"
-debug = 1
 incremental = false
+
+[profile.ci.package."*"]
+# Keep dependencies without debug information if the workspace profile is
+# changed to "line-tables-only" for more useful workspace panic traces.
+debug = false
 ```
+
+The package overrides intentionally repeat the profile defaults. If more useful
+workspace panic traces become worth the artifact size, this lets the workspace
+profile switch to `debug = "line-tables-only"` without enabling dependency
+debug information.
 
 This can be combined with building the most performance-relevant
 dependencies with optimizations, either manually:
