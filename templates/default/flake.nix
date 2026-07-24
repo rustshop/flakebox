@@ -38,6 +38,7 @@
         buildSrc = flakeboxLib.source.fromPaths {
           root = ./.;
           paths = buildPaths;
+          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
         };
 
         multiBuild = (flakeboxLib.craneMultiBuild { }) (

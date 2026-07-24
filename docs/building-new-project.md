@@ -329,6 +329,7 @@ index cb41316..08c8f65 100644
 +            ".cargo"
 +            "src"
 +          ];
++          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
 +        };
 +
 +        legacyPackages = (flakeboxLib.craneMultiBuild { }) (craneLib':
@@ -439,6 +440,7 @@ The next binding is:
             ".cargo"
             "src"
           ];
+          filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
         };
 ```
 

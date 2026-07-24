@@ -21,6 +21,7 @@ let
   src = flakeboxLib.source.fromPaths {
     root = ./.;
     paths = buildPaths;
+    filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
   };
 in
 # ...
@@ -36,11 +37,13 @@ Reuse path lists when later build stages need extra inputs:
 buildSrc = flakeboxLib.source.fromPaths {
   root = ./.;
   paths = buildPaths;
+  filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
 };
 
 testSrc = flakeboxLib.source.fromPaths {
   root = ./.;
   paths = buildPaths ++ [ "scripts" ];
+  filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
 };
 ```
 
@@ -66,10 +69,12 @@ in {
   buildSrc = source.fromFileset {
     root = ./.;
     fileset = buildFiles;
+    filter = source.filters.excludeDirectoriesNamed [ "specs" ];
   };
   testSrc = source.fromFileset {
     root = ./.;
     fileset = fs.union buildFiles ./scripts;
+    filter = source.filters.excludeDirectoriesNamed [ "specs" ];
   };
 }
 ```

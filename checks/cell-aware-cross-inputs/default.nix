@@ -34,7 +34,17 @@ let
         package = craneLib.buildPackage {
           pname = "cell-aware-cross-inputs";
           version = "0.1.0";
-          src = craneLib.cleanCargoSource ./.;
+          src = craneLib.cleanCargoSource (
+            flakeboxLib.source.fromPaths {
+              root = ./.;
+              paths = [
+                "Cargo.toml"
+                "Cargo.lock"
+                "src"
+              ];
+              filter = flakeboxLib.source.filters.excludeDirectoriesNamed [ "specs" ];
+            }
+          );
           strictDeps = true;
         };
       });
