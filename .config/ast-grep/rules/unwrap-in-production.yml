@@ -1,0 +1,40 @@
+id: unwrap-in-production
+language: Rust
+severity: warning
+message: Avoid unwrap() outside test code; propagate the error or document the invariant with expect().
+ignores:
+  - "**/benches/**"
+  - "**/examples/**"
+  - "**/tests/**"
+  - "**/tests.rs"
+  - "**/*-tests.rs"
+  - "**/*_test.rs"
+  - "**/*_tests.rs"
+  - "**/test_*.rs"
+rule:
+  all:
+    - pattern: $VALUE.unwrap()
+    - not:
+        inside:
+          stopBy: end
+          any:
+            - kind: mod_item
+              follows:
+                stopBy:
+                  not:
+                    kind: attribute_item
+                pattern: "#[cfg(test)]"
+            - kind: function_item
+              follows:
+                stopBy:
+                  not:
+                    kind: attribute_item
+                any:
+                  - pattern: "#[cfg(test)]"
+                  - pattern: "#[test]"
+            - kind: impl_item
+              follows:
+                stopBy:
+                  not:
+                    kind: attribute_item
+                pattern: "#[cfg(test)]"

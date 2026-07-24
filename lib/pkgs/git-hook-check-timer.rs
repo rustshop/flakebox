@@ -72,7 +72,7 @@ impl ChildSignalState {
             if current_state == SHUTTING_DOWN {
                 return None;
             }
-            if current_state > 0 {
+            if 0 < current_state {
                 return Some(current_state);
             }
 

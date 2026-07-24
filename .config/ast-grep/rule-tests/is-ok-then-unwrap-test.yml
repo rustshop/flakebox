@@ -1,0 +1,15 @@
+id: is-ok-then-unwrap
+valid:
+  - |
+    if let Ok(value) = result {
+        consume(value);
+    }
+  - |
+    if result.is_ok() {
+        consume(other.unwrap());
+    }
+invalid:
+  - |
+    if result.is_ok() {
+        consume(result.unwrap());
+    }

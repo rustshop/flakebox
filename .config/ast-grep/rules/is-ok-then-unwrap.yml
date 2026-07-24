@@ -1,0 +1,14 @@
+id: is-ok-then-unwrap
+language: Rust
+severity: warning
+message: Replace an is_ok() check followed by unwrap() with if let Ok(...).
+rule:
+  kind: if_expression
+  all:
+    - has:
+        field: condition
+        pattern: $VALUE.is_ok()
+    - has:
+        field: consequence
+        stopBy: end
+        pattern: $VALUE.unwrap()

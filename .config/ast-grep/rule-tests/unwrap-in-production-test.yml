@@ -1,0 +1,60 @@
+id: unwrap-in-production
+valid:
+  - value?
+  - value.expect("value was validated above")
+  - |
+    #[cfg(test)]
+    mod tests {
+        #[test]
+        fn works() {
+            value.unwrap();
+        }
+    }
+  - |
+    #[cfg(test)]
+    fn test_helper() {
+        value.unwrap();
+    }
+  - |
+    #[test]
+    fn works() {
+        value.unwrap();
+    }
+  - |
+    #[test]
+    #[should_panic]
+    fn panics() {
+        value.unwrap();
+    }
+  - |
+    #[cfg(test)]
+    #[allow(dead_code)]
+    fn test_helper() {
+        value.unwrap();
+    }
+  - |
+    #[cfg(test)]
+    #[allow(dead_code)]
+    mod tests {
+        fn helper() {
+            value.unwrap();
+        }
+    }
+  - |
+    #[cfg(test)]
+    #[allow(dead_code)]
+    impl Fixture {
+        fn helper() {
+            value.unwrap();
+        }
+    }
+invalid:
+  - value.unwrap()
+  - |
+    #[cfg(test)]
+    fn test_helper() {}
+
+    #[allow(dead_code)]
+    fn production() {
+        value.unwrap();
+    }

@@ -1,0 +1,22 @@
+id: is-err-then-unwrap-err
+snapshots:
+  ? |
+    if result.is_err() {
+        report(result.unwrap_err());
+    }
+  : labels:
+    - source: |-
+        if result.is_err() {
+            report(result.unwrap_err());
+        }
+      style: primary
+      start: 0
+      end: 55
+    - source: result.is_err()
+      style: secondary
+      start: 3
+      end: 18
+    - source: result.unwrap_err()
+      style: secondary
+      start: 32
+      end: 51

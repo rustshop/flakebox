@@ -1,0 +1,15 @@
+id: is-some-then-unwrap
+valid:
+  - |
+    if let Some(value) = value {
+        consume(value);
+    }
+  - |
+    if value.is_some() {
+        consume(other.unwrap());
+    }
+invalid:
+  - |
+    if value.is_some() {
+        consume(value.unwrap());
+    }

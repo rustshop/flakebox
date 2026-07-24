@@ -1,0 +1,8 @@
+id: unwrap-or-default
+language: Rust
+severity: warning
+message: Use unwrap_or_default() instead of constructing a default value eagerly.
+rule:
+  any:
+    - pattern: $VALUE.unwrap_or(Default::default())
+    - pattern: $VALUE.unwrap_or($TYPE::default())

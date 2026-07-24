@@ -1,0 +1,21 @@
+id: unwrap-in-production
+snapshots:
+  ? |
+    #[cfg(test)]
+    fn test_helper() {}
+
+    #[allow(dead_code)]
+    fn production() {
+        value.unwrap();
+    }
+  : labels:
+    - source: value.unwrap()
+      style: primary
+      start: 76
+      end: 90
+  value.unwrap():
+    labels:
+    - source: value.unwrap()
+      style: primary
+      start: 0
+      end: 14

@@ -1,0 +1,22 @@
+id: is-some-then-unwrap
+snapshots:
+  ? |
+    if value.is_some() {
+        consume(value.unwrap());
+    }
+  : labels:
+    - source: |-
+        if value.is_some() {
+            consume(value.unwrap());
+        }
+      style: primary
+      start: 0
+      end: 51
+    - source: value.is_some()
+      style: secondary
+      start: 3
+      end: 18
+    - source: value.unwrap()
+      style: secondary
+      start: 33
+      end: 47
