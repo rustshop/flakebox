@@ -33,6 +33,69 @@ fn rounds_display_to_millisecond_precision() {
     );
 }
 
+#[test]
+fn warning_formatter_compacts_only_redundant_newlines() {
+    let input = [
+        b"terminated\n".as_slice(),
+        WARNING_MARKER,
+        b"flakebox: warning: check_one took 1.200s (>1s)\n",
+        WARNING_MARKER,
+        b"flakebox: warning: check_two took 1.300s (>1s)\n",
+    ]
+    .concat();
+    let mut output = Vec::new();
+
+    compact_warning_spacing(&input[..], &mut output).unwrap();
+
+    assert_eq!(
+        output,
+        b"terminated\nflakebox: warning: check_one took 1.200s (>1s)\n\
+            flakebox: warning: check_two took 1.300s (>1s)\n"
+    );
+}
+
+#[test]
+fn warning_formatter_preserves_unterminated_and_binary_output() {
+    let input = [
+        b"unterminated\0".as_slice(),
+        WARNING_MARKER,
+        b"flakebox: warning: check_slow took 1.200s (>1s)\n",
+    ]
+    .concat();
+    let mut output = Vec::new();
+
+    compact_warning_spacing(&input[..], &mut output).unwrap();
+
+    assert_eq!(
+        output,
+        b"unterminated\0\nflakebox: warning: check_slow took 1.200s (>1s)\n"
+    );
+}
+
+#[test]
+fn warning_formatter_preserves_ordinary_output_byte_exactly() {
+    let input = b"\0ordinary\n\noutput without newline";
+    let mut output = Vec::new();
+
+    compact_warning_spacing(&input[..], &mut output).unwrap();
+
+    assert_eq!(output, input);
+}
+
+#[test]
+fn warning_formatter_does_not_prefix_first_warning() {
+    let input = [
+        WARNING_MARKER,
+        b"flakebox: warning: check_slow took 1.200s (>1s)\n",
+    ]
+    .concat();
+    let mut output = Vec::new();
+
+    compact_warning_spacing(&input[..], &mut output).unwrap();
+
+    assert_eq!(output, b"flakebox: warning: check_slow took 1.200s (>1s)\n");
+}
+
 #[cfg(unix)]
 #[test]
 fn signal_before_child_publication_is_queued_for_publisher() {

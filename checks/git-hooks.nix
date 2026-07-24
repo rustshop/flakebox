@@ -41,6 +41,11 @@ let
       while [ ! -e "$FLAKEBOX_TEST_LOG.a-ready" ]; do sleep 0.01; done
       sleep 2
     '';
+    "d-slow-nul" = ''
+      printf 'd-slow-nul\n' >> "$FLAKEBOX_TEST_LOG"
+      printf '\0' >&2
+      sleep 2
+    '';
   };
 
   queueHooks = mkHookFixture {
@@ -49,6 +54,13 @@ let
     '';
     "b-fast-after-queue" = ''
       true
+    '';
+  };
+
+  backgroundHooks = mkHookFixture {
+    background = ''
+      sleep 30 </dev/null >/dev/null 2>/dev/null &
+      printf '%s\n' "$!" > "$FLAKEBOX_BACKGROUND_PID"
     '';
   };
 
@@ -92,6 +104,29 @@ let
     '';
   };
 
+  usabilityHooks =
+    (mkLib pkgs {
+      config.git = {
+        pre-commit = {
+          trailing_newline = false;
+          trailing_whitespace = false;
+          hooks = pkgs.lib.mkForce {
+            fail-pre-commit = ''
+              printf 'pre-commit ran\n' >> "$FLAKEBOX_TEST_LOG"
+              return 41
+            '';
+          };
+        };
+        commit-msg.hooks = pkgs.lib.mkForce {
+          fail-commit-msg = ''
+            printf 'commit-msg ran\n' >> "$FLAKEBOX_TEST_LOG"
+            exit 42
+          '';
+        };
+        commit-template.enable = false;
+      };
+    }).root;
+
   emptyHooks = mkHookFixture { };
 in
 assert pkgs.lib.elem timer flakeboxLib.config.env.shellPackages;
@@ -127,7 +162,7 @@ pkgs.runCommand "git-hooks-tests"
 
     bash -n "$pre_commit"
     ! grep -q check_nothing "$pre_commit"
-    grep -q '^  flakebox-git-hook-check-timer "\$1"$' "$pre_commit"
+    grep -q '^    flakebox-git-hook-check-timer "\$1"$' "$pre_commit"
     ! grep -q '/nix/store/.*flakebox-git-hook-check-timer' "$pre_commit"
     ! grep -q 'Skipping semgrep check' "$pre_commit"
 
@@ -166,6 +201,20 @@ pkgs.runCommand "git-hooks-tests"
     printf 'stderr line\nstderr-without-newline' > expected-timer.stderr
     cmp expected-timer.stdout timer.stdout
     cmp expected-timer.stderr timer.stderr
+
+    function check_slow_newline() {
+      printf 'terminated stderr\n' >&2
+      sleep 1.2
+    }
+    export -f check_slow_newline
+    flakebox-git-hook-check-timer check_slow_newline 2> slow-newline.stderr
+    sed -E 's/took [0-9]+\.[0-9]{3}s/took DURATION/' \
+      slow-newline.stderr > normalized-slow-newline.stderr
+    # Standalone timer use conservatively separates warnings because it cannot
+    # inspect arbitrary inherited stderr. Generated hooks compact this output.
+    printf 'terminated stderr\n\nflakebox: warning: check_slow_newline took DURATION (>1s)\n' \
+      > expected-slow-newline.stderr
+    cmp expected-slow-newline.stderr normalized-slow-newline.stderr
 
     function check_slow_output() {
       printf slow-stderr-without-newline >&2
@@ -236,17 +285,21 @@ pkgs.runCommand "git-hooks-tests"
     NO_STASH=1 bash ${timedHooks}/misc/git-hooks/pre-commit \
       > hook.stdout 2> hook.stderr
 
-    printf 'a-slow\nb-fast\nc-slow\n' | sort > expected-hooks
+    printf 'a-slow\nb-fast\nc-slow\nd-slow-nul\n' | sort > expected-hooks
     sort hooks.log > actual-hooks
     cmp expected-hooks actual-hooks
-    [ "$(grep -c '^flakebox: warning: check_.* took [0-9]*\.[0-9]\{3\}s (>1s)$' hook.stderr)" -eq 2 ]
-    [ "$(grep -c '^flakebox: warning: check_a_slow took ' hook.stderr)" -eq 1 ]
-    [ "$(grep -c '^flakebox: warning: check_c_slow took ' hook.stderr)" -eq 1 ]
-    ! grep -q 'warning: check_b_fast took' hook.stderr
-    grep -q 'slow stderr without newline' hook.stderr
-    grep -q 'fast stderr without newline' hook.stderr
+    [ "$(grep -a -c '^flakebox: warning: check_.* took [0-9]*\.[0-9]\{3\}s (>1s)$' hook.stderr)" -eq 3 ]
+    [ "$(grep -a -c '^flakebox: warning: check_a_slow took ' hook.stderr)" -eq 1 ]
+    [ "$(grep -a -c '^flakebox: warning: check_c_slow took ' hook.stderr)" -eq 1 ]
+    [ "$(grep -a -c '^flakebox: warning: check_d_slow_nul took ' hook.stderr)" -eq 1 ]
+    ! grep -a -q 'warning: check_b_fast took' hook.stderr
+    grep -a -q 'slow stderr without newline' hook.stderr
+    grep -a -q 'fast stderr without newline' hook.stderr
     grep -q 'slow stdout' hook.stdout
     grep -q 'fast stdout without newline' hook.stdout
+    ! grep -a -q '^$' hook.stderr
+    od -An -t u1 hook.stderr | tr -s ' ' '\n' | grep -A1 -x 0 |
+      grep -qx 10
 
     # GNU Parallel's aggregate status and complete coverage are unchanged when
     # checks return distinct non-zero statuses.
@@ -274,6 +327,21 @@ pkgs.runCommand "git-hooks-tests"
     [ "$(grep -c '^flakebox: warning:' queue.stderr)" -eq 1 ]
     grep -q '^flakebox: warning: check_a_blocker took ' queue.stderr
     ! grep -q 'warning: check_b_fast_after_queue took' queue.stderr
+    ! grep -q '^$' queue.stderr
+    cd ..
+
+    # The formatter descriptor is closed in checks, so a detached descendant
+    # with redirected standard streams cannot keep the hook alive.
+    mkdir background-repo
+    cd background-repo
+    git init -q
+    touch tracked
+    git add tracked
+    export FLAKEBOX_BACKGROUND_PID="$PWD/background.pid"
+    timeout 10 env NO_STASH=1 \
+      bash ${backgroundHooks}/misc/git-hooks/pre-commit
+    background_pid="$(cat "$FLAKEBOX_BACKGROUND_PID")"
+    kill "$background_pid" 2>/dev/null || true
     cd ..
 
     # Private patch restoration exposes indexed content to checks and restores
@@ -350,6 +418,119 @@ pkgs.runCommand "git-hooks-tests"
     [ "$(cat unstaged.txt)" = unstaged ]
     [ -z "$(git for-each-ref --format='%(refname)' refs/flakebox/pre-commit/)" ]
     [ ! -s jj.stderr ]
+    cd ..
+
+    # Pre-commit failures happen before Git has opened the message editor, so
+    # they must not suggest recovering COMMIT_EDITMSG. A commit-msg failure does
+    # provide the exact retry command once Git has populated that file.
+    mkdir usability-repo
+    cd usability-repo
+    git init -q
+    git config user.email flakebox@example.invalid
+    git config user.name Flakebox
+    touch tracked
+    git add tracked
+    mkdir -p .git/hooks
+    cp ${usabilityHooks}/misc/git-hooks/pre-commit .git/hooks/pre-commit.flakebox
+    cp ${usabilityHooks}/misc/git-hooks/commit-msg .git/hooks/commit-msg.flakebox
+    cat > .git/hooks/pre-commit <<'EOF'
+    #!${pkgs.bash}/bin/bash
+    exec ${pkgs.bash}/bin/bash .git/hooks/pre-commit.flakebox "$@"
+    EOF
+    cat > .git/hooks/commit-msg <<'EOF'
+    #!${pkgs.bash}/bin/bash
+    exec ${pkgs.bash}/bin/bash .git/hooks/commit-msg.flakebox "$@"
+    EOF
+    chmod +x .git/hooks/pre-commit .git/hooks/commit-msg
+    export FLAKEBOX_TEST_LOG="$PWD/hooks.log"
+
+    set +e
+    git commit -m rejected-by-pre-commit > pre-commit.stdout 2> pre-commit.stderr
+    pre_commit_status=$?
+    set -e
+    [ "$pre_commit_status" -ne 0 ]
+    grep -qx 'pre-commit ran' hooks.log
+    ! grep -q -- '-eF .git/COMMIT_EDITMSG' pre-commit.stderr
+
+    : > hooks.log
+    mv .git/hooks/pre-commit .git/hooks/pre-commit.disabled
+    set +e
+    git commit -m rejected-by-commit-msg > commit-msg.stdout 2> commit-msg.stderr
+    commit_msg_status=$?
+    set -e
+    [ "$commit_msg_status" -ne 0 ]
+    grep -qx 'commit-msg ran' hooks.log
+    grep -qx 'flakebox: commit message checks failed; your message is saved in .git/COMMIT_EDITMSG' commit-msg.stderr
+    grep -qx 'flakebox: rerun your original git commit command, replacing any message options with:' commit-msg.stderr
+    grep -qx -- '-eF .git/COMMIT_EDITMSG' commit-msg.stderr
+    [ -s .git/COMMIT_EDITMSG ]
+
+    # Alternate commit-msg input paths do not support the advertised recovery
+    # command and therefore receive no guidance.
+    printf 'message\n' > alternate-message
+    set +e
+    bash .git/hooks/commit-msg.flakebox alternate-message \
+      > alternate.stdout 2> alternate.stderr
+    alternate_status=$?
+    set -e
+    [ "$alternate_status" -eq 42 ]
+    ! grep -q -- '-eF .git/COMMIT_EDITMSG' alternate.stderr
+
+    # Only the exact value 1 bypasses each generated hook. Unset and other
+    # values preserve normal failure behavior.
+    set +e
+    NO_STASH=1 bash .git/hooks/pre-commit.flakebox > /dev/null 2> /dev/null
+    unset_pre_commit_status=$?
+    FLAKEBOX_SKIP_GIT_HOOKS=yes NO_STASH=1 \
+      bash .git/hooks/pre-commit.flakebox > /dev/null 2> /dev/null
+    other_pre_commit_status=$?
+    bash .git/hooks/commit-msg.flakebox alternate-message > /dev/null 2> /dev/null
+    unset_commit_msg_status=$?
+    FLAKEBOX_SKIP_GIT_HOOKS=yes \
+      bash .git/hooks/commit-msg.flakebox alternate-message > /dev/null 2> /dev/null
+    other_commit_msg_status=$?
+    set -e
+    [ "$unset_pre_commit_status" -ne 0 ]
+    [ "$other_pre_commit_status" -ne 0 ]
+    [ "$unset_commit_msg_status" -eq 42 ]
+    [ "$other_commit_msg_status" -eq 42 ]
+
+    : > hooks.log
+    FLAKEBOX_SKIP_GIT_HOOKS=1 NO_STASH=1 \
+      bash .git/hooks/pre-commit.flakebox
+    FLAKEBOX_SKIP_GIT_HOOKS=1 \
+      bash .git/hooks/commit-msg.flakebox alternate-message
+    [ ! -s hooks.log ]
+
+    mv .git/hooks/pre-commit.disabled .git/hooks/pre-commit
+    FLAKEBOX_SKIP_GIT_HOOKS=1 git commit -m bypassed -q
+    [ ! -s hooks.log ]
+    git rev-parse --verify HEAD
+
+    # Operations whose original options matter must be rerun with those options
+    # plus the saved-message flags, rather than as a plain new commit.
+    mv .git/hooks/pre-commit .git/hooks/pre-commit.disabled
+    printf 'changed\n' > tracked
+    set +e
+    git commit -a -m rejected-a > commit-a.stdout 2> commit-a.stderr
+    commit_a_status=$?
+    set -e
+    [ "$commit_a_status" -ne 0 ]
+    grep -qx -- '-eF .git/COMMIT_EDITMSG' commit-a.stderr
+    FLAKEBOX_SKIP_GIT_HOOKS=1 GIT_EDITOR=true \
+      git commit -a -eF .git/COMMIT_EDITMSG -q
+    [ "$(git rev-list --count HEAD)" -eq 2 ]
+
+    set +e
+    git commit --amend -m rejected-amend \
+      > commit-amend.stdout 2> commit-amend.stderr
+    commit_amend_status=$?
+    set -e
+    [ "$commit_amend_status" -ne 0 ]
+    grep -qx -- '-eF .git/COMMIT_EDITMSG' commit-amend.stderr
+    FLAKEBOX_SKIP_GIT_HOOKS=1 GIT_EDITOR=true \
+      git commit --amend -eF .git/COMMIT_EDITMSG -q
+    [ "$(git rev-list --count HEAD)" -eq 2 ]
     cd ..
 
     # A configuration with no hooks remains a valid no-op without a sentinel.
