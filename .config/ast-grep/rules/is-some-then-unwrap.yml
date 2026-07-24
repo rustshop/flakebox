@@ -1,0 +1,14 @@
+id: is-some-then-unwrap
+language: Rust
+severity: warning
+message: Replace an is_some() check followed by unwrap() with if let Some(...).
+rule:
+  kind: if_expression
+  all:
+    - has:
+        field: condition
+        pattern: $VALUE.is_some()
+    - has:
+        field: consequence
+        stopBy: end
+        pattern: $VALUE.unwrap()

@@ -1,0 +1,15 @@
+id: is-err-then-unwrap-err
+valid:
+  - |
+    if let Err(error) = result {
+        report(error);
+    }
+  - |
+    if result.is_err() {
+        report(other.unwrap_err());
+    }
+invalid:
+  - |
+    if result.is_err() {
+        report(result.unwrap_err());
+    }

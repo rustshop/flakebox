@@ -24,6 +24,7 @@ onlyDrvs (
       craneMultiBuildTests = callPackage ./crane-multi-build-tests.nix { };
       cargoCrapModule = callPackage ./cargo-crap-module.nix { inherit mkLib; };
       astGrepModule = callPackage ./ast-grep-module.nix { inherit mkLib; };
+      astGrepRules = callPackage ./ast-grep-rules.nix { };
       gitHooks = callPackage ./git-hooks.nix { inherit mkLib; };
     }
     // lib.optionalAttrs (pkgs.stdenv.buildPlatform.system == "x86_64-linux") {

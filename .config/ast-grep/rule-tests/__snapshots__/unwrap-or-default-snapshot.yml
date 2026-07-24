@@ -1,0 +1,14 @@
+id: unwrap-or-default
+snapshots:
+  value.unwrap_or(Default::default()):
+    labels:
+    - source: value.unwrap_or(Default::default())
+      style: primary
+      start: 0
+      end: 35
+  value.unwrap_or(String::default()):
+    labels:
+    - source: value.unwrap_or(String::default())
+      style: primary
+      start: 0
+      end: 34

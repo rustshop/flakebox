@@ -1,0 +1,14 @@
+id: is-err-then-unwrap-err
+language: Rust
+severity: warning
+message: Replace an is_err() check followed by unwrap_err() with if let Err(...).
+rule:
+  kind: if_expression
+  all:
+    - has:
+        field: condition
+        pattern: $VALUE.is_err()
+    - has:
+        field: consequence
+        stopBy: end
+        pattern: $VALUE.unwrap_err()
