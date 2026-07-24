@@ -125,13 +125,16 @@ Use ast-grep's standard project layout:
 ```yaml
 # sgconfig.yml
 ruleDirs:
-  - rules
+  - .config/ast-grep/rules
 testConfigs:
-  - testDir: rule-tests
+  - testDir: .config/ast-grep/rule-tests
 ```
 
-Store rule YAML under `rules/`, then run `just ast-grep` to scan the project or
-`ast-grep test` to test the rules.
+Keeping `sgconfig.yml` at the repository root preserves ast-grep's automatic
+project discovery. Store the rules and their tests under
+`.config/ast-grep/` to avoid adding tool-specific directories at the root.
+Then run `just ast-grep` to scan the project or `ast-grep test` to test the
+rules.
 
 Projects can promote selected rules to commit-blocking errors:
 
