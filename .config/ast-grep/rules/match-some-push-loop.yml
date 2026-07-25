@@ -1,0 +1,51 @@
+id: match-some-push-loop
+language: rust
+severity: warning
+rule:
+  any:
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            Some($Y) => $VEC.push($PUSH),
+            None => {}
+          }
+        }
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            None => {},
+            Some($Y) => $VEC.push($PUSH),
+          }
+        }
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            Some($Y) => $VEC.push($PUSH),
+            _ => {}
+          }
+        }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Match-Some-push loop — collapse into `.filter_map()`.
+note: |
+  Replace:
+    for x in iter {
+      match f(x) {
+        Some(y) => out.push(y),
+        None => {}
+      }
+    }
+  with:
+    let out: Vec<_> = iter.filter_map(|x| f(x)).collect();
+  This is the same shape as [[if-let-some-push-loop]] written with `match`.

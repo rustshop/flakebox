@@ -1,14 +1,38 @@
 id: is-some-then-unwrap
-language: Rust
+language: rust
 severity: warning
-message: Replace an is_some() check followed by unwrap() with if let Some(...).
 rule:
-  kind: if_expression
   all:
+    - pattern: |
+        if $OPT.is_some() {
+          $$$
+        }
     - has:
-        field: condition
-        pattern: $VALUE.is_some()
-    - has:
-        field: consequence
+        pattern: $OPT.unwrap()
         stopBy: end
-        pattern: $VALUE.unwrap()
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  `if x.is_some()` + `x.unwrap()` — use `if let Some(v) = x` to bind once.
+note: |
+  Replace:
+    if opt.is_some() {
+        ... opt.unwrap() ...
+    }
+  with:
+    if let Some(v) = opt {
+        ... v ...
+    }
+  Same shape for `Result`: prefer `if let Ok(v) = res` over `res.is_ok()`
+  followed by `res.unwrap()`. Binding once removes the panic site and lets
+  the borrow checker reason about the inner value.

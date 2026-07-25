@@ -1,0 +1,35 @@
+id: if-let-ok-push-loop
+language: rust
+severity: warning
+rule:
+  pattern: |
+    for $X in $ITER {
+      if let Ok($Y) = $EXPR {
+        $VEC.push($PUSH);
+      }
+    }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Conditional-push loop on Result — use `.filter_map(|x| f(x).ok())`.
+note: |
+  Replace:
+    for x in iter {
+      if let Ok(y) = f(x) {
+        out.push(y);
+      }
+    }
+  with:
+    let out: Vec<_> = iter.filter_map(|x| f(x).ok()).collect();
+  Errors are silently dropped — if that matters, log them first:
+    .filter_map(|x| f(x).inspect_err(|e| warn!(%e)).ok())

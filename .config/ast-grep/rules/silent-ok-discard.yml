@@ -1,9 +1,12 @@
-id: unwrap-or-default
+id: silent-ok-discard
 language: rust
-severity: hint
+severity: warning
 rule:
   all:
-    - pattern: $EXPR.unwrap_or_default()
+    - pattern: $EXPR.ok()
+    - inside:
+        kind: expression_statement
+        stopBy: neighbor
     - not:
         inside:
           stopBy: end
@@ -25,7 +28,7 @@ ignores:
   - "target/**"
   - "tracehealth-ios/**"
 message: |
-  Silent fallback — .unwrap_or_default() returns the Default value (empty
-  string, zero, empty vec, etc.) if the Result or Option is empty/failed.
-  On Results, this silently hides errors. Prefer .expect("reason"),
-  .inspect_err(|e| warn!(%e, "context")).unwrap_or_default(), or ?.
+  Silent .ok() discard — calling .ok() on a Result as a statement converts
+  the error to None and drops it. If the operation can fail meaningfully,
+  log the error or propagate with ?. If failure is truly ignorable, use
+  `let _ = expr;` with a comment explaining why.

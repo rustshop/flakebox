@@ -1,0 +1,30 @@
+id: filter-in-loop
+language: rust
+severity: warning
+rule:
+  pattern: |
+    for $X in $ITER {
+      if $COND {
+        $VEC.push($EXPR);
+      }
+    }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Filter-then-push loop — consider using iterator methods.
+note: |
+  Replace:
+    for x in iter { if cond { vec.push(expr); } }
+  with:
+    let vec: Vec<_> = iter.filter(|x| cond).map(|x| expr).collect();
+  or use .filter_map() if condition and transformation are combined.

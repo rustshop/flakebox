@@ -1,0 +1,36 @@
+id: if-let-some-push-loop
+language: rust
+severity: warning
+rule:
+  pattern: |
+    for $X in $ITER {
+      if let Some($Y) = $EXPR {
+        $VEC.push($PUSH);
+      }
+    }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Conditional-push loop on Option — use `.filter_map()` instead.
+note: |
+  Replace:
+    for x in iter {
+      if let Some(y) = f(x) {
+        out.push(y);
+      }
+    }
+  with:
+    let out: Vec<_> = iter.filter_map(|x| f(x)).collect();
+  or, when `out` already exists:
+    out.extend(iter.filter_map(|x| f(x)));
+  If you need both Some and None branches handled, keep the explicit loop.

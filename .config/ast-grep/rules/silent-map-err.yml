@@ -1,9 +1,9 @@
-id: unwrap-or-default
+id: silent-map-err
 language: rust
 severity: hint
 rule:
   all:
-    - pattern: $EXPR.unwrap_or_default()
+    - pattern: $EXPR.map_err(|_| $$$BODY)
     - not:
         inside:
           stopBy: end
@@ -25,7 +25,8 @@ ignores:
   - "target/**"
   - "tracehealth-ios/**"
 message: |
-  Silent fallback — .unwrap_or_default() returns the Default value (empty
-  string, zero, empty vec, etc.) if the Result or Option is empty/failed.
-  On Results, this silently hides errors. Prefer .expect("reason"),
-  .inspect_err(|e| warn!(%e, "context")).unwrap_or_default(), or ?.
+  Original error discarded — .map_err(|_| ...) replaces the error without
+  preserving context, making failures harder to diagnose. Prefer:
+    .map_err(|e| MyError::Foo(e))  or  .map_err(MyError::from)
+  For parse errors where the original is unhelpful, add .inspect_err() or
+  include the input value in the replacement error message.

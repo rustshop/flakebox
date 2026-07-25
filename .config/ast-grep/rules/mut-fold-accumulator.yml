@@ -1,0 +1,56 @@
+id: mut-fold-accumulator
+language: rust
+severity: warning
+rule:
+  any:
+    - all:
+        - kind: expression_statement
+        - has:
+            pattern: |
+              for $X in $ITER {
+                $ACC += $RHS;
+              }
+        - follows:
+            pattern: let mut $ACC = $INIT;
+    - all:
+        - kind: expression_statement
+        - has:
+            pattern: |
+              for $X in $ITER {
+                $ACC = $ACC + $RHS;
+              }
+        - follows:
+            pattern: let mut $ACC = $INIT;
+    - all:
+        - kind: expression_statement
+        - has:
+            pattern: |
+              for $X in $ITER {
+                $ACC = $ACC.$OP($$$);
+              }
+        - follows:
+            pattern: let mut $ACC = $INIT;
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Mutable accumulator loop — consider `.fold(init, |acc, x| ...)`.
+note: |
+  Replace:
+    let mut acc = init;
+    for x in iter { acc = acc.op(x); }   // or acc += x;
+  with:
+    let acc = iter.fold(init, |acc, x| acc.op(x));
+  Two common specializations:
+    iter.sum()       — when acc starts at 0 and you `+= x`
+    iter.product()   — when acc starts at 1 and you `*= x`
+  Prefer those when they fit; fold otherwise.

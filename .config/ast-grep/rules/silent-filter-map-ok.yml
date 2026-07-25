@@ -1,0 +1,32 @@
+id: silent-filter-map-ok
+language: rust
+severity: warning
+rule:
+  any:
+    - pattern: $EXPR.filter_map(Result::ok)
+    - pattern: $EXPR.filter_map(|$X| $X.ok())
+  not:
+    inside:
+      stopBy: end
+      kind: mod_item
+      follows:
+        kind: attribute_item
+        regex: "cfg\\(test\\)"
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "**/test_utils.rs"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Silent error filtering — .filter_map(Result::ok) silently drops all Err
+  values from the iterator. If any row/item fails to parse or deserialize,
+  it vanishes with no trace. Prefer logging failures:
+    .filter_map(|r| r.inspect_err(|e| warn!(%e, "skipped")).ok())

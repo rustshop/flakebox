@@ -1,0 +1,34 @@
+id: if-let-some-else
+language: rust
+severity: warning
+rule:
+  all:
+    - pattern: |
+        if let Some($X) = $Y {
+          $$$
+        } else {
+          $$$
+        }
+    - not:
+        has:
+          pattern: return $$$
+          stopBy: end
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  if let Some/else can often be replaced with Option combinators.
+note: |
+  Alternatives:
+    opt.map_or(default, |x| ...)         — both branches return values
+    opt.map_or_else(|| default, |x| ...) — lazy default computation
+    opt.map(|x| ...).unwrap_or(default)  — transform then default

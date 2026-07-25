@@ -1,14 +1,36 @@
 id: is-err-then-unwrap-err
-language: Rust
+language: rust
 severity: warning
-message: Replace an is_err() check followed by unwrap_err() with if let Err(...).
 rule:
-  kind: if_expression
   all:
+    - pattern: |
+        if $RES.is_err() {
+          $$$
+        }
     - has:
-        field: condition
-        pattern: $VALUE.is_err()
-    - has:
-        field: consequence
+        pattern: $RES.unwrap_err()
         stopBy: end
-        pattern: $VALUE.unwrap_err()
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  `if r.is_err()` + `r.unwrap_err()` — use `if let Err(e) = r` to bind once.
+note: |
+  Replace:
+    if res.is_err() {
+        ... res.unwrap_err() ...
+    }
+  with:
+    if let Err(e) = res {
+        ... e ...
+    }
+  This is the Err sibling of [[is-ok-then-unwrap]] / [[is-some-then-unwrap]].

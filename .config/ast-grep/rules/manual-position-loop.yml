@@ -1,0 +1,43 @@
+id: manual-position-loop
+language: rust
+severity: warning
+rule:
+  all:
+    - kind: expression_statement
+    - has:
+        pattern: |
+          for ($I, $X) in $ITER {
+            if $COND {
+              $FOUND = Some($I);
+              break;
+            }
+          }
+    - follows:
+        pattern: let mut $FOUND = None;
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Manual `position` loop — use `iter.position(...)` instead.
+note: |
+  Replace:
+    let mut idx = None;
+    for (i, x) in iter.enumerate() {
+      if pred(&x) {
+        idx = Some(i);
+        break;
+      }
+    }
+  with:
+    let idx = iter.position(|x| pred(x));
+  `.position()` short-circuits like the break does and returns the index of
+  the first match. Use `.rposition()` if you walk back-to-front.

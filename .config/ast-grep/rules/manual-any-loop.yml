@@ -1,0 +1,42 @@
+id: manual-any-loop
+language: rust
+severity: warning
+rule:
+  all:
+    - kind: expression_statement
+    - has:
+        pattern: |
+          for $X in $ITER {
+            if $COND {
+              $FLAG = true;
+              break;
+            }
+          }
+    - follows:
+        pattern: let mut $FLAG = false;
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Manual `any` loop — use `iter.any(...)` instead.
+note: |
+  Replace:
+    let mut ok = false;
+    for x in iter {
+      if pred(&x) {
+        ok = true;
+        break;
+      }
+    }
+  with:
+    let ok = iter.any(|x| pred(x));
+  `.any()` short-circuits on the first match, just like the break does.

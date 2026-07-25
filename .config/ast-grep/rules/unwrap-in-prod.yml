@@ -1,31 +1,32 @@
-id: unwrap-or-default
+id: unwrap-in-prod
 language: rust
-severity: hint
+severity: error
 rule:
   all:
-    - pattern: $EXPR.unwrap_or_default()
+    - pattern: $EXPR.unwrap()
     - not:
         inside:
           stopBy: end
           kind: mod_item
           follows:
             kind: attribute_item
-            regex: "cfg\\(test\\)"
+            regex: "cfg\\(.*\\btest\\b"
 ignores:
   - "crates/**/tests/**"
   - "crates/**/benches/**"
   - "benches/**"
   - "tests/**"
   - "examples/**"
+  - "crates/**/examples/**"
   - "tracehealth-api/tests/**"
   - "tracehealth-api/benches/**"
+  - "tracehealth-api/examples/**"
   - "**/test_utils.rs"
   - "vendor/**"
   - ".claude/worktrees/**"
   - "target/**"
   - "tracehealth-ios/**"
 message: |
-  Silent fallback — .unwrap_or_default() returns the Default value (empty
-  string, zero, empty vec, etc.) if the Result or Option is empty/failed.
-  On Results, this silently hides errors. Prefer .expect("reason"),
-  .inspect_err(|e| warn!(%e, "context")).unwrap_or_default(), or ?.
+  Avoid .unwrap() in production code — prefer .expect("reason"), ?, or
+  combinators (.unwrap_or, .map_or, .ok_or_else) for better diagnostics
+  and graceful error handling.

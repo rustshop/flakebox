@@ -1,9 +1,9 @@
-id: unwrap-or-default
+id: silent-unwrap-or-else
 language: rust
-severity: hint
+severity: warning
 rule:
   all:
-    - pattern: $EXPR.unwrap_or_default()
+    - pattern: $EXPR.unwrap_or_else(|_| $$$BODY)
     - not:
         inside:
           stopBy: end
@@ -25,7 +25,7 @@ ignores:
   - "target/**"
   - "tracehealth-ios/**"
 message: |
-  Silent fallback — .unwrap_or_default() returns the Default value (empty
-  string, zero, empty vec, etc.) if the Result or Option is empty/failed.
-  On Results, this silently hides errors. Prefer .expect("reason"),
-  .inspect_err(|e| warn!(%e, "context")).unwrap_or_default(), or ?.
+  Silent error swallow — .unwrap_or_else(|_| ...) discards the error and
+  returns a default value. If this operation fails, the bug will be invisible.
+  Log the error first with .inspect_err(|e| warn!(%e, "context")), or
+  propagate with ?.

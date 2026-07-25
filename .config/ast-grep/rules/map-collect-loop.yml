@@ -1,0 +1,42 @@
+id: map-collect-loop
+language: rust
+severity: warning
+rule:
+  all:
+    - pattern: |
+        for $X in $ITER {
+          $VEC.push($EXPR);
+        }
+    - not:
+        inside:
+          kind: if_expression
+          stopBy: end
+constraints:
+  VEC:
+    not:
+      kind: call_expression
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Push-only loop — consider iter.map(...).collect() instead.
+note: |
+  Replace:
+    for x in iter { vec.push(expr); }
+  with:
+    let vec: Vec<_> = iter.map(|x| expr).collect();
+  or, if `vec` already exists and should be extended:
+    vec.extend(iter.map(|x| expr));
+  The filter-then-push variant (`if cond { vec.push(...) }`) is covered by
+  filter-in-loop; this rule targets the unconditional shape. Chained-method
+  receivers (`HashMap::entry(...).or_default().push(...)`) are excluded
+  because they bucket into a HashMap, not append to a single Vec.

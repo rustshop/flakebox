@@ -1,0 +1,45 @@
+id: map-collect-loop-with-let
+language: rust
+severity: hint
+rule:
+  all:
+    - pattern: |
+        for $X in $ITER {
+          let $Y = $LET_EXPR;
+          $VEC.push($PUSH);
+        }
+    - not:
+        inside:
+          kind: if_expression
+          stopBy: end
+constraints:
+  VEC:
+    not:
+      kind: call_expression
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Push-only loop with a single `let` binding — likely a `.map(...).collect()`.
+note: |
+  This is the [[map-collect-loop]] shape with one intermediate binding:
+    for x in iter {
+      let y = transform(x);
+      out.push(use_y(y));
+    }
+  Usually rewrites as:
+    let out: Vec<_> = iter.map(|x| {
+      let y = transform(x);
+      use_y(y)
+    }).collect();
+  Lower confidence than [[map-collect-loop]] because the body might rely
+  on side effects between `let` and `push`. Skim before accepting.

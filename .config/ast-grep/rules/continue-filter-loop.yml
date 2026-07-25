@@ -1,0 +1,47 @@
+id: continue-filter-loop
+language: rust
+severity: warning
+rule:
+  any:
+    - pattern: |
+        for $X in $ITER {
+          if !$COND {
+            continue;
+          }
+          $$$REST
+        }
+    - pattern: |
+        for $X in $ITER {
+          if $COND {
+            continue;
+          }
+          $$$REST
+        }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Guard-and-`continue` loop — pull the predicate into `.filter()` upstream.
+note: |
+  Replace:
+    for x in iter {
+      if !pred(&x) {
+        continue;
+      }
+      out.push(f(x));
+    }
+  with:
+    let out: Vec<_> = iter.filter(|x| pred(x)).map(|x| f(x)).collect();
+  The early-continue is the imperative form of `filter`. Once the guard is
+  gone, the remaining body often collapses to `map`, `for_each`, or another
+  combinator. Inverse guard (`if cond { continue; }`) flips to
+  `.filter(|x| !cond)`.

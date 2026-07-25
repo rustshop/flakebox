@@ -1,0 +1,54 @@
+id: match-option-verbose
+language: rust
+severity: warning
+rule:
+  all:
+    - any:
+        - pattern: |
+            match $OPT {
+              Some($X) => $SOME_BODY,
+              None => $NONE_BODY,
+            }
+        - pattern: |
+            match $OPT {
+              None => $NONE_BODY,
+              Some($X) => $SOME_BODY,
+            }
+        - pattern: |
+            match $OPT {
+              Some($X) => $SOME_BODY,
+              _ => $NONE_BODY,
+            }
+        - pattern: |
+            match $OPT {
+              Some(ref $X) => $SOME_BODY,
+              None => $NONE_BODY,
+            }
+    - not:
+        has:
+          pattern: return $$$
+          stopBy: end
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Verbose match on Option — consider using Option combinators.
+note: |
+  Alternatives:
+    opt.map_or(default, |x| ...)         — both arms are expressions
+    opt.map_or_else(|| default, |x| ...) — lazy default
+    opt.unwrap_or(default)               — extract value with fallback
+    opt.unwrap_or_else(|| ...)           — lazy fallback
+  This catches all four arm orderings: `Some/None`, `None/Some`,
+  `Some/_`, and `Some(ref x)/None`. For `match opt.as_ref()`, write the
+  combinator on the original Option instead — `opt.as_ref().map(...)`
+  composes the same way.

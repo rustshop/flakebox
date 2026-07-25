@@ -1,0 +1,56 @@
+id: manual-all-loop
+language: rust
+severity: warning
+rule:
+  any:
+    - all:
+        - kind: expression_statement
+        - has:
+            pattern: |
+              for $X in $ITER {
+                if !$COND {
+                  $FLAG = false;
+                  break;
+                }
+              }
+        - follows:
+            pattern: let mut $FLAG = true;
+    - all:
+        - kind: expression_statement
+        - has:
+            pattern: |
+              for $X in $ITER {
+                if $COND {
+                  $FLAG = false;
+                  break;
+                }
+              }
+        - follows:
+            pattern: let mut $FLAG = true;
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Manual `all` loop — use `iter.all(...)` instead.
+note: |
+  Replace:
+    let mut ok = true;
+    for x in iter {
+      if !pred(&x) {
+        ok = false;
+        break;
+      }
+    }
+  with:
+    let ok = iter.all(|x| pred(x));
+  The inverse shape (`if cond { ok = false; break; }`) is also caught; in
+  that case flip the predicate: `iter.all(|x| !cond)`.

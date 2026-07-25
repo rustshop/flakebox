@@ -1,0 +1,25 @@
+id: push-str-format
+language: rust
+severity: error
+rule:
+  pattern: $VAR.push_str(&format!($$$))
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Avoid push_str(&format!(...)) — it allocates an intermediate String.
+  Use write!(&mut $VAR, ...) instead, which writes directly into the buffer.
+note: |
+  Add `use std::fmt::Write;` then replace:
+    $VAR.push_str(&format!("...", args))
+  with:
+    write!(&mut $VAR, "...", args).unwrap()

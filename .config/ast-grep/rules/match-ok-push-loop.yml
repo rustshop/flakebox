@@ -1,0 +1,52 @@
+id: match-ok-push-loop
+language: rust
+severity: warning
+rule:
+  any:
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            Ok($Y) => $VEC.push($PUSH),
+            Err(_) => {}
+          }
+        }
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            Err(_) => {},
+            Ok($Y) => $VEC.push($PUSH),
+          }
+        }
+    - pattern: |
+        for $X in $ITER {
+          match $EXPR {
+            Ok($Y) => $VEC.push($PUSH),
+            _ => {}
+          }
+        }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Match-Ok-push loop — collapse into `.filter_map(|x| f(x).ok())`.
+note: |
+  Replace:
+    for x in iter {
+      match f(x) {
+        Ok(y) => out.push(y),
+        Err(_) => {}
+      }
+    }
+  with:
+    let out: Vec<_> = iter.filter_map(|x| f(x).ok()).collect();
+  Errors disappear silently — if that matters, log them first:
+    .filter_map(|x| f(x).inspect_err(|e| warn!(%e)).ok())

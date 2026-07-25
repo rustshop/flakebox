@@ -1,0 +1,42 @@
+id: stringly-typed-dispatch
+language: rust
+severity: warning
+rule:
+  kind: if_expression
+  all:
+    - has:
+        field: condition
+        pattern: $EXPR.contains($LIT)
+    - has:
+        kind: else_clause
+        has:
+          kind: if_expression
+          has:
+            field: condition
+            pattern: $EXPR2.contains($LIT2)
+    - not:
+        inside:
+          stopBy: end
+          kind: function_item
+          regex: "fn\\s+(from_str|parse)"
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Stringly-typed dispatch — chained .contains() checks simulate enum
+  matching with strings. Define an enum with the variants and match on
+  it instead.
+note: |
+  Define an enum and implement FromStr:
+    enum Model { Haiku, Opus, Sonnet }
+    let model = Model::from_str(name).unwrap_or(Model::Sonnet);
+    match model { Model::Haiku => ..., Model::Opus => ... }

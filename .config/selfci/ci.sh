@@ -6,6 +6,11 @@ function job_lint() {
   if ! treefmt --ci ; then
     selfci step fail
   fi
+
+  selfci step start "ast-grep"
+  if ! ast-grep scan --config sgconfig.yml ; then
+    selfci step fail
+  fi
 }
 
 function job_checks() {

@@ -1,0 +1,49 @@
+id: stringly-typed-match
+language: rust
+severity: warning
+rule:
+  all:
+    - kind: match_expression
+    - has:
+        field: value
+        pattern: $EXPR.as_str()
+    - not:
+        inside:
+          stopBy: end
+          kind: impl_item
+          regex: "impl\\s+FromStr"
+    - not:
+        inside:
+          stopBy: end
+          kind: impl_item
+          regex: "impl\\s+TryFrom<&str>"
+    - not:
+        inside:
+          stopBy: end
+          kind: impl_item
+          regex: "impl\\s+TryFrom<String>"
+    - not:
+        inside:
+          stopBy: end
+          kind: function_item
+          regex: "fn\\s+(from_str|parse)"
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Stringly-typed match — matching on .as_str() with string literal arms
+  loses exhaustiveness checking and type safety. Use the enum's existing
+  parse/from_str method, or define one if it doesn't exist.
+note: |
+  If the enum has a from_str_loose/parse method, call it instead:
+    let value = MyEnum::from_str_loose(input).unwrap_or_default();
+    match value { MyEnum::Foo => ..., MyEnum::Bar => ... }

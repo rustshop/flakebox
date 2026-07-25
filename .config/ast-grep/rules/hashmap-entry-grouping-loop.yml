@@ -1,0 +1,42 @@
+id: hashmap-entry-grouping-loop
+language: rust
+severity: hint
+rule:
+  any:
+    - pattern: |
+        for $X in $ITER {
+          $MAP.entry($KEY).or_default().push($VAL);
+        }
+    - pattern: |
+        for $X in $ITER {
+          $MAP.entry($KEY).or_insert_with(Vec::new).push($VAL);
+        }
+    - pattern: |
+        for $X in $ITER {
+          $MAP.entry($KEY).or_insert_with(|| Vec::new()).push($VAL);
+        }
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Manual grouping loop — consider `fold` or `itertools::into_group_map_by`.
+note: |
+  Pure functional rewrite (no extra deps):
+    let by_key = iter.fold(HashMap::new(), |mut acc, item| {
+      acc.entry(key_of(&item)).or_default().push(item);
+      acc
+    });
+  Or, if you already pull in `itertools`:
+    use itertools::Itertools;
+    let by_key = iter.into_group_map_by(|item| key_of(item));
+  Hint-only — the imperative form is often the most readable shape in
+  Rust. Switch when the surrounding code is already iterator-chained.

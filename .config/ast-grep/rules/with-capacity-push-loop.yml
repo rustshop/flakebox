@@ -1,0 +1,36 @@
+id: with-capacity-push-loop
+language: rust
+severity: warning
+rule:
+  kind: expression_statement
+  has:
+    pattern: |
+      for $X in $ITER {
+        $V.push($EXPR);
+      }
+  follows:
+    pattern: let mut $V = Vec::with_capacity($CAP);
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  `Vec::with_capacity` + push-loop — `iter.map(...).collect()` is shorter
+  and the size hint is propagated automatically when `ITER` is an
+  `ExactSizeIterator`.
+note: |
+  Replace:
+    let mut v = Vec::with_capacity(iter.len());
+    for x in iter { v.push(expr); }
+  with:
+    let v: Vec<_> = iter.map(|x| expr).collect();
+  `collect()` calls `size_hint()` and pre-allocates, so the capacity hint
+  is preserved without you wiring it through by hand.

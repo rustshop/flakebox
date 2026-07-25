@@ -1,9 +1,9 @@
-id: unwrap-or-default
+id: let-underscore-call
 language: rust
-severity: hint
+severity: warning
 rule:
   all:
-    - pattern: $EXPR.unwrap_or_default()
+    - pattern: let _ = $EXPR;
     - not:
         inside:
           stopBy: end
@@ -11,6 +11,9 @@ rule:
           follows:
             kind: attribute_item
             regex: "cfg\\(test\\)"
+constraints:
+  EXPR:
+    kind: call_expression
 ignores:
   - "crates/**/tests/**"
   - "crates/**/benches/**"
@@ -25,7 +28,7 @@ ignores:
   - "target/**"
   - "tracehealth-ios/**"
 message: |
-  Silent fallback — .unwrap_or_default() returns the Default value (empty
-  string, zero, empty vec, etc.) if the Result or Option is empty/failed.
-  On Results, this silently hides errors. Prefer .expect("reason"),
-  .inspect_err(|e| warn!(%e, "context")).unwrap_or_default(), or ?.
+  Discarded call result — `let _ = expr()` suppresses the unused-Result
+  warning, silently dropping any error. If the call can fail meaningfully,
+  handle or log the error. If failure is truly ignorable, add a comment
+  explaining why.

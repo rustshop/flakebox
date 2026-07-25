@@ -1,0 +1,53 @@
+id: match-result-verbose
+language: rust
+severity: warning
+rule:
+  all:
+    - any:
+        - pattern: |
+            match $RES {
+              Ok($V) => $OK_BODY,
+              Err($E) => $ERR_BODY,
+            }
+        - pattern: |
+            match $RES {
+              Err($E) => $ERR_BODY,
+              Ok($V) => $OK_BODY,
+            }
+        - pattern: |
+            match $RES {
+              Ok($V) => $OK_BODY,
+              Err(_) => $ERR_BODY,
+            }
+        - pattern: |
+            match $RES {
+              Err(_) => $ERR_BODY,
+              Ok($V) => $OK_BODY,
+            }
+    - not:
+        has:
+          pattern: return $$$
+          stopBy: end
+ignores:
+  - "crates/**/tests/**"
+  - "crates/**/benches/**"
+  - "benches/**"
+  - "tests/**"
+  - "examples/**"
+  - "tracehealth-api/tests/**"
+  - "tracehealth-api/benches/**"
+  - "vendor/**"
+  - ".claude/worktrees/**"
+  - "target/**"
+  - "tracehealth-ios/**"
+message: |
+  Verbose match on Result — consider Result combinators.
+note: |
+  Alternatives:
+    res.map_or(default, |v| ...)            — both arms are pure expressions
+    res.map_or_else(|e| ..., |v| ...)       — both arms use their binding
+    res.unwrap_or(default)                  — extract Ok value with fallback
+    res.unwrap_or_else(|e| ...)             — lazy fallback using the error
+    res.map(|v| ...).unwrap_or(default)     — transform then default
+  Keep the explicit `match` when either arm has side effects, uses `?`, or
+  returns from the enclosing function.
