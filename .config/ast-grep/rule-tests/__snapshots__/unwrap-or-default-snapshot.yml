@@ -12,3 +12,9 @@ snapshots:
       style: primary
       start: 0
       end: 34
+  value.unwrap_or_default():
+    labels:
+    - source: value.unwrap_or_default()
+      style: primary
+      start: 0
+      end: 25

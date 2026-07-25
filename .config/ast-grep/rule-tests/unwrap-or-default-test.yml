@@ -1,7 +1,7 @@
 id: unwrap-or-default
 valid:
-  - value.unwrap_or_default()
   - value.unwrap_or(fallback)
-invalid:
   - value.unwrap_or(Default::default())
   - value.unwrap_or(String::default())
+invalid:
+  - value.unwrap_or_default()
