@@ -45,7 +45,7 @@ fn warning_formatter_compacts_only_redundant_newlines() {
     .concat();
     let mut output = Vec::new();
 
-    compact_warning_spacing(&input[..], &mut output).unwrap();
+    compact_warning_spacing(&input[..], &mut output).expect("warning formatter succeeds");
 
     assert_eq!(
         output,
@@ -64,7 +64,7 @@ fn warning_formatter_preserves_unterminated_and_binary_output() {
     .concat();
     let mut output = Vec::new();
 
-    compact_warning_spacing(&input[..], &mut output).unwrap();
+    compact_warning_spacing(&input[..], &mut output).expect("warning formatter succeeds");
 
     assert_eq!(
         output,
@@ -77,7 +77,7 @@ fn warning_formatter_preserves_ordinary_output_byte_exactly() {
     let input = b"\0ordinary\n\noutput without newline";
     let mut output = Vec::new();
 
-    compact_warning_spacing(&input[..], &mut output).unwrap();
+    compact_warning_spacing(&input[..], &mut output).expect("warning formatter succeeds");
 
     assert_eq!(output, input);
 }
@@ -91,7 +91,7 @@ fn warning_formatter_does_not_prefix_first_warning() {
     .concat();
     let mut output = Vec::new();
 
-    compact_warning_spacing(&input[..], &mut output).unwrap();
+    compact_warning_spacing(&input[..], &mut output).expect("warning formatter succeeds");
 
     assert_eq!(output, b"flakebox: warning: check_slow took 1.200s (>1s)\n");
 }

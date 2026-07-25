@@ -37,22 +37,25 @@ fn main() -> AppResult<()> {
     match opts.command {
         Commands::Init => init(&opts)?,
         Commands::Install => install(&opts)?,
-        Commands::Docs { docs_dir } => {
-            if let Some(docs_dir) = docs_dir {
-                let docs_index = docs_dir.join("index.html");
-                eprintln!("Opening docs available at {}", docs_index.display());
-                cmd!("xdg-open", docs_index)
-                    .run()
-                    .change_context(AppError::General)?;
-            } else {
+        Commands::Docs { docs_dir } => docs_dir.map_or_else(
+            || {
                 cmd!("nix", "build", "github:rustshop/flakebox#docs")
                     .run()
                     .change_context(AppError::General)?;
                 cmd!("xdg-open", "result/index.html")
                     .run()
                     .change_context(AppError::General)?;
-            }
-        }
+                Ok::<(), error_stack::Report<AppError>>(())
+            },
+            |docs_dir| {
+                let docs_index = docs_dir.join("index.html");
+                eprintln!("Opening docs available at {}", docs_index.display());
+                cmd!("xdg-open", docs_index)
+                    .run()
+                    .change_context(AppError::General)?;
+                Ok::<(), error_stack::Report<AppError>>(())
+            },
+        )?,
         Commands::Lint { fix, silent } => match lint(&opts, fix, silent) {
             Err(e) if e.current_context() == &AppError::Lint => std::process::exit(1),
             other => other,
@@ -172,11 +175,7 @@ fn item_as_table_mut<'item>(
 ) -> &'item mut toml_edit::Table {
     if !item.is_table() {
         let owned = std::mem::take(item);
-        *item = toml_edit::Item::Table(
-            owned
-                .into_table()
-                .unwrap_or_else(|_| panic!("{invalid_message}")),
-        );
+        *item = toml_edit::Item::Table(owned.into_table().expect(invalid_message));
     }
 
     item.as_table_mut()
@@ -304,7 +303,9 @@ fn install_files(src: &Path, dst: &Path) -> AppResult<()> {
         } else {
             remove_file_or_symlink(&dst_path).change_context_lazy(|| AppError::IO)?;
             fs::copy(source_path, &dst_path).change_context_lazy(|| AppError::IO)?;
-            let _ = cmd!("git", "add", &dst_path).run();
+            if let Err(error) = cmd!("git", "add", &dst_path).run() {
+                tracing::debug!(%error, path = %dst_path.display(), "could not stage installed file");
+            }
 
             chmod_non_writable(&dst_path)?;
         }
@@ -364,7 +365,9 @@ fn init_logging() {
     let subscriber = tracing_subscriber::fmt()
         .with_writer(std::io::stderr) // Print to stderr
         .with_env_filter(
-            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+            EnvFilter::builder()
+                .with_default_directive("info".parse().expect("info is a valid filter directive"))
+                .from_env_lossy(),
         )
         .finish();
 
