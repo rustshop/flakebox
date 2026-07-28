@@ -185,17 +185,14 @@ fn item_as_table_mut<'item>(
 fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
     let (path, cargo_toml) = load_root_cargo_toml(opts)?;
 
-    if let Some(toml_edit::Item::Table(workspace)) = cargo_toml.get("workspace") {
-        match workspace.get("resolver") {
-            Some(toml_edit::Item::Value(toml_edit::Value::String(v))) if v.value() == "2" => {}
-            _ => {
-                problems.push(LintItem {
-                    path: path.clone(),
-                    msg: "`workspace.resolver` missing or not set to 'v2'".to_string(),
-                    fix: Some(lint_cargo_toml_fix_resolver_v2),
-                });
-            }
-        }
+    if let Some(toml_edit::Item::Table(workspace)) = cargo_toml.get("workspace")
+        && !workspace_resolver_is_supported(workspace)
+    {
+        problems.push(LintItem {
+            path: path.clone(),
+            msg: "`workspace.resolver` missing or not set to '2' or '3'".to_string(),
+            fix: Some(lint_cargo_toml_fix_resolver_v2),
+        });
     }
     if cargo_toml
         .get("profile")
@@ -209,6 +206,14 @@ fn lint_cargo_toml(opts: &Opts, problems: &mut Vec<LintItem>) -> AppResult<()> {
         });
     }
     Ok(())
+}
+
+fn workspace_resolver_is_supported(workspace: &toml_edit::Table) -> bool {
+    matches!(
+        workspace.get("resolver"),
+        Some(toml_edit::Item::Value(toml_edit::Value::String(resolver)))
+            if resolver.value() == "2" || resolver.value() == "3"
+    )
 }
 
 #[derive(Deserialize)]
@@ -377,6 +382,38 @@ fn init_logging() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cargo_workspace_resolver_accepts_current_versions() {
+        for resolver in ["2", "3"] {
+            let cargo_toml = format!("[workspace]\nresolver = \"{resolver}\"\n")
+                .parse::<toml_edit::DocumentMut>()
+                .expect("valid test manifest");
+            let workspace = cargo_toml["workspace"]
+                .as_table()
+                .expect("workspace is a table");
+
+            assert!(workspace_resolver_is_supported(workspace));
+        }
+    }
+
+    #[test]
+    fn cargo_workspace_resolver_rejects_stale_or_invalid_values() {
+        for manifest in [
+            "[workspace]\n",
+            "[workspace]\nresolver = \"1\"\n",
+            "[workspace]\nresolver = 3\n",
+        ] {
+            let cargo_toml = manifest
+                .parse::<toml_edit::DocumentMut>()
+                .expect("valid test manifest");
+            let workspace = cargo_toml["workspace"]
+                .as_table()
+                .expect("workspace is a table");
+
+            assert!(!workspace_resolver_is_supported(workspace));
+        }
+    }
 
     #[test]
     fn cargo_profile_defaults_disable_debug_info_and_preserve_inline_dev_settings() {
