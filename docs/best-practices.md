@@ -164,3 +164,34 @@ ast-grep = {
   ];
 };
 ```
+
+
+## Lint prose with Vale
+
+Flakebox installs [Vale](https://vale.sh/) and adds a `just vale` recipe. Its
+generated pre-commit hook does nothing until the repository contains a non-empty
+`.vale.ini`, so projects can opt into prose linting by adding their own Vale
+configuration.
+
+Start with Vale's standard configuration file:
+
+```ini
+; .vale.ini
+MinAlertLevel = suggestion
+
+[*]
+BasedOnStyles = Vale
+```
+
+Run `just vale` to lint the repository. Configure another configuration path or
+additional pre-commit arguments through the `vale` module:
+
+```nix
+vale = {
+  configFile = ".config/vale/.vale.ini";
+  pre-commit.args = [
+    "--minAlertLevel"
+    "warning"
+  ];
+};
+```
