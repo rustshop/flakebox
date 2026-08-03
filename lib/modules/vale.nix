@@ -60,8 +60,14 @@ in
           content = ''
             # lint prose with Vale
             [positional-arguments]
-            vale *ARGS="":
-              vale --config ${configFileArg} . "$@"
+            vale *ARGS:
+              #!${pkgs.bash}/bin/bash
+              set -euo pipefail
+              mapfile -d "" -t vale_paths < <(git ls-files -z -- '*.md')
+              if [[ "''${#vale_paths[@]}" -eq 0 ]]; then
+                exit 0
+              fi
+              vale --config ${configFileArg} "$@" -- "''${vale_paths[@]}"
           '';
         };
       })
@@ -72,7 +78,12 @@ in
             return 0
           fi
 
-          vale --config ${configFileArg} . ${preCommitArgs}
+          mapfile -d "" -t vale_paths < <(git ls-files -z -- '*.md')
+          if [[ "''${#vale_paths[@]}" -eq 0 ]]; then
+            return 0
+          fi
+
+          vale --config ${configFileArg} ${preCommitArgs} -- "''${vale_paths[@]}"
         '';
       })
     ]

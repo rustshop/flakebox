@@ -93,7 +93,7 @@ assert assertMsg (
   !(lib.elem pkgs.vale configuredLib.config.env.shellPackages)
 ) "a custom Vale package removes the default package";
 assert assertMsg
-  (lib.hasInfix "--config '.config/vale/with space.ini' . \"\$@\"" configuredLib.config.just.rules.vale.content)
+  (lib.hasInfix "--config '.config/vale/with space.ini' \"\$@\" -- \"\${vale_paths[@]}\"" configuredLib.config.just.rules.vale.content)
   "custom config path is rendered into the just recipe";
 assert assertMsg
   (lib.hasInfix "--minAlertLevel 'warning level' '$HOME; do not run'" configuredLib.config.git.pre-commit.hooks.vale)
@@ -119,8 +119,12 @@ pkgs.runCommand "vale-module-tests"
     mkdir repo
     cd repo
     git init -q
-    touch tracked
-    git add tracked
+    touch tracked.md
+    touch ignored.txt
+    touch -- --output=JSON.md
+    mkdir .direnv
+    touch .direnv/untracked.md
+    git add tracked.md ignored.txt -- --output=JSON.md
 
     export VALE_LOG="$PWD/vale.log"
     pre_commit="${configuredLib.root}/misc/git-hooks/pre-commit"
@@ -138,14 +142,26 @@ pkgs.runCommand "vale-module-tests"
     printf '%s\0' \
       "--config" \
       ".config/vale/with space.ini" \
-      "." \
       "--minAlertLevel" \
       "warning level" \
       '$HOME; do not run' \
+      "--" \
+      "--output=JSON.md" \
+      "tracked.md" \
       > expected.log
     cmp expected.log "$VALE_LOG"
 
-    just --justfile "${configuredLib.root}/justfile" vale \
+    just --working-directory "$PWD" --justfile "${configuredLib.root}/justfile" vale
+    printf '%s\0' \
+      "--config" \
+      ".config/vale/with space.ini" \
+      "--" \
+      "--output=JSON.md" \
+      "tracked.md" \
+      >> expected.log
+    cmp expected.log "$VALE_LOG"
+
+    just --working-directory "$PWD" --justfile "${configuredLib.root}/justfile" vale \
       "argument with spaces" \
       '$HOME' \
       '; do not run' \
@@ -153,13 +169,26 @@ pkgs.runCommand "vale-module-tests"
     printf '%s\0' \
       "--config" \
       ".config/vale/with space.ini" \
-      "." \
       "argument with spaces" \
       '$HOME' \
       '; do not run' \
       "a'b" \
+      "--" \
+      "--output=JSON.md" \
+      "tracked.md" \
       >> expected.log
     cmp expected.log "$VALE_LOG"
+
+    mkdir no-markdown
+    cd no-markdown
+    git init -q
+    mkdir -p .config/vale
+    printf '[*]\nBasedOnStyles = Vale\n' > ".config/vale/with space.ini"
+    export VALE_LOG="$PWD/vale.log"
+    NO_STASH=1 bash "$pre_commit"
+    [ ! -e "$VALE_LOG" ]
+    just --working-directory "$PWD" --justfile "${configuredLib.root}/justfile" vale
+    [ ! -e "$VALE_LOG" ]
 
     touch "$out"
   ''

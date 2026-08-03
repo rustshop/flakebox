@@ -3,7 +3,7 @@
 Android toolchains uses [`android-nixpkgs`](https://github.com/tadfisher/android-nixpkgs) to
 source precompiled Android toolchains.
 
-Toolchain short-names:
+Toolchain short names:
 
 * `aarch64-android` - `aarch64-linux-android` target
 * `arm-android` - `arm-linux-androideabi` target

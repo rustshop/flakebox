@@ -25,7 +25,7 @@ Create a new project:
 > cd flakebox-tutorial/
 ```
 
-Since we don't have a dev shell yet, initialize new project using `cargo` from nixpkgs:
+Since we don't have a dev shell yet, initialize a new project using `cargo` from Nixpkgs:
 
 ```
 > git init .
@@ -236,7 +236,7 @@ If you see:
 direnv: error /home/dpc/tmp/flakebox-tutorial/.envrc is blocked. Run `direnv allow` to approve its content
 ```
 
-it's because you have `direnv` installed on your system and flakebox enabled support for it. If you allow
+it's because you have `direnv` installed on your system and Flakebox enabled support for it. If you allow
 it with `direnv allow`, you will automatically enter your dev shell each time you `cd` into your project.
 
 Verify the files installed by `flakebox install`:
@@ -297,7 +297,7 @@ Skipping semgrep check: .config/semgrep.yaml doesn't exist
 # ... skipped for brevity
 ```
 
-That's better. There's more to Flakebox Dev Shells, but this will do for now.
+That's better. There's more to Flakebox development shells, but this will do for now.
 Let's move to the cool part - building your project with Nix.
 
 ## Building Rust code with Flakebox - setup
@@ -361,14 +361,14 @@ Verify the Nix code is still OK:
 > nix flake check
 ```
 
-Now there is one thing missing: since we want reproduceable builds it is mandatory that we supply a `Cargo.lock` file to the build process to make sure we are know which versions of the dependencies to compile.
+Now one thing is missing: reproducible builds require a `Cargo.lock` file so the build process knows which dependency versions to compile.
 
 ```
 > cargo update
 > git add -N Cargo.lock
 ```
 
-`git add -N <pathspec>` records the intend to add this file to a commit in the future, adding it to gits view. This is needed as nix only looks for files that git is aware of.
+`git add -N <pathspec>` records the intent to add this file to a future commit, adding it to Git's view. This is needed because Nix considers only files that Git knows about.
 
 Let's check if it works:
 
@@ -381,7 +381,7 @@ result/bin/flakebox-tutorial: ELF 64-bit LSB pie executable, x86-64, version 1 (
 Hello, world!
 ```
 
-Tada! It's working! `nix build` creates a `result/` symlink in the current directory pointing the result of the requested derivation (build output in non-Nix).
+It works. `nix build` creates a `result/` symlink in the current directory that points to the requested derivation's build output.
 
 Good time to add `result/` to `.gitignore`:
 
@@ -417,14 +417,14 @@ to names, that can later be used in `<expr>` following
 in.
 
 Our first name binding is `pkgs` which is the standard way to
-get the nixpkgs package set for the current `system`.
+get the Nixpkgs package set for the current `system`.
 
 Next is `flakeboxLib` which exposes all
 Flakebox APIs. `flakebox` is the name of the input
 defined in the flake, `flakebox.lib.mkLib` is
 the function used to initialize the library.
 `flakebox.lib.mkLib pkgs { }` is a function call, where
-`pkgs` is the nixpkgs package set and `{ }` are the
+`pkgs` is the Nixpkgs package set and `{ }` are the
 configuration arguments (empty set, defaults).
 
 This is where you can enable, disable, and configure various Flakebox features. To browse all config options locally, run `flakebox docs` from a Flakebox-enabled project. Alternatively, build the latest documentation with `nix build github:rustshop/flakebox#docs` and open `result/index.html`.
@@ -485,7 +485,7 @@ It returns a function that must be called with ... another function as an argume
 You can see why functional programming is called, well, functional.
 
 The rest of this code block `(craneLib': /* ... */ });` is the actual build
-function. The `craneLib'` is the the [crane](https://crane.dev/) library instance
+function. The `craneLib'` is the [crane](https://crane.dev/) library instance
 already pre-configured for the caller requested environment.
 
 [crane](https://crane.dev/) is a Nix library for building `cargo` projects.

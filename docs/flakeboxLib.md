@@ -28,8 +28,8 @@ in
 ```
 
 `root` must be a Nix path value, not a store-path string produced by
-`builtins.path`. Subpaths must be relative, non-empty, stay below `root`, and
-exist. Filesets preserve symlinks but omit empty directories.
+`builtins.path`. The subpaths must be relative, non-empty, stay below `root`, and
+exist. The selected file sets preserve symlinks but omit empty directories.
 
 Reuse path lists when later build stages need extra inputs:
 
@@ -53,7 +53,7 @@ build. Include every build dependency, including build-script inputs,
 
 ### Fileset composition
 
-`source.filesetFromPaths` returns a nixpkgs file set for composition with
+`source.filesetFromPaths` returns a Nixpkgs file set for composition with
 `pkgs.lib.fileset.union`, `unions`, `intersection`, and `difference`.
 `source.fromFileset` performs the final source import:
 
@@ -103,9 +103,9 @@ pruned at any selected depth.
 ### Glob filtering
 
 `source.fromGlobs` is an explicit native-traversal alternative for large trees.
-It supports nixpkgs `sourceByGlobs` inclusion patterns such as `src/**`, `*.py`,
+It supports Nixpkgs `sourceByGlobs` inclusion patterns such as `src/**`, `*.py`,
 and `**/*.py`, and accepts the same optional `filter`. It retains matched empty
-directories and requires nixpkgs 26.05 or newer. Prefer literal paths and
+directories and requires Nixpkgs 26.05 or newer. Prefer literal paths and
 fileset composition unless measurements justify glob traversal.
 
 ## `flakeboxLib.craneMultiBuild `
@@ -193,7 +193,7 @@ cross derivation.
 
 ## `flakeboxLib.cargoCrap`
 
-`flakeboxLib.cargoCrap` exposes flakebox's packaged `cargo-crap` derivation for
+`flakeboxLib.cargoCrap` exposes Flakebox's packaged `cargo-crap` derivation for
 custom Nix checks and reports.
 
 Most projects should prefer the default `cargo-crap` module integration, which

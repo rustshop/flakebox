@@ -3,10 +3,10 @@
 ## Use `nix develop` and not `nix build` for local development
 
 No matter how optimized, as a general purpose tool Nix will never
-be able to match the the speed and convenience of incremental
+be able to match the speed and convenience of incremental
 builds with `cargo` itself.
 
-Repeadly calling `nix build .#package` during local development
+Repeatedly calling `nix build .#package` during local development
 can quickly become unbearable for developers working on
 something.
 
@@ -20,7 +20,7 @@ In essence it is the same problem that people trying to use
 Docker for daily work would hit, often resolved by mounting
 the source code as a volume into a Docker container providing
 reproducible environment, without rebuilding project from
-scartch every time. Such a setup can be thought of as "poor man's
+scratch every time. Such a setup can be thought of as "poor man's
 Nix dev shell".
 
 Scripts and utilities should be written in such a way to work
@@ -183,8 +183,8 @@ MinAlertLevel = suggestion
 BasedOnStyles = Vale
 ```
 
-Run `just vale` to lint the repository. Configure another configuration path or
-additional pre-commit arguments through the `vale` module:
+Run `just vale` to lint Git-tracked Markdown files. Configure another
+configuration path or additional pre-commit arguments through the `vale` module:
 
 ```nix
 vale = {

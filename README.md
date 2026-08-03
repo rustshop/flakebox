@@ -2,11 +2,11 @@
 
 <p align="center">
   <a href="https://github.com/rustshop/flakebox/actions/workflows/flakebox-ci.yml">
-      <img src="https://github.com/rustshop/flakebox/actions/workflows/flakebox-ci.yml/badge.svg" alt="Github Actions CI Build Status">
+      <img src="https://github.com/rustshop/flakebox/actions/workflows/flakebox-ci.yml/badge.svg" alt="GitHub Actions CI Build Status">
   </a>
   <a href="https://matrix.to/#/#flakebox:matrix.org"><img alt="Chat on Matrix" src="https://img.shields.io/matrix/flakebox:matrix.org.svg"></a>
   <a href="https://github.com/rustshop/flakebox/discussions">
-    <img src="https://img.shields.io/badge/commmunity-discussion-blue" alt="Flakebox Github Discussions">
+    <img src="https://img.shields.io/badge/commmunity-discussion-blue" alt="Flakebox GitHub Discussions">
   </a>
 </p>
 
@@ -67,7 +67,7 @@ some changes and submit a PR. It's OK, we don't mind, it's a demo app.
 
 ## Join the Community
 
-[Our Github Discussions](https://github.com/rustshop/flakebox/discussions)
+[Our GitHub Discussions](https://github.com/rustshop/flakebox/discussions)
 is the best place to ask questions and participate in building Flakebox. Don't be shy.
 
 If you're looking for more interactive conversation, join [Flakebox Matrix channel](https://matrix.to/#/#flakebox:matrix.org).

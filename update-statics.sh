@@ -15,6 +15,7 @@ echo -n > README.md
 {
   printf '<!-- WARNING: THIS FILE IS AUTO-GENERATED. EDIT ./docs/README.md instead -->\n\n'
   sed -e 's#(\.#(./docs#g' < docs/README.md
+  printf '\n'
   echo "# Flakebox Book ToC"
   echo
   echo "The best way to view the Flakebox documentation is by running:"
