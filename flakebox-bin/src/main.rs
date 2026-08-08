@@ -1,3 +1,4 @@
+mod git_hooks;
 mod opts;
 
 use std::fs::{Permissions, set_permissions};
@@ -37,6 +38,7 @@ fn main() -> AppResult<()> {
     match opts.command {
         Commands::Init => init(&opts)?,
         Commands::Install => install(&opts)?,
+        Commands::InstallHooks => git_hooks::install(&opts)?,
         Commands::Docs { docs_dir } => {
             if let Some(docs_dir) = docs_dir {
                 let docs_index = docs_dir.join("index.html");

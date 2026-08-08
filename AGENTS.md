@@ -20,6 +20,7 @@ skill before working with specs or governed code.
 - `lib/mkDevShell.nix` — dev-shell assembly and shellHook sourcing.
 - `lib/modules/rootDir.nix` + `lib/modules/env.nix` — generated repo files and shell hook script.
 - `flakebox-bin/src/main.rs` — `flakebox` CLI commands like `install`, `init`, `lint`.
+- `SECURITY.md` — shared-state trust boundaries and mutation invariants.
 
 ## Generated files: do not edit directly
 

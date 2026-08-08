@@ -181,17 +181,20 @@ pkgs.runCommand "git-hooks-tests"
   {
     nativeBuildInputs = [
       pkgs.bash
+      pkgs.cargo
       pkgs.coreutils
       pkgs.git
       pkgs.gnugrep
       pkgs.gnused
       pkgs.parallel
       timer
+      flakeboxLib.flakeboxBin
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.util-linux ];
   }
   ''
     set -euo pipefail
+    export GIT_PAGER=cat
 
     pre_commit="${flakeboxLib.root}/misc/git-hooks/pre-commit"
     first_line="$(head -n 1 "$pre_commit")"
@@ -222,8 +225,10 @@ pkgs.runCommand "git-hooks-tests"
     bash -n "$commit_msg"
 
     [ -e "${flakeboxLib.root}/misc/git-hooks/commit-template.txt" ]
-    grep -q 'git config commit.template misc/git-hooks/commit-template.txt' \
-      "${flakeboxLib.root}/.config/flakebox/shellHook.sh"
+    shell_hook="${flakeboxLib.root}/.config/flakebox/shellHook.sh"
+    grep -q "flakebox install-hooks" "$shell_hook"
+    ! grep -q 'git config commit.template' "$shell_hook"
+    ! grep -Eq '(^|[[:space:]])(ln|rm|mkdir)([[:space:]]|$)' "$shell_hook"
     grep -q 'hooks/pre-commit' "${flakeboxLib.root}/justfile"
     grep -q 'misc/git-hooks/pre-commit' \
       "${gitEnabledCiLib.root}/.github/workflows/flakebox-ci.yml"
@@ -259,6 +264,385 @@ pkgs.runCommand "git-hooks-tests"
     [ ! -e ${commitTemplateDisabledLib.root}/misc/git-hooks/commit-template.txt ]
     ! grep -q 'git config commit.template' \
       "${commitTemplateDisabledLib.root}/.config/flakebox/shellHook.sh"
+
+    # Shell entry reports all missing integration once and leaves .git untouched.
+    mkdir shell-entry
+    (
+      cd shell-entry
+      git init -q
+      before="$(find .git -printf '%P %y %l\n' | sort)"
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        bash "$shell_hook" >stdout 2>stderr
+      after="$(find .git -printf '%P %y %l\n' | sort)"
+      [ "$before" = "$after" ]
+      [ ! -s stdout ]
+      [ "$(grep -c 'flakebox install-hooks' stderr)" -eq 1 ]
+    )
+
+    # Explicit installation is atomic, idempotent, and serialized across
+    # concurrent installers.
+    mkdir explicit-install
+    (
+      cd explicit-install
+      export HOME="$PWD/home"
+      mkdir "$HOME"
+      git init -q
+      git config --global extensions.worktreeConfig true
+      printf '%s\n' \
+        '[package]' \
+        'name = "git-hooks-fixture"' \
+        'version = "0.0.0"' \
+        'edition = "2024"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      mkdir -p misc/git-hooks .git/hooks
+      cp ${flakeboxLib.root}/misc/git-hooks/pre-commit misc/git-hooks/
+      cp ${flakeboxLib.root}/misc/git-hooks/commit-msg misc/git-hooks/
+      cp ${flakeboxLib.root}/misc/git-hooks/commit-template.txt misc/git-hooks/
+      ln -s "$PWD/misc/git-hooks/pre-commit" .git/hooks/pre-commit
+      ln -s "$PWD/misc/git-hooks/commit-msg" .git/hooks/commit-msg
+
+      export FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root}
+      export FLAKEBOX_PROJECT_ROOT_DIR="$PWD"
+      installer_pids=
+      for _ in $(seq 1 16); do
+        flakebox install-hooks &
+        installer_pids="$installer_pids $!"
+      done
+      for installer_pid in $installer_pids; do
+        wait "$installer_pid"
+      done
+
+      [ "$(readlink .git/hooks/pre-commit)" = "flakebox/pre-commit" ]
+      [ "$(readlink .git/hooks/commit-msg)" = "flakebox/commit-msg" ]
+      [ -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ -e .git/flakebox/hooks/commit-msg-enabled ]
+      [ "$(git config --local --type=bool --get extensions.worktreeConfig)" = true ]
+      ! git config --local --get-all core.bare
+      cmp ${flakeboxLib.root}/.config/flakebox/git-hooks/pre-commit \
+        .git/hooks/flakebox/pre-commit
+      cmp ${flakeboxLib.root}/.config/flakebox/git-hooks/commit-msg \
+        .git/hooks/flakebox/commit-msg
+      git config --null --get commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+      [ -f .git/flakebox-install-hooks.lock ]
+      ! find .git/hooks -name '*.flakebox-new-*' | grep .
+
+      # Common hook state alone is insufficient: each enabled worktree must
+      # have its own installed enablement marker.
+      rm .git/flakebox/hooks/pre-commit-enabled
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+        bash "$shell_hook" >stdout 2>stderr
+      [ "$(grep -c 'flakebox install-hooks' stderr)" -eq 1 ]
+      flakebox install-hooks
+
+      # Values with trailing whitespace or newlines are stale; neither shell
+      # inspection nor installation loses bytes through command substitution.
+      git config --worktree commit.template $'misc/git-hooks/commit-template.txt\n'
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+        bash "$shell_hook" >stdout 2>stderr
+      [ "$(grep -c 'flakebox install-hooks' stderr)" -eq 1 ]
+      flakebox install-hooks
+      git config --null --get commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+
+      # Effective lookup selects the correct higher-precedence worktree value
+      # without concatenating differing values from global and local scopes.
+      git config --global commit.template global-template
+      git config --local commit.template local-template
+      git config --null --get commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+        bash "$shell_hook" >stdout 2>stderr
+      ! grep -q 'flakebox install-hooks' stderr
+
+      # A correct installation succeeds without write access to the hook/config
+      # state, proving that the comparisons bypass every mutation.
+      chmod -R a-w .git
+      flakebox install-hooks
+      chmod -R u+w .git
+
+      # The common-dir dispatchers select policy from the worktree where Git
+      # invoked the hook rather than from the worktree that installed it.
+      git config user.email flakebox@example.invalid
+      git config user.name Flakebox
+      git add Cargo.toml flake.nix src misc
+      git -c core.hooksPath=/nonexistent commit -qm fixture
+      git worktree add -qb linked ../explicit-linked
+      (
+        cd ../explicit-linked
+        export FLAKEBOX_PROJECT_ROOT_DIR="$PWD"
+        export FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root}
+        flakebox install-hooks
+      )
+      chmod u+w misc/git-hooks/pre-commit misc/git-hooks/commit-msg \
+        ../explicit-linked/misc/git-hooks/pre-commit \
+        ../explicit-linked/misc/git-hooks/commit-msg
+      printf '#!/usr/bin/env bash\nprintf main > "$FLAKEBOX_WORKTREE_LOG"\n' \
+        > misc/git-hooks/pre-commit
+      printf '#!/usr/bin/env bash\nprintf linked > "$FLAKEBOX_WORKTREE_LOG"\n' \
+        > ../explicit-linked/misc/git-hooks/pre-commit
+      chmod +x misc/git-hooks/pre-commit \
+        ../explicit-linked/misc/git-hooks/pre-commit
+      dispatcher="$PWD/.git/hooks/flakebox/pre-commit"
+      FLAKEBOX_WORKTREE_LOG="$PWD/main.log" bash "$dispatcher"
+      (
+        cd ../explicit-linked
+        FLAKEBOX_WORKTREE_LOG="$PWD/../explicit-install/linked.log" \
+          bash "$dispatcher"
+      )
+      grep -qx main main.log
+      grep -qx linked linked.log
+
+      # A disabled linked worktree neither removes shared dispatchers nor runs
+      # a stale generated policy, and its template state is isolated.
+      (
+        cd ../explicit-linked
+        export FLAKEBOX_PROJECT_ROOT_DIR="$PWD"
+        export FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root}
+        flakebox install-hooks
+        git_dir="$(git rev-parse --absolute-git-dir)"
+        [ ! -e "$git_dir/flakebox/hooks/pre-commit-enabled" ]
+        [ ! -e "$git_dir/flakebox/hooks/commit-msg-enabled" ]
+        [ -e misc/git-hooks/pre-commit ]
+        ! git config --worktree --get-all commit.template
+        FLAKEBOX_WORKTREE_LOG="$PWD/disabled.log" bash "$dispatcher"
+        [ ! -e disabled.log ]
+      )
+      git config --null --get commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+      [ "$(readlink .git/hooks/pre-commit)" = "flakebox/pre-commit" ]
+      [ "$(readlink .git/hooks/commit-msg)" = "flakebox/commit-msg" ]
+
+      # Granular disablement preserves the shared hooks and each still-enabled
+      # integration. Template cleanup is worktree-local and ownership-exact.
+      export FLAKEBOX_ROOT_DIR_CANDIDATE=${preCommitDisabledLib.root}
+      flakebox install-hooks
+      [ "$(readlink .git/hooks/pre-commit)" = "flakebox/pre-commit" ]
+      [ "$(readlink .git/hooks/commit-msg)" = "flakebox/commit-msg" ]
+      [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ -e .git/flakebox/hooks/commit-msg-enabled ]
+      git config --null --get commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+
+      export FLAKEBOX_ROOT_DIR_CANDIDATE=${commitTemplateDisabledLib.root}
+      flakebox install-hooks
+      [ "$(readlink .git/hooks/pre-commit)" = "flakebox/pre-commit" ]
+      [ "$(readlink .git/hooks/commit-msg)" = "flakebox/commit-msg" ]
+      [ -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ -e .git/flakebox/hooks/commit-msg-enabled ]
+      ! git config --worktree --get-all commit.template
+
+      git config --worktree commit.template foreign-template
+      rm .git/hooks/pre-commit
+      ln -s "$PWD/../explicit-linked/misc/git-hooks/pre-commit" \
+        .git/hooks/pre-commit
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root} \
+        flakebox install-hooks >stdout 2>stderr
+      linked_legacy_status=$?
+      set -e
+      [ "$linked_legacy_status" -ne 0 ]
+      grep -q 'ambiguous legacy-style target' stderr
+      [ "$(readlink .git/hooks/pre-commit)" = \
+        "$PWD/../explicit-linked/misc/git-hooks/pre-commit" ]
+
+      rm .git/hooks/pre-commit
+      ln -s foreign-pre-commit .git/hooks/pre-commit
+      export FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root}
+      flakebox install-hooks
+      [ "$(readlink .git/hooks/pre-commit)" = "foreign-pre-commit" ]
+      [ "$(readlink .git/hooks/commit-msg)" = "flakebox/commit-msg" ]
+      [ "$(git config --worktree --get commit.template)" = foreign-template ]
+      [ "$(git config --local --get commit.template)" = local-template ]
+    )
+
+    # A disabled upgrade neutralizes only legacy direct links whose ownership
+    # is proven by an exact target in the invoking worktree.
+    mkdir legacy-disabled
+    (
+      cd legacy-disabled
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "fresh-disabled"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      mkdir -p misc/git-hooks .git/hooks
+      touch misc/git-hooks/pre-commit misc/git-hooks/commit-msg
+      ln -s "$PWD/misc/git-hooks/pre-commit" .git/hooks/pre-commit
+      ln -s "$PWD/misc/git-hooks/commit-msg" .git/hooks/commit-msg
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks
+      ! git config --local --get extensions.worktreeConfig
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+      [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ ! -e .git/flakebox/hooks/commit-msg-enabled ]
+      [ -e misc/git-hooks/pre-commit ]
+      [ -e misc/git-hooks/commit-msg ]
+
+      ln -s /opt/company/misc/git-hooks/pre-commit .git/hooks/pre-commit
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      foreign_legacy_status=$?
+      set -e
+      [ "$foreign_legacy_status" -ne 0 ]
+      grep -q 'ambiguous legacy-style target' stderr
+      [ "$(readlink .git/hooks/pre-commit)" = \
+        /opt/company/misc/git-hooks/pre-commit ]
+
+      # Unexpected lookup errors fail closed and preserve the legacy link.
+      rm .git/hooks/pre-commit
+      ln -s "$PWD/misc/git-hooks/pre-commit" .git/hooks/pre-commit
+      chmod 000 .git/hooks
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      lookup_status=$?
+      set -e
+      chmod 700 .git/hooks
+      [ "$lookup_status" -ne 0 ]
+      grep -q '.git/hooks/pre-commit' stderr
+      [ "$(readlink .git/hooks/pre-commit)" = \
+        "$PWD/misc/git-hooks/pre-commit" ]
+
+      # Enabled installation refuses both regular and symlink entries without
+      # positive Flakebox ownership evidence.
+      rm .git/hooks/pre-commit
+      printf 'foreign regular hook\n' > .git/hooks/pre-commit
+      cp .git/hooks/pre-commit foreign-regular.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${commitTemplateDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      regular_status=$?
+      set -e
+      [ "$regular_status" -ne 0 ]
+      grep -q 'not a Flakebox-owned symlink' stderr
+      cmp foreign-regular.expected .git/hooks/pre-commit
+
+      rm .git/hooks/pre-commit
+      ln -s /opt/company/pre-commit .git/hooks/pre-commit
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${commitTemplateDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      foreign_symlink_status=$?
+      set -e
+      [ "$foreign_symlink_status" -ne 0 ]
+      grep -q 'points to non-Flakebox target' stderr
+      [ "$(readlink .git/hooks/pre-commit)" = /opt/company/pre-commit ]
+    )
+
+    # A wholly disabled fresh repository neither enables worktree config nor
+    # creates shared hooks or per-worktree enablement markers.
+    mkdir fresh-disabled
+    (
+      cd fresh-disabled
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "fresh-disabled"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${gitDisabledLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks
+      ! git config --local --get extensions.worktreeConfig
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+      [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ ! -e .git/flakebox/hooks/commit-msg-enabled ]
+    )
+
+    # An enabled upgrade migrates the exact previous shared-local template into
+    # the invoking worktree after activating repository-local worktree config.
+    mkdir legacy-template
+    (
+      cd legacy-template
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "legacy-template"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      git config --local commit.template misc/git-hooks/commit-template.txt
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks
+      [ "$(git config --local --type=bool --get extensions.worktreeConfig)" = true ]
+      ! git config --local --get-all commit.template
+      git config --worktree --null --get-all commit.template |
+        cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+    )
+
+    # Enabling worktree config refuses repositories with unusual local core
+    # settings instead of silently changing their interpretation.
+    mkdir unusual-core
+    (
+      cd unusual-core
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "unusual-core"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      git config --local core.worktree "$PWD"
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      install_status=$?
+      set -e
+      [ "$install_status" -ne 0 ]
+      grep -q 'migrate core.worktree to worktree config' stderr
+      ! git config --local --get extensions.worktreeConfig
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+
+      # Non-default and multiple local core.bare values are also rejected.
+      git config --local --unset-all core.worktree
+      git config --local core.bare true
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      bare_status=$?
+      set -e
+      [ "$bare_status" -ne 0 ]
+      grep -q 'non-default local core.bare' stderr
+      ! git --git-dir=.git config --local --get extensions.worktreeConfig
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+
+      git --git-dir=.git config --local --add core.bare false
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      multiple_bare_status=$?
+      set -e
+      [ "$multiple_bare_status" -ne 0 ]
+      grep -q 'non-default local core.bare' stderr
+      ! git --git-dir=.git config --local --get extensions.worktreeConfig
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+    )
 
     # The timer preserves success, failures, errexit, signals, and byte-exact
     # ordinary output when no warning is emitted.

@@ -19,6 +19,8 @@ pub struct Opts {
 pub enum Commands {
     Init,
     Install,
+    /// Install Flakebox's generated Git hooks and commit template.
+    InstallHooks,
     Docs {
         #[arg(long, env = "FLAKEBOX_DOCS_DIR")]
         docs_dir: Option<PathBuf>,

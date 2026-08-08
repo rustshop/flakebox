@@ -151,24 +151,17 @@ in
             ${content}
           '';
         };
-
-      env.shellHooks = [
-        ''
+      rootDir.".config/flakebox/git-hooks/commit-msg" = {
+        source = pkgs.writeScript "flakebox-commit-msg-dispatcher" ''
+          #!/usr/bin/env bash
           root="$(git rev-parse --show-toplevel)"
-          dot_git="$(git rev-parse --git-common-dir)"
-          if [[ ! -d "''${dot_git}/hooks" ]]; then mkdir -p "''${dot_git}/hooks"; fi
-          # fix old bug
-          if [[ -e "''${dot_git}/hooks/comit-msg" || -L "''${dot_git}/hooks/comit-msg" ]]; then
-            rm -f "''${dot_git}/hooks/comit-msg"
+          git_dir="$(git rev-parse --absolute-git-dir)"
+          if [[ ! -e "''${git_dir}/flakebox/hooks/commit-msg-enabled" ]]; then
+            exit 0
           fi
-          hook="''${dot_git}/hooks/commit-msg"
-          source="''${root}/misc/git-hooks/commit-msg"
-          if [[ ! -e "''${hook}" ]] || ! cmp -s "''${source}" "''${hook}"; then
-            rm -f "''${hook}"
-            ln -sf "''${source}" "''${hook}"
-          fi
-        ''
-      ];
+          exec bash "''${root}/misc/git-hooks/commit-msg" "$@"
+        '';
+      };
 
     })
 
@@ -262,24 +255,18 @@ in
             #
           '';
         };
-
-      env.shellHooks = [
-        ''
+      rootDir.".config/flakebox/git-hooks/pre-commit" = {
+        source = pkgs.writeScript "flakebox-pre-commit-dispatcher" ''
+          #!/usr/bin/env bash
           root="$(git rev-parse --show-toplevel)"
-          dot_git="$(git rev-parse --git-common-dir)"
-          if [[ ! -d "''${dot_git}/hooks" ]]; then mkdir -p "''${dot_git}/hooks"; fi
-          # fix old bug
-          if [[ -e "''${dot_git}/hooks/pre-comit" || -L "''${dot_git}/hooks/pre-comit" ]]; then
-            rm -f "''${dot_git}/hooks/pre-comit"
+          git_dir="$(git rev-parse --absolute-git-dir)"
+          if [[ ! -e "''${git_dir}/flakebox/hooks/pre-commit-enabled" ]]; then
+            exit 0
           fi
-          hook="''${dot_git}/hooks/pre-commit"
-          source="''${root}/misc/git-hooks/pre-commit"
-          if [[ ! -e "''${hook}" ]] || ! cmp -s "''${source}" "''${hook}"; then
-            rm -f "''${hook}"
-            ln -sf "''${source}" "''${hook}"
-          fi
-        ''
-      ];
+          exec bash "''${root}/misc/git-hooks/pre-commit" "$@"
+        '';
+      };
+
       env.shellPackages = [ gitHookCheckTimer ];
 
     })
@@ -294,15 +281,50 @@ in
         );
       };
 
+    })
+
+    (lib.mkIf config.git.enable {
       env.shellHooks = [
         ''
-          # set template
-          if [[ "$(git config --get commit.template || true)" != "misc/git-hooks/commit-template.txt" ]]; then
-            git config commit.template misc/git-hooks/commit-template.txt
+          flakebox_git_integration_outdated=
+          if root="$(git rev-parse --show-toplevel 2>/dev/null)" &&
+            dot_git="$(git rev-parse --git-common-dir 2>/dev/null)" &&
+            git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null)"; then
+            ${lib.optionalString config.git.pre-commit.enable ''
+              hook="''${dot_git}/hooks/pre-commit"
+              dispatcher="''${dot_git}/hooks/flakebox/pre-commit"
+              source="''${FLAKEBOX_ROOT_DIR_CANDIDATE}/.config/flakebox/git-hooks/pre-commit"
+              if [[ ! -e "''${git_dir}/flakebox/hooks/pre-commit-enabled" ]] ||
+                [[ ! -L "''${hook}" ]] ||
+                [[ "$(readlink "''${hook}")" != "flakebox/pre-commit" ]] ||
+                ! cmp -s "''${source}" "''${dispatcher}"; then
+                flakebox_git_integration_outdated=1
+              fi
+            ''}
+            ${lib.optionalString config.git.commit-msg.enable ''
+              hook="''${dot_git}/hooks/commit-msg"
+              dispatcher="''${dot_git}/hooks/flakebox/commit-msg"
+              source="''${FLAKEBOX_ROOT_DIR_CANDIDATE}/.config/flakebox/git-hooks/commit-msg"
+              if [[ ! -e "''${git_dir}/flakebox/hooks/commit-msg-enabled" ]] ||
+                [[ ! -L "''${hook}" ]] ||
+                [[ "$(readlink "''${hook}")" != "flakebox/commit-msg" ]] ||
+                ! cmp -s "''${source}" "''${dispatcher}"; then
+                flakebox_git_integration_outdated=1
+              fi
+            ''}
+            ${lib.optionalString config.git.commit-template.enable ''
+              if ! git config --null --get commit.template 2>/dev/null |
+                cmp -s - <(printf 'misc/git-hooks/commit-template.txt\0'); then
+                flakebox_git_integration_outdated=1
+              fi
+            ''}
           fi
+          if [[ -n "''${flakebox_git_integration_outdated}" ]]; then
+            >&2 echo "ℹ️  Flakebox Git integration is missing or outdated. Run 'flakebox install-hooks'."
+          fi
+          unset flakebox_git_integration_outdated dispatcher git_dir hook source root dot_git
         ''
       ];
-
     })
 
   ];

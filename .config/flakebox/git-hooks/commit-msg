@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+root="$(git rev-parse --show-toplevel)"
+git_dir="$(git rev-parse --absolute-git-dir)"
+if [[ ! -e "${git_dir}/flakebox/hooks/commit-msg-enabled" ]]; then
+  exit 0
+fi
+exec bash "${root}/misc/git-hooks/commit-msg" "$@"
