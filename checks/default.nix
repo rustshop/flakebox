@@ -31,6 +31,7 @@ onlyDrvs (
     }
     // lib.optionalAttrs (pkgs.stdenv.buildPlatform.system == "x86_64-linux") {
       crossLinkerCompression = callPackage ./cross-linker-compression.nix { };
+      linkerCompatibility = callPackage ./linker-compatibility.nix { inherit mkLib; };
       cellAwareCrossInputs = callPackage ./cell-aware-cross-inputs { };
     }
   )

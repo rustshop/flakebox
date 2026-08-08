@@ -54,6 +54,8 @@ else
         '';
       };
 
+    wildSupportsDebugCompression = lib.versionAtLeast (pkgs.wild.version or "0") "0.9.0";
+
     # https://github.com/NixOS/nixpkgs/blob/f7ac75f242ca29f9160b97917dec8ebd4dfbe008/doc/release-notes/rl-2505.section.md?plain=1#L90
     fixedTarget = if target == "arm64-apple-darwin" then "aarch64-apple-darwin" else target;
     target_underscores = lib.strings.replaceStrings [ "-" ] [ "_" ] fixedTarget;
@@ -89,7 +91,9 @@ else
         if pkgs.stdenv.isLinux && config.linker.wild.enable && canUseWild && pkgs ? useWildLinker then
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-              "-C link-arg=--ld-path=${wild-wrapped}/bin/wild -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
+              "-C link-arg=--ld-path=${wild-wrapped}/bin/wild "
+              + lib.optionalString wildSupportsDebugCompression "-C link-arg=-Wl,--compress-debug-sections=zstd "
+              + extraRustFlags;
           }
         else if
           config.linker.mold.enable
@@ -103,10 +107,11 @@ else
               "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
           }
         else if pkgs.stdenv.isLinux then
-          # compressed debug sections, only supported on Linux
+          # GNU ld builds do not necessarily include zstd support. Nixpkgs'
+          # binutils supports the older and more widely available zlib format.
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
-              "-C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
+              "-C link-arg=-Wl,--compress-debug-sections=zlib ${extraRustFlags}";
           }
         else
           {

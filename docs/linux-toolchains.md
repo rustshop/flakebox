@@ -11,8 +11,10 @@ These toolchains use Nixpkgs cross-compilation packages, which
 are not guaranteed to be cached, so building them might take a
 long time. Binary cache is required to make it practical.
 
-Native Wild and mold linkers compress debug sections with zstd. For
-non-native targets, Flakebox instead asks Nixpkgs' target-specific GNU
-linker to use zlib, the strongest configured format it supports.
+Native Wild 0.9 and newer and mold linkers compress debug sections with
+zstd. Flakebox omits debug compression for older Wild versions, which do
+not support the compression option. When Flakebox uses GNU ld, including
+for non-native targets, it asks the linker to use the more widely
+available zlib format instead.
 
 These toolchains don't work on MacOS right now (unimplemented in Nixpkgs).
