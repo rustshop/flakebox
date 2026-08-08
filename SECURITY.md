@@ -50,6 +50,22 @@ configuration. Disablement does not enable the extension; it unsets an existing
 worktree value only when every byte matches Flakebox's value. Foreign worktree,
 local, and global values remain unchanged.
 
+The installer separates validation from mutation. Under its common-directory
+lock, it builds a validated plan for every enabled and disabled hook plus all
+template and worktree-config ownership safeguards before changing any hook,
+dispatcher, marker, or Git configuration. Validation includes dormant
+`config.worktree` content that enabling `extensions.worktreeConfig` would
+activate. Markers require a regular file with exact Flakebox content and mode.
+Dispatchers require either the same byte-and-mode match or a regular file plus
+the installed reserved hook link as independent ownership evidence.
+Byte-identical symlinks remain foreign. A foreign worktree template is refused
+rather than overwritten.
+An I/O failure during the later multi-artifact apply phase can still leave a safe
+partial installation. Rerunning converges owned destinations. If an error says
+that an exclusively created temporary path was preserved, inspect and remove that
+named path explicitly; Flakebox never guesses that an occupied temporary path is
+safe to delete.
+
 Git's `core.hooksPath` can redirect hook lookup away from the common hook
 directory. Flakebox does not override or validate that setting. Repository
 owners who configure an external hook path must arrange equivalent enforcement;
@@ -65,17 +81,32 @@ the process exits. The lock serializes Flakebox installers only; unrelated
 programs do not have to honor it.
 
 After acquiring the lock, the installer re-reads candidate and installed state.
-It writes each changed dispatcher or symlink to a neighboring temporary path and
-renames it into place. A hook reader therefore sees the complete old entry or
-the complete new entry. Git protects configuration replacement with its own
-`config.lock` transaction. An unrelated concurrent Git configuration writer can
-still cause one command to fail, but Git does not expose a partially written
-configuration.
+It creates each neighboring temporary path exclusively and never removes an
+unexpected occupant. Immediately before a destructive destination operation, it
+checks that the destination still has the state captured by the validated plan,
+then renames the complete temporary entry into place. A hook reader therefore
+sees the complete old entry or the complete new entry. Git protects configuration
+replacement with its own `config.lock` transaction.
+
+The Flakebox lock does not exclude unrelated writers. Revalidation prevents
+ordinary changes between planning and apply from being silently overwritten, but
+portable filesystem APIs cannot make the final check and replacement one
+conditional atomic operation. An adversarial writer can still win that narrow
+TOCTOU window or change an entry after installation. Git configuration uses
+rolling snapshots: the installer revalidates the affected config file immediately
+before each Git transaction, then captures the resulting bytes for the next
+transaction. Removals also match the exact Flakebox value, so an intervening
+foreign value is not selected for deletion. A writer can still race within one
+check-and-Git-command interval or make a command fail. These races can leave a
+partial Flakebox installation, but the installer does not claim transactionality
+against processes that ignore its lock.
 
 Installation updates multiple entries and is not one transaction across every
 hook and configuration. A process failure can leave a mix of old and new
 entries. Re-run `flakebox install-hooks`; its comparisons skip correct entries
-and converge the remaining Flakebox-owned state.
+and converge the remaining Flakebox-owned destinations. A failed write or rename
+can preserve its named PID-scoped temporary entry to avoid deleting a path an
+outside writer may have replaced. Inspect and remove that temporary explicitly.
 
 
 ## Verification and revisit triggers

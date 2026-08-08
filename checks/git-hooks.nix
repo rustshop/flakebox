@@ -6,6 +6,7 @@
 
 let
   timer = pkgs.callPackage ../lib/pkgs/git-hook-check-timer.nix { };
+  testFlakeboxBin = flakeboxLib.flakeboxBin.override { testSupport = true; };
 
   mkHookFixture =
     hooks:
@@ -184,17 +185,46 @@ pkgs.runCommand "git-hooks-tests"
       pkgs.cargo
       pkgs.coreutils
       pkgs.git
+      pkgs.gnutar
       pkgs.gnugrep
       pkgs.gnused
       pkgs.parallel
       timer
-      flakeboxLib.flakeboxBin
+      testFlakeboxBin
     ]
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.util-linux ];
   }
   ''
     set -euo pipefail
     export GIT_PAGER=cat
+
+    snapshot_managed_state() {
+      local snapshot="$1"
+      local paths=(.git/hooks)
+      if [ -e .git/flakebox ]; then
+        paths+=(.git/flakebox)
+      fi
+      tar --sort=name --format=gnu --mtime=@0 -cf "$snapshot" "''${paths[@]}"
+      cp .git/config "$snapshot.config"
+      if [ -e .git/config.worktree ]; then
+        cp .git/config.worktree "$snapshot.config.worktree"
+      else
+        : > "$snapshot.no-config-worktree"
+      fi
+    }
+
+    assert_managed_state() {
+      local expected="$1"
+      local actual="$expected.actual"
+      snapshot_managed_state "$actual"
+      cmp "$expected" "$actual"
+      cmp "$expected.config" "$actual.config"
+      if [ -e "$expected.no-config-worktree" ]; then
+        [ -e "$actual.no-config-worktree" ]
+      else
+        cmp "$expected.config.worktree" "$actual.config.worktree"
+      fi
+    }
 
     pre_commit="${flakeboxLib.root}/misc/git-hooks/pre-commit"
     first_line="$(head -n 1 "$pre_commit")"
@@ -338,12 +368,22 @@ pkgs.runCommand "git-hooks-tests"
       [ "$(grep -c 'flakebox install-hooks' stderr)" -eq 1 ]
       flakebox install-hooks
 
-      # Values with trailing whitespace or newlines are stale; neither shell
-      # inspection nor installation loses bytes through command substitution.
+      # Values with trailing whitespace or newlines are byte-distinct. Shell
+      # inspection notices them, and explicit installation preserves/refuses
+      # them as foreign rather than losing bytes through command substitution.
       git config --worktree commit.template $'misc/git-hooks/commit-template.txt\n'
+      cp .git/config.worktree newline-template.expected
       FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
         bash "$shell_hook" >stdout 2>stderr
       [ "$(grep -c 'flakebox install-hooks' stderr)" -eq 1 ]
+      set +e
+      flakebox install-hooks >newline.stdout 2>newline.stderr
+      newline_template_status=$?
+      set -e
+      [ "$newline_template_status" -ne 0 ]
+      grep -q 'worktree commit.template has a non-Flakebox value' newline.stderr
+      cmp newline-template.expected .git/config.worktree
+      git config --worktree --unset-all commit.template
       flakebox install-hooks
       git config --null --get commit.template |
         cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
@@ -360,9 +400,9 @@ pkgs.runCommand "git-hooks-tests"
 
       # A correct installation succeeds without write access to the hook/config
       # state, proving that the comparisons bypass every mutation.
-      chmod -R a-w .git
+      chmod a-w .git .git/hooks .git/hooks/flakebox .git/flakebox .git/flakebox/hooks
       flakebox install-hooks
-      chmod -R u+w .git
+      chmod u+w .git .git/hooks .git/hooks/flakebox .git/flakebox .git/flakebox/hooks
 
       # The common-dir dispatchers select policy from the worktree where Git
       # invoked the hook rather than from the worktree that installed it.
@@ -511,7 +551,7 @@ pkgs.runCommand "git-hooks-tests"
       set -e
       chmod 700 .git/hooks
       [ "$lookup_status" -ne 0 ]
-      grep -q '.git/hooks/pre-commit' stderr
+      grep -q '.git/hooks' stderr
       [ "$(readlink .git/hooks/pre-commit)" = \
         "$PWD/misc/git-hooks/pre-commit" ]
 
@@ -564,6 +604,80 @@ pkgs.runCommand "git-hooks-tests"
       [ ! -e .git/hooks/commit-msg ]
       [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
       [ ! -e .git/flakebox/hooks/commit-msg-enabled ]
+
+      # Reserved dispatcher and marker paths also require positive ownership
+      # evidence before any subsystem changes.
+      git config --local --unset-all core.bare
+      git config --local extensions.worktreeConfig true
+      git config --worktree commit.template misc/git-hooks/commit-template.txt
+      mkdir -p .git/hooks/flakebox
+      printf 'foreign dispatcher\n' > .git/hooks/flakebox/pre-commit
+      cp .git/config config.expected
+      cp .git/config.worktree config-worktree.expected
+      cp .git/hooks/flakebox/pre-commit dispatcher.expected
+      snapshot_managed_state dispatcher-state.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      foreign_dispatcher_status=$?
+      set -e
+      [ "$foreign_dispatcher_status" -ne 0 ]
+      grep -q 'not proven to be Flakebox-owned' stderr
+      cmp config.expected .git/config
+      cmp config-worktree.expected .git/config.worktree
+      cmp dispatcher.expected .git/hooks/flakebox/pre-commit
+      assert_managed_state dispatcher-state.expected
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+
+      rm .git/hooks/flakebox/pre-commit
+      ln -s ${flakeboxLib.root}/.config/flakebox/git-hooks/pre-commit \
+        .git/hooks/flakebox/pre-commit
+      snapshot_managed_state dispatcher-symlink-state.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      dispatcher_symlink_status=$?
+      set -e
+      [ "$dispatcher_symlink_status" -ne 0 ]
+      grep -q 'not a Flakebox-owned regular file' stderr
+      assert_managed_state dispatcher-symlink-state.expected
+
+      rm .git/hooks/flakebox/pre-commit
+      mkdir -p .git/flakebox/hooks
+      printf 'foreign marker\n' > .git/flakebox/hooks/pre-commit-enabled
+      cp .git/flakebox/hooks/pre-commit-enabled marker.expected
+      snapshot_managed_state marker-state.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      foreign_marker_status=$?
+      set -e
+      [ "$foreign_marker_status" -ne 0 ]
+      grep -q 'not a Flakebox-owned enablement marker' stderr
+      cmp config.expected .git/config
+      cmp config-worktree.expected .git/config.worktree
+      cmp marker.expected .git/flakebox/hooks/pre-commit-enabled
+      assert_managed_state marker-state.expected
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+
+      rm .git/flakebox/hooks/pre-commit-enabled
+      printf 'enabled\n' > exact-marker
+      ln -s "$PWD/exact-marker" .git/flakebox/hooks/pre-commit-enabled
+      snapshot_managed_state marker-symlink-state.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      marker_symlink_status=$?
+      set -e
+      [ "$marker_symlink_status" -ne 0 ]
+      grep -q 'not a Flakebox-owned regular enablement marker' stderr
+      assert_managed_state marker-symlink-state.expected
     )
 
     # An enabled upgrade migrates the exact previous shared-local template into
@@ -587,6 +701,210 @@ pkgs.runCommand "git-hooks-tests"
       ! git config --local --get-all commit.template
       git config --worktree --null --get-all commit.template |
         cmp - <(printf 'misc/git-hooks/commit-template.txt\0')
+    )
+
+    # Every ownership and config safeguard runs before the first artifact
+    # mutation. Combined foreign hook/config state is byte-exact after refusal.
+    mkdir foreign-preflight
+    (
+      cd foreign-preflight
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "foreign-preflight"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      git config --local --unset-all core.bare
+      git config --local extensions.worktreeConfig true
+      git config --worktree commit.template foreign-template
+      mkdir -p .git/hooks
+      printf 'foreign regular hook\n' > .git/hooks/pre-commit
+      ln -s /opt/company/commit-msg .git/hooks/commit-msg
+      cp .git/config config.expected
+      cp .git/config.worktree config-worktree.expected
+      cp .git/hooks/pre-commit pre-commit.expected
+      commit_msg_target="$(readlink .git/hooks/commit-msg)"
+      snapshot_managed_state combined-state.expected
+
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      combined_foreign_status=$?
+      set -e
+      [ "$combined_foreign_status" -ne 0 ]
+      grep -q 'not a Flakebox-owned symlink' stderr
+      cmp config.expected .git/config
+      cmp config-worktree.expected .git/config.worktree
+      cmp pre-commit.expected .git/hooks/pre-commit
+      [ "$(readlink .git/hooks/commit-msg)" = "$commit_msg_target" ]
+      [ ! -e .git/hooks/flakebox ]
+      [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ ! -e .git/flakebox/hooks/commit-msg-enabled ]
+      ! find .git/hooks -name '*.flakebox-new-*' | grep .
+      assert_managed_state combined-state.expected
+
+      # With acceptable hook destinations, the foreign worktree template itself
+      # refuses installation before hooks or configuration change.
+      rm .git/hooks/pre-commit .git/hooks/commit-msg
+      cp .git/config config.expected
+      cp .git/config.worktree config-worktree.expected
+      snapshot_managed_state template-state.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      foreign_template_status=$?
+      set -e
+      [ "$foreign_template_status" -ne 0 ]
+      grep -q 'worktree commit.template has a non-Flakebox value' stderr
+      cmp config.expected .git/config
+      cmp config-worktree.expected .git/config.worktree
+      [ ! -e .git/hooks/pre-commit ]
+      [ ! -e .git/hooks/commit-msg ]
+      [ ! -e .git/hooks/flakebox ]
+      [ ! -e .git/flakebox/hooks/pre-commit-enabled ]
+      [ ! -e .git/flakebox/hooks/commit-msg-enabled ]
+      assert_managed_state template-state.expected
+
+    )
+
+    # Reserved parent namespaces must be real directories. Symlinks must not
+    # redirect dispatcher or marker writes into foreign trees.
+    mkdir foreign-parent-namespaces
+    (
+      cd foreign-parent-namespaces
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "foreign-parent-namespaces"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src foreign-dispatchers foreign-markers
+      touch src/lib.rs flake.nix
+
+      ln -s "$PWD/foreign-dispatchers" .git/hooks/flakebox
+      snapshot_managed_state dispatcher-parent.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      dispatcher_parent_status=$?
+      set -e
+      [ "$dispatcher_parent_status" -ne 0 ]
+      grep -q 'not an ownership-safe directory' stderr
+      assert_managed_state dispatcher-parent.expected
+      [ ! -e foreign-dispatchers/pre-commit ]
+
+      rm .git/hooks/flakebox
+      ln -s "$PWD/foreign-markers" .git/flakebox
+      snapshot_managed_state marker-parent.expected
+      set +e
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      marker_parent_status=$?
+      set -e
+      [ "$marker_parent_status" -ne 0 ]
+      grep -q 'not an ownership-safe directory' stderr
+      assert_managed_state marker-parent.expected
+      [ ! -e foreign-markers/hooks ]
+    )
+
+    # Dormant worktree configuration must be validated before enabling the
+    # extension that makes it active. Both absent and explicitly false extension
+    # states preserve the complete repository state on refusal.
+    mkdir dormant-worktree-config
+    (
+      cd dormant-worktree-config
+      git init -q
+      printf '%s\n' \
+        '[package]' \
+        'name = "dormant-worktree-config"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      git config --file .git/config.worktree commit.template foreign-dormant-template
+
+      for extension_state in absent false; do
+        if [ "$extension_state" = false ]; then
+          git config --local extensions.worktreeConfig false
+        fi
+        snapshot_managed_state "dormant-$extension_state.expected"
+        set +e
+        FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+        FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+          flakebox install-hooks >stdout 2>stderr
+        dormant_status=$?
+        set -e
+        [ "$dormant_status" -ne 0 ]
+        grep -q 'worktree commit.template has a non-Flakebox value' stderr
+        assert_managed_state "dormant-$extension_state.expected"
+        [ ! -e .git/hooks/pre-commit ]
+        [ ! -e .git/hooks/commit-msg ]
+      done
+    )
+
+    ${pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+      # Git paths stay byte-exact on Unix. Dormant foreign configuration in a
+      # non-UTF-8 repository path must still be found and preserved. APFS rejects
+      # this filename, so supported macOS checks exercise the portable paths.
+      non_utf8_project="$(printf 'non-utf8-\\377')"
+      mkdir "$non_utf8_project"
+      (
+        cd "$non_utf8_project"
+        git init -q
+        printf '%s\n' \
+          '[package]' \
+          'name = "non-utf8-project"' \
+          'version = "0.0.0"' \
+          > Cargo.toml
+        mkdir src
+        touch src/lib.rs flake.nix
+        git config --file .git/config.worktree commit.template foreign-non-utf8-template
+        snapshot_managed_state non-utf8.expected
+        set +e
+        FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+        FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+          flakebox install-hooks >stdout 2>stderr
+        non_utf8_status=$?
+        set -e
+        [ "$non_utf8_status" -ne 0 ]
+        grep -q 'worktree commit.template has a non-Flakebox value' stderr
+        assert_managed_state non-utf8.expected
+      )
+    ''}
+
+    # Recheck activation invariants after migrating default core.bare. The
+    # fault-injection seam adds a foreign value between the removal and activation
+    # transactions; the installer must preserve it and refuse the extension.
+    mkdir activation-race
+    (
+      cd activation-race
+      git init -q
+      git config --local core.bare false
+      printf '%s\n' \
+        '[package]' \
+        'name = "activation-race"' \
+        'version = "0.0.0"' \
+        > Cargo.toml
+      mkdir src
+      touch src/lib.rs flake.nix
+      set +e
+      FLAKEBOX_TEST_INJECT_CORE_BARE_AFTER_MIGRATION=1 \
+      FLAKEBOX_ROOT_DIR_CANDIDATE=${flakeboxLib.root} \
+      FLAKEBOX_PROJECT_ROOT_DIR="$PWD" \
+        flakebox install-hooks >stdout 2>stderr
+      activation_race_status=$?
+      set -e
+      [ "$activation_race_status" -ne 0 ]
+      grep -q 'core.bare changed during installation' stderr
+      [ "$(git config --local --get core.bare)" = true ]
+      ! git config --local --get extensions.worktreeConfig
+      [ ! -e .git/config.worktree ]
     )
 
     # Enabling worktree config refuses repositories with unusual local core

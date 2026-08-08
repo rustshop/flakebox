@@ -98,6 +98,17 @@ rename it into place, so readers see either the previous entry or the complete
 new entry. Git updates the configuration through its own `config.lock`
 transaction.
 
+All hook ownership, filesystem inspection, template ownership, dormant
+worktree-config inspection, and worktree-configuration safeguards produce one
+validated plan under the installer lock before the first hook, marker,
+dispatcher, or Git-config mutation. A foreign worktree template or hook therefore
+makes the command fail without changing either subsystem. Dispatchers and markers
+must be regular files. Markers require exact Flakebox content and mode;
+dispatchers require that match or the installed reserved hook link as separate
+ownership evidence. Symlinks do not prove file ownership even when their targets
+provide the same bytes. Reserved parent namespaces must also be real directories;
+Flakebox refuses symlinked parents instead of following them.
+
 Linked worktrees share their Git hook directory. Each installed hook therefore
 points to a shared Flakebox dispatcher, which asks Git for the invoking worktree
 and runs that worktree's generated policy when present. A disabled worktree
@@ -110,12 +121,26 @@ hook-only installation does not enable the extension. Flakebox refuses
 activation when non-default local `core.worktree` or `core.bare` values require
 manual migration under Git's worktree-config rules.
 
-The Flakebox lock coordinates only `flakebox install-hooks` processes. An
-unrelated process that writes Git configuration concurrently can still win the
-race for `.git/config.lock`; Git then rejects one writer rather than exposing a
-partial configuration. The persistent Flakebox lock file avoids stale-lock
-recovery because the operating system releases its advisory lock when a process
-exits.
+The Flakebox lock coordinates only `flakebox install-hooks` processes. Apply
+creates temporary entries exclusively, preserves unexpected temporary occupants,
+and revalidates each destination immediately before destructive replacement.
+An unrelated process can still win the narrow interval between revalidation and
+rename, change an installed entry afterward, or race for `.git/config.lock`.
+Configuration apply similarly maintains rolling file snapshots, revalidates
+immediately before every Git command, and restricts removals to the exact
+Flakebox value. The residual race is one check-and-command interval rather than
+the whole multi-command apply phase.
+Flakebox therefore guarantees mutation-free validation refusals and avoids
+knowingly overwriting concurrent foreign state, but it does not claim a
+multi-file transaction against writers that ignore its lock. The persistent
+lock file avoids stale-lock recovery because the operating system releases its
+advisory lock when a process exits.
+
+A failed write or rename can preserve the named PID-scoped temporary path. This
+is deliberate: an outside writer may have replaced that path, so automatic
+cleanup could delete foreign state. Inspect and remove the path named in the
+error before retrying. Reruns converge managed destinations, not unknown
+temporary occupants.
 
 
 ### Disabling commit integration
