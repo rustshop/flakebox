@@ -18,7 +18,9 @@
     };
 
     android-nixpkgs = {
-      url = "github:tadfisher/android-nixpkgs?rev=0afc63ee6baf0914918169427744cc09ee651ebc"; # upstream emulator build fix
+      # Keep the emulator build fix and use stable platform-tools 37.0.1,
+      # whose archives match Google's repository metadata.
+      url = "github:tadfisher/android-nixpkgs?rev=1d5e41f183a3e69cc99678bfa82483adf3a60b0a";
       inputs.flake-utils.follows = "flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };

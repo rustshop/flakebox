@@ -287,7 +287,7 @@ in
       env.shellHooks = [
         ''
           flakebox_git_integration_outdated=
-          if root="$(git rev-parse --show-toplevel 2>/dev/null)" &&
+          if git rev-parse --show-toplevel >/dev/null 2>&1 &&
             dot_git="$(git rev-parse --git-common-dir 2>/dev/null)" &&
             git_dir="$(git rev-parse --absolute-git-dir 2>/dev/null)"; then
             ${lib.optionalString config.git.pre-commit.enable ''
@@ -322,7 +322,7 @@ in
           if [[ -n "''${flakebox_git_integration_outdated}" ]]; then
             >&2 echo "ℹ️  Flakebox Git integration is missing or outdated. Run 'flakebox install-hooks'."
           fi
-          unset flakebox_git_integration_outdated dispatcher git_dir hook source root dot_git
+          unset flakebox_git_integration_outdated dispatcher git_dir hook source dot_git
         ''
       ];
     })
