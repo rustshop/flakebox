@@ -163,7 +163,8 @@ fn main() {
 
     if let Ok(check_result) = &check_result {
         if let Some(warning) = slow_check_warning(&check_name, check_result.elapsed) {
-            // A diagnostic write failure must never replace the check's exit status.
+            // A diagnostic write failure must never replace the check's exit
+            // status.
             let separator = if env::var_os(COMPACT_WARNINGS_ENV).as_deref() == Some(OsStr::new("1"))
             {
                 std::str::from_utf8(WARNING_MARKER).expect("warning marker is UTF-8")

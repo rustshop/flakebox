@@ -134,7 +134,7 @@ typos-fix-all:
 # lint prose with Vale
 [positional-arguments]
 vale *ARGS:
-  #!/nix/store/0641h8qfqaxnwrsw2nzrz6i1wbzyx92l-bash-interactive-5.3p9/bin/bash
+  #!/nix/store/13czpvp88x852739v5xi04s871pn35b5-bash-interactive-5.3p9/bin/bash
   set -euo pipefail
   mapfile -d "" -t vale_paths < <(git ls-files -z -- '*.md')
   if [[ "${#vale_paths[@]}" -eq 0 ]]; then
