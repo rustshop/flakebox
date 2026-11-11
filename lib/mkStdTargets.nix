@@ -13,6 +13,23 @@
   android-nixpkgs,
 }:
 { ... }@mkStdTargetsArgs:
+let
+  # bindgen for a cross Linux target. libclang must come from the same LLVM as
+  # the cross clang: clang-sys takes its include search paths from that clang
+  # (through `LLVM_CONFIG_PATH_<target>`), and a libclang of another version
+  # rejects those builtin headers. The unwrapped clang reports no libc include
+  # path, so add the target glibc headers explicitly.
+  crossLinuxBindgenArgs =
+    crossPkgs: target_underscores:
+    let
+      llvmPackages = crossPkgs.buildPackages.llvmPackages;
+    in
+    {
+      LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib/";
+      "BINDGEN_EXTRA_CLANG_ARGS_${target_underscores}" =
+        "-isystem ${crossPkgs.stdenv.cc.libc.dev}/include";
+    };
+in
 {
   default = mkNativeTarget {
     canUseWild = true;
@@ -37,8 +54,8 @@
       CFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CPPFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CXXFLAGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_aarch64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-    };
+    }
+    // crossLinuxBindgenArgs pkgs.pkgsCross.aarch64-multiplatform "aarch64_unknown_linux_gnu";
   };
 
   x86_64-linux = mkClangTarget {
@@ -58,8 +75,8 @@
       CFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CPPFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CXXFLAGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_x86_64_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-    };
+    }
+    // crossLinuxBindgenArgs pkgs.pkgsCross.gnu64 "x86_64_unknown_linux_gnu";
   };
 
   i686-linux = mkClangTarget {
@@ -76,8 +93,8 @@
       CFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CPPFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CXXFLAGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_i686_unknown_linux_gnu = "-I ${pkgs.pkgsCross.gnu32.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-    };
+    }
+    // crossLinuxBindgenArgs pkgs.pkgsCross.gnu32 "i686_unknown_linux_gnu";
   };
 
   riscv64-linux = mkClangTarget {
@@ -97,8 +114,8 @@
       CFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CPPFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
       CXXFLAGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-      BINDGEN_EXTRA_CLANG_ARGS_riscv64gc_unknown_linux_gnu = "-I ${pkgs.pkgsCross.riscv64.buildPackages.llvmPackages.clang-unwrapped.lib}/lib/clang/18/include/";
-    };
+    }
+    // crossLinuxBindgenArgs pkgs.pkgsCross.riscv64 "riscv64gc_unknown_linux_gnu";
   };
 }
 // {
