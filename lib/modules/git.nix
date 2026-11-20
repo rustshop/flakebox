@@ -9,7 +9,6 @@ let
   inherit (lib) types;
   gitHookCheckTimer = pkgs.callPackage ../pkgs/git-hook-check-timer.nix { };
   gitCheckNewline = pkgs.callPackage ../pkgs/git-check-newline.nix { };
-  textExclude = ''\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)$'';
 in
 {
 
@@ -98,17 +97,7 @@ in
 
     (lib.mkIf config.git.pre-commit.trailing_newline {
       git.pre-commit.hooks.trailing_newline = ''
-        # Keep filenames as NUL-delimited records, not Git-quoted shell words.
-        excludes=(-e '${textExclude}')
-        if [[ -n "''${FLAKEBOX_GIT_LS_IGNORE:-}" ]]; then
-          excludes+=(-e "$FLAKEBOX_GIT_LS_IGNORE")
-        fi
-        if [[ -n "''${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]]; then
-          excludes+=(-e "$FLAKEBOX_GIT_LS_TEXT_IGNORE")
-        fi
-        git ls-files -z --deduplicate |
-          { grep -azEv "''${excludes[@]}" || [[ $? == 1 ]]; } |
-          flakebox-git-check-newline
+        flakebox-git-check-newline < "$FLAKEBOX_GIT_LS_TEXT_FILE"
       '';
     })
 
@@ -248,9 +237,7 @@ in
               exit 0
             fi
 
-            ${builtins.replaceStrings [ "@textExclude@" ] [ textExclude ] (
-              builtins.readFile ./git/pre-commit.body.bash
-            )}
+            ${builtins.readFile ./git/pre-commit.body.bash}
             ${hooksFns}
             ${runHooks}
             #
@@ -272,10 +259,11 @@ in
 
       env.shellPackages = [
         gitHookCheckTimer
+        pkgs.gnugrep
+        pkgs.findutils
       ]
       ++ lib.optionals config.git.pre-commit.trailing_newline [
         gitCheckNewline
-        pkgs.gnugrep
       ];
 
     })

@@ -5,10 +5,17 @@ git diff-files --quiet
 is_unclean=$?
 set -e
 
-# Restore the worktree patch captured by this hook.
-function restore_flakebox_worktree {
+inventory_dir="$(mktemp -d)"
+[[ "$inventory_dir" == /* ]] || inventory_dir="$PWD/$inventory_dir"
+restore_patch=false
+function cleanup_flakebox_hook {
   local hook_status=$?
   trap - EXIT
+
+  rm -rf -- "$inventory_dir" || hook_status=1
+  if ! "$restore_patch"; then
+    exit "$hook_status"
+  fi
 
   if ! git cat-file blob "$FLAKEBOX_GIT_PATCH_OID" | git apply --whitespace=nowarn; then
     >&2 echo "flakebox: error: could not restore uncommitted changes; recover the patch from $FLAKEBOX_GIT_PATCH_REF"
@@ -19,6 +26,7 @@ function restore_flakebox_worktree {
 
   exit "$hook_status"
 }
+trap cleanup_flakebox_hook EXIT
 
 # Hide tracked worktree changes during checks and restore them on exit. Store
 # the binary patch under a private ref so recovery remains possible on failure.
@@ -34,20 +42,35 @@ if [ -z "${NO_STASH:-}" ] &&
   )"
   FLAKEBOX_GIT_PATCH_REF="refs/flakebox/pre-commit/$$-$RANDOM"
   git update-ref "$FLAKEBOX_GIT_PATCH_REF" "$FLAKEBOX_GIT_PATCH_OID" ""
-  trap restore_flakebox_worktree EXIT
+  restore_patch=true
   GIT_LITERAL_PATHSPECS=0 git restore --worktree -- .
 fi
 
-export FLAKEBOX_GIT_LS
-if [ -z "${FLAKEBOX_GIT_LS_IGNORE:-}" ]; then
-  FLAKEBOX_GIT_LS="$(git ls-files | while read -r file; do if [ ! -L "$file" ]; then printf '%s\n' "$file"; fi; done)"
-else
-  FLAKEBOX_GIT_LS="$(git ls-files | { grep -v -E -e "${FLAKEBOX_GIT_LS_IGNORE}" || [[ $? == 1 ]]; } | while read -r file; do if [ ! -L "$file" ]; then printf '%s\n' "$file"; fi; done)"
-fi
+unset FLAKEBOX_GIT_LS FLAKEBOX_GIT_LS_TEXT
+export FLAKEBOX_GIT_LS_FILE="$inventory_dir/tracked"
+export FLAKEBOX_GIT_LS_TEXT_FILE="$inventory_dir/text"
 
-export FLAKEBOX_GIT_LS_TEXT
-if [ -z "${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]; then
-  FLAKEBOX_GIT_LS_TEXT="$(printf '%s\n' "$FLAKEBOX_GIT_LS" | { grep -v -E -e '@textExclude@' || [[ $? == 1 ]]; })"
-else
-  FLAKEBOX_GIT_LS_TEXT="$(printf '%s\n' "$FLAKEBOX_GIT_LS" | { grep -v -E -e '@textExclude@' -e "${FLAKEBOX_GIT_LS_TEXT_IGNORE}" || [[ $? == 1 ]]; })"
-fi
+function exclude_paths {
+  if (( $# )); then
+    grep -azvE "$@" || [[ $? == 1 ]]
+  else
+    cat
+  fi
+}
+global_excludes=()
+text_excludes=(-e '\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)$')
+[[ -z "${FLAKEBOX_GIT_LS_IGNORE:-}" ]] || global_excludes+=(-e "$FLAKEBOX_GIT_LS_IGNORE")
+[[ -z "${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]] || text_excludes+=(-e "$FLAKEBOX_GIT_LS_TEXT_IGNORE")
+git ls-files -z --deduplicate | exclude_paths "${global_excludes[@]}" |
+  while LC_ALL=C IFS= read -r -d '' file; do
+    if [[ ! -L "$file" ]]; then printf '%s\0' "$file"; fi
+  done > "$FLAKEBOX_GIT_LS_FILE"
+exclude_paths "${text_excludes[@]}" < "$FLAKEBOX_GIT_LS_FILE" > "$FLAKEBOX_GIT_LS_TEXT_FILE"
+
+# Transitional adapter for custom Bash checks. Keep these shell variables out
+# of child environments even when a check runs external commands.
+function flakebox_load_legacy_inventory {
+  FLAKEBOX_GIT_LS="$(tr '\0' '\n' < "$FLAKEBOX_GIT_LS_FILE")"
+  FLAKEBOX_GIT_LS_TEXT="$(tr '\0' '\n' < "$FLAKEBOX_GIT_LS_TEXT_FILE")"
+}
+export -f flakebox_load_legacy_inventory

@@ -21,7 +21,18 @@
   config = lib.mkIf config.typos.enable {
     git.pre-commit.hooks = lib.mkIf config.typos.pre-commit.enable {
       typos = ''
-        if ! echo "$FLAKEBOX_GIT_LS_TEXT" | typos --file-list - --force-exclude ; then
+        # --file-list cannot represent every Git path. Preserve the spelling
+        # used by exclusion globs, except for "-" (standard input).
+        if ! (
+          while LC_ALL=C IFS= read -r -d "" path; do
+            if [[ "$path" == - ]]; then
+              typos --force-exclude -- - < ./- >&2 || exit 1
+            else
+              printf '%s\0' "$path"
+            fi
+          done < "$FLAKEBOX_GIT_LS_TEXT_FILE" |
+            xargs -0 -r typos --force-exclude --
+        ); then
           >&2 echo "Typos found: Valid new words can be added to '.typos.toml'"
           return 1
         fi
