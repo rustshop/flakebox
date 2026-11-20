@@ -8,6 +8,8 @@
 let
   inherit (lib) types;
   gitHookCheckTimer = pkgs.callPackage ../pkgs/git-hook-check-timer.nix { };
+  gitCheckNewline = pkgs.callPackage ../pkgs/git-check-newline.nix { };
+  textExclude = ''\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)$'';
 in
 {
 
@@ -21,9 +23,17 @@ in
         default = true;
       };
 
-      trailing_newline = lib.mkEnableOption "git pre-commit trailing newline check" // {
-        default = true;
-      };
+      trailing_newline =
+        lib.mkEnableOption "git pre-commit trailing newline check for tracked text files"
+        // {
+          default = true;
+          description = ''
+            Require a final LF in nonempty tracked text files. Known binary
+            extensions and files containing a NUL byte are skipped.
+            `FLAKEBOX_GIT_LS_IGNORE` and `FLAKEBOX_GIT_LS_TEXT_IGNORE` are
+            extended regular expressions matched against raw Git paths.
+          '';
+        };
 
       trailing_whitespace = lib.mkEnableOption "git pre-commit trailing whitespace check" // {
         default = true;
@@ -88,26 +98,17 @@ in
 
     (lib.mkIf config.git.pre-commit.trailing_newline {
       git.pre-commit.hooks.trailing_newline = ''
-        errors=""
-        for path in $(echo "$FLAKEBOX_GIT_LS_TEXT"); do
-
-          # extra branches for clarity
-          if [ ! -f "$path" ] || [ ! -s "$path" ]; then
-             # echo "$path is not a file or is empty"
-             true
-          elif [ -z "$(tail -c 1 < "$path")" ]; then
-             # echo "$path ends with a newline or with a null byte"
-             true
-          else
-            >&2 echo "$path doesn't end with a newline" 1>&2
-            errors="true"
-          fi
-        done
-
-        if [ -n "$errors" ]; then
-          >&2 echo "Fix the problems above or use --no-verify" 1>&2
-          return 1
+        # Keep filenames as NUL-delimited records, not Git-quoted shell words.
+        excludes=(-e '${textExclude}')
+        if [[ -n "''${FLAKEBOX_GIT_LS_IGNORE:-}" ]]; then
+          excludes+=(-e "$FLAKEBOX_GIT_LS_IGNORE")
         fi
+        if [[ -n "''${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]]; then
+          excludes+=(-e "$FLAKEBOX_GIT_LS_TEXT_IGNORE")
+        fi
+        git ls-files -z --deduplicate |
+          { grep -azEv "''${excludes[@]}" || [[ $? == 1 ]]; } |
+          flakebox-git-check-newline
       '';
     })
 
@@ -247,7 +248,9 @@ in
               exit 0
             fi
 
-            ${builtins.readFile ./git/pre-commit.body.bash}
+            ${builtins.replaceStrings [ "@textExclude@" ] [ textExclude ] (
+              builtins.readFile ./git/pre-commit.body.bash
+            )}
             ${hooksFns}
             ${runHooks}
             #
@@ -267,7 +270,13 @@ in
         '';
       };
 
-      env.shellPackages = [ gitHookCheckTimer ];
+      env.shellPackages = [
+        gitHookCheckTimer
+      ]
+      ++ lib.optionals config.git.pre-commit.trailing_newline [
+        gitCheckNewline
+        pkgs.gnugrep
+      ];
 
     })
 
