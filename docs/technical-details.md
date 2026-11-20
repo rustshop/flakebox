@@ -53,6 +53,29 @@ when check output lacks a final newline. The internal timer helper's standalone
 mode cannot inspect arbitrary inherited standard error portably, so it
 conservatively starts its warning with a newline instead.
 
+### Tracked files in custom pre-commit hooks
+
+`FLAKEBOX_GIT_LS_FILE` points to a temporary file of NUL-delimited, tracked
+paths relative to the repository root. It excludes symlinks and paths matching
+the `FLAKEBOX_GIT_LS_IGNORE` extended regular expression. The text inventory,
+`FLAKEBOX_GIT_LS_TEXT_FILE`, also excludes known binary extensions and paths
+matching `FLAKEBOX_GIT_LS_TEXT_IGNORE`. Read either file during the check;
+the hook removes both when it exits.
+
+```bash
+while IFS= read -r -d '' path; do
+  my_check -- "$path"
+done < "$FLAKEBOX_GIT_LS_TEXT_FILE"
+```
+
+Earlier versions exported the lists themselves as `FLAKEBOX_GIT_LS` and
+`FLAKEBOX_GIT_LS_TEXT`. Large lists could prevent the hook from starting any
+checks. Migrate custom checks, including their child scripts, to the file
+variables. As a temporary bridge, a Bash check can call
+`flakebox_load_legacy_inventory` before reading the old variables. The helper sets
+newline-separated shell variables in the calling shell only. Do not export
+them; they cannot distinguish filenames containing newlines.
+
 ### Skipping generated commit hooks
 
 Set `FLAKEBOX_SKIP_GIT_HOOKS=1` to bypass Flakebox's generated `pre-commit`

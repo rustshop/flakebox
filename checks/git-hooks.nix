@@ -80,6 +80,18 @@ let
   };
   newlineHooks = newlineLib.root;
 
+  inventoryHooks = mkHookFixture {
+    inherit (flakeboxLib.config.git.pre-commit.hooks) typos;
+    custom = ''
+      cmp "$FLAKEBOX_GIT_LS_FILE" expected.tracked
+      cmp "$FLAKEBOX_GIT_LS_TEXT_FILE" expected.text
+      printf '%s\n' "$FLAKEBOX_GIT_LS_FILE" > inventory.location
+      flakebox_load_legacy_inventory
+      [[ "$FLAKEBOX_GIT_LS" == *photo.png* && "$FLAKEBOX_GIT_LS_TEXT" != *photo.png* ]]
+      bash -c '[[ ! -v FLAKEBOX_GIT_LS && ! -v FLAKEBOX_GIT_LS_TEXT ]]'
+    '';
+  };
+
   gitDisabledLib = mkLib pkgs {
     config = {
       git.enable = false;
@@ -200,6 +212,7 @@ pkgs.runCommand "git-hooks-tests"
       pkgs.gnugrep
       pkgs.gnused
       pkgs.parallel
+      pkgs.typos
       timer
       testFlakeboxBin
     ]
@@ -1171,10 +1184,18 @@ pkgs.runCommand "git-hooks-tests"
     # This untracked path makes an unsafe expansion of literal[glob].sh match.
     printf '#!/bin/sh\n' > literalg.sh
     git --literal-pathspecs add 'alpha script.sh' 'literal[glob].sh'
+    NO_STASH=1 FLAKEBOX_GIT_LS_IGNORE='.' bash ${shellcheckHooks}/misc/git-hooks/pre-commit
+    NO_STASH=1 FLAKEBOX_GIT_LS_TEXT_IGNORE='.' bash ${shellcheckHooks}/misc/git-hooks/pre-commit
+    [ ! -e "$FLAKEBOX_SHELLCHECK_LOG" ]
+    if NO_STASH=1 FLAKEBOX_GIT_LS_IGNORE='[' bash ${shellcheckHooks}/misc/git-hooks/pre-commit; then
+      echo 'invalid ignore expression accepted' >&2
+      exit 1
+    fi
     NO_STASH=1 bash ${shellcheckHooks}/misc/git-hooks/pre-commit
     [ "$(grep -c '^invocation$' "$FLAKEBOX_SHELLCHECK_LOG")" -eq 1 ]
     printf '%s\n' \
       '--severity=warning' \
+      '--' \
       'alpha script.sh' \
       'literal[glob].sh' > expected-shellcheck.args
     cmp expected-shellcheck.args "$FLAKEBOX_SHELLCHECK_ARGS"
@@ -1260,6 +1281,57 @@ pkgs.runCommand "git-hooks-tests"
     FLAKEBOX_GIT_LS_TEXT_IGNORE='.' bash ${newlineHooks}/misc/git-hooks/pre-commit
     git rm -qrf --cached .
     bash ${newlineHooks}/misc/git-hooks/pre-commit
+    cd ..
+
+    # Both inventories exceed Linux's per-environment-string limit. Check
+    # their exact records from a parallel worker, then exercise real typos.
+    mkdir .inventory-repo
+    cd .inventory-repo
+    git init -q
+    mkdir bench-fixtures
+    for ((i=0; i<5200; i++)); do
+      : > "bench-fixtures/tracked-document-$i.txt"
+    done
+    odd=$' -[glob]\t\\\n'
+    # Use a non-UTF-8 filename too where the filesystem supports it.
+    if ( : > "$odd"$'\377.txt' ) 2>/dev/null; then
+      odd+=$'\377'
+    fi
+    odd+=.txt
+    printf 'correct\n' > "$odd"
+    printf 'correct\n' > ./-
+    ln -s ./- tracked-link
+    # Split the test misspelling so the project's own spell check passes.
+    printf '%s%s\n' te h > global.ignore
+    cp global.ignore text.ignore
+    cp global.ignore photo.png
+    cp global.ignore skip.txt
+    printf '[files]\nextend-exclude = [".*", "skip.txt"]\n' > .typos.toml
+    git add -A
+    git ls-files -z -- ':!tracked-link' ':!global.ignore' > expected.tracked
+    git ls-files -z -- ':!tracked-link' ':!global.ignore' ':!text.ignore' ':!photo.png' > expected.text
+    [ "$(wc -c < expected.text)" -gt 131072 ]
+    run_inventory_hook() {
+      NO_STASH=1 FLAKEBOX_GIT_LS_IGNORE='^global[.]ignore$' \
+        FLAKEBOX_GIT_LS_TEXT_IGNORE='^text[.]ignore$' \
+        bash ${inventoryHooks}/misc/git-hooks/pre-commit
+    }
+    run_inventory_hook
+    [ ! -e "$(cat inventory.location)" ]
+    cp global.ignore "$odd"
+    if run_inventory_hook > typos.log 2>&1; then
+      echo "typos skipped an unusual tracked path" >&2
+      exit 1
+    fi
+    grep -aq 'should be' typos.log
+    [ ! -e "$(cat inventory.location)" ]
+    printf 'correct\n' > "$odd"
+    cp global.ignore ./-
+    if run_inventory_hook > typos.log 2>&1; then
+      echo 'typos treated a tracked dash as standard input' >&2
+      exit 1
+    fi
+    grep -aq 'should be' typos.log
     cd ..
 
     # Private patch restoration exposes indexed content to checks and restores

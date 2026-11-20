@@ -78,12 +78,7 @@ in
             return 0
           fi
 
-          mapfile -d "" -t vale_paths < <(git ls-files -z -- '*.md')
-          if [[ "''${#vale_paths[@]}" -eq 0 ]]; then
-            return 0
-          fi
-
-          vale --config ${configFileArg} ${preCommitArgs} -- "''${vale_paths[@]}"
+          git ls-files -z -- '*.md' | xargs -0 -r vale --config ${configFileArg} ${preCommitArgs} --
         '';
       })
     ]
