@@ -132,6 +132,29 @@ Customize the generated `.cargo-crap.toml` by setting
 with `cargo-crap.enable = false`.
 
 
+## Check YAML and GitHub Actions workflows
+
+Enable either or both checks in your Flakebox configuration:
+
+```nix
+yamllint.enable = true;
+actionlint.enable = true;
+```
+
+- `yamllint` checks tracked `.yaml` and `.yml` files for syntax and duplicate
+  keys only. It does not apply formatting rules or load a project's
+  `yamllint` configuration.
+- `actionlint` checks tracked `.yaml` and `.yml` files directly under
+  `.github/workflows/`. It uses ShellCheck for inline shell scripts even if
+  Flakebox's standalone `shellcheck` integration is disabled.
+
+Both checks are off by default. They use the pre-commit hook's tracked text
+file inventory, respect `FLAKEBOX_GIT_LS_IGNORE` and
+`FLAKEBOX_GIT_LS_TEXT_IGNORE`, and skip symbolic links and files Git doesn't
+track. Run `flakebox install` to regenerate the hook, then run
+`bash misc/git-hooks/pre-commit` to check files manually.
+
+
 ## Enforce structural rules with ast-grep
 
 Flakebox installs [ast-grep](https://ast-grep.github.io/) and runs

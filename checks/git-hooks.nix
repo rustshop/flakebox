@@ -69,6 +69,23 @@ let
     inherit (flakeboxLib.config.git.pre-commit.hooks) shellcheck;
   };
 
+  yamlLintConfig =
+    (mkLib pkgs {
+      config = {
+        shellcheck.enable = false;
+        yamllint.enable = true;
+      };
+    }).config;
+  actionLintConfig =
+    (mkLib pkgs {
+      config = {
+        shellcheck.enable = false;
+        actionlint.enable = true;
+      };
+    }).config;
+  yamlLintHooks = mkHookFixture { inherit (yamlLintConfig.git.pre-commit.hooks) yamllint; };
+  actionLintHooks = mkHookFixture { inherit (actionLintConfig.git.pre-commit.hooks) actionlint; };
+
   newlineLib = mkLib pkgs {
     config.git.pre-commit = {
       trailing_newline = true;
@@ -184,6 +201,15 @@ let
   emptyHooks = mkHookFixture { };
 in
 assert pkgs.lib.elem timer flakeboxLib.config.env.shellPackages;
+assert !(flakeboxLib.config.git.pre-commit.hooks ? yamllint);
+assert !(flakeboxLib.config.git.pre-commit.hooks ? actionlint);
+assert !(pkgs.lib.elem pkgs.yamllint flakeboxLib.config.env.shellPackages);
+assert !(pkgs.lib.elem pkgs.actionlint flakeboxLib.config.env.shellPackages);
+assert !(yamlLintConfig.git.pre-commit.hooks ? actionlint);
+assert !(actionLintConfig.git.pre-commit.hooks ? yamllint);
+assert pkgs.lib.elem pkgs.yamllint yamlLintConfig.env.shellPackages;
+assert pkgs.lib.elem pkgs.actionlint actionLintConfig.env.shellPackages;
+assert pkgs.lib.elem pkgs.shellcheck actionLintConfig.env.shellPackages;
 assert flakeboxLib.config.git.enable;
 assert gitDisabledLib.config.git.pre-commit.enable;
 assert gitDisabledLib.config.git.commit-msg.enable;
@@ -1208,6 +1234,86 @@ pkgs.runCommand "git-hooks-tests"
     [ "$shellcheck_failure_status" -ne 0 ]
     [ "$(grep -c '^invocation$' "$FLAKEBOX_SHELLCHECK_LOG")" -eq 2 ]
     cd ..
+
+    # Exercise the real tools: malformed tracked input fails, but formatting,
+    # ignored paths, and empty selections do not.
+    (
+      export PATH="${
+        pkgs.lib.makeBinPath [
+          pkgs.yamllint
+          pkgs.actionlint
+          pkgs.shellcheck
+        ]
+      }:$PATH"
+      mkdir yaml-repo
+      cd yaml-repo
+      git init -q
+      mkdir -p .github/workflows/nested
+      run_yamllint() {
+        NO_STASH=1 bash ${yamlLintHooks}/misc/git-hooks/pre-commit
+      }
+      run_actionlint() {
+        NO_STASH=1 bash ${actionLintHooks}/misc/git-hooks/pre-commit
+      }
+
+      printf 'broken: [\n' > .github/workflows/untracked.yml
+      ln -s untracked.yml .github/workflows/symlink.yml
+      git add .github/workflows/symlink.yml
+      run_yamllint
+      run_actionlint
+
+      yaml_path=$'-odd file[0]\n.yaml'
+      printf 'key:    value  \n' > "$yaml_path"
+      git add -- "$yaml_path"
+      run_yamllint
+
+      printf 'key: value\nkey: duplicate\n' > "$yaml_path"
+      if run_yamllint > duplicate.log 2>&1; then
+        echo 'yamllint accepted a duplicate key' >&2
+        exit 1
+      fi
+      grep -F 'key-duplicates' duplicate.log
+      FLAKEBOX_GIT_LS_IGNORE='^-odd' run_yamllint
+      FLAKEBOX_GIT_LS_TEXT_IGNORE='^-odd' run_yamllint
+
+      printf 'broken: [\n' > "$yaml_path"
+      if run_yamllint > syntax.log 2>&1; then
+        echo 'yamllint accepted invalid YAML' >&2
+        exit 1
+      fi
+      grep -F 'syntax' syntax.log
+
+      workflow_path=$'.github/workflows/odd file[0]\n.yml'
+      printf 'not a workflow\n' > .github/workflows/nested/not-a-workflow.yaml
+      cat > "$workflow_path" <<'EOF'
+    on: push
+    jobs:
+      check:
+        runs-on: ubuntu-latest
+        steps:
+          - run: echo ok
+    EOF
+      git add -- "$workflow_path" .github/workflows/nested/not-a-workflow.yaml
+      run_actionlint
+
+      sed -i 's/ubuntu-latest/unknown-runner/' "$workflow_path"
+      if run_actionlint > workflow.log 2>&1; then
+        echo 'actionlint accepted an unknown runner label' >&2
+        exit 1
+      fi
+      grep -F 'label "unknown-runner" is unknown' workflow.log
+      FLAKEBOX_GIT_LS_IGNORE='^\.github/workflows/odd' run_actionlint
+      FLAKEBOX_GIT_LS_TEXT_IGNORE='^\.github/workflows/odd' run_actionlint
+
+      printf 'self-hosted-runner: {labels: [unknown-runner]}\n' > .github/actionlint.yaml
+      run_actionlint
+      sed -i 's/echo ok/echo $UNQUOTED/' "$workflow_path"
+      if run_actionlint > inline-shell.log 2>&1; then
+        echo 'actionlint did not run ShellCheck on the inline script' >&2
+        exit 1
+      fi
+      grep -F 'SC2086' inline-shell.log
+    )
 
     # The newline hook sees all tracked files and uses raw path records, not
     # Git's quoted display or shell word splitting.
