@@ -69,6 +69,17 @@ let
     inherit (flakeboxLib.config.git.pre-commit.hooks) shellcheck;
   };
 
+  newlineLib = mkLib pkgs {
+    config.git.pre-commit = {
+      trailing_newline = true;
+      trailing_whitespace = false;
+      hooks = builtins.mapAttrs (_: _: pkgs.lib.mkForce null) (
+        builtins.removeAttrs flakeboxLib.config.git.pre-commit.hooks [ "trailing_newline" ]
+      );
+    };
+  };
+  newlineHooks = newlineLib.root;
+
   gitDisabledLib = mkLib pkgs {
     config = {
       git.enable = false;
@@ -192,6 +203,7 @@ pkgs.runCommand "git-hooks-tests"
       timer
       testFlakeboxBin
     ]
+    ++ newlineLib.config.env.shellPackages
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.util-linux ];
   }
   ''
@@ -1174,6 +1186,80 @@ pkgs.runCommand "git-hooks-tests"
     set -e
     [ "$shellcheck_failure_status" -ne 0 ]
     [ "$(grep -c '^invocation$' "$FLAKEBOX_SHELLCHECK_LOG")" -eq 2 ]
+    cd ..
+
+    # The newline hook sees all tracked files and uses raw path records, not
+    # Git's quoted display or shell word splitting.
+    mkdir newline-repo
+    cd newline-repo
+    git init -q
+    git config user.email flakebox@example.invalid
+    git config user.name Flakebox
+    printf 'ok\n' > good
+    printf 'ok\r\n' > crlf
+    touch empty
+    printf 'bad' > 'space name'
+    printf 'bad' > 'literal[glob]'
+    printf 'ok\n' > literalg
+    printf 'bad' > $'embedded\nnewline'
+    # APFS only accepts valid UTF-8 at creation.
+    if printf 'bad' 2>/dev/null > $'non-utf8-\377'; then
+      expected_violations=5
+    else
+      expected_violations=4
+    fi
+    printf 'bad' > ./-leading-dash
+    printf 'bad' > global.ignore
+    printf 'bad' > text.ignore
+    printf 'bad' > image.png
+    printf 'bad' > deleted
+    mkdir directory
+    printf 'bad' > directory/child
+    printf '\0payload' > binary
+    printf 'payload\0' > binary-last-nul
+    { head -c 32768 /dev/zero | tr '\0' A; printf '\0payload'; } > binary-late-nul
+    ln -s 'space name' symlink
+    git add .
+    git commit -qm base
+    rm deleted
+    mv directory saved-directory
+    printf 'untracked\n' > directory
+    printf 'bad' > untracked
+
+    if NO_STASH=1 FLAKEBOX_GIT_LS_IGNORE='^global[.]ignore$' \
+      FLAKEBOX_GIT_LS_TEXT_IGNORE='^text[.]ignore$' \
+      bash ${newlineHooks}/misc/git-hooks/pre-commit > result 2>&1; then
+      echo "expected newline hook to reject tracked text files" >&2
+      exit 1
+    fi
+    grep -F -- 'space name doesn' result
+    grep -F -- 'literal[glob] doesn' result
+    grep -F -- '"embedded\nnewline" doesn' result
+    if [ "$expected_violations" -eq 5 ]; then
+      grep -F -- '"non-utf8-\xFF" doesn' result
+    fi
+    grep -F -- '-leading-dash doesn' result
+    [ "$(grep -c "doesn't end with a newline" result)" -eq "$expected_violations" ]
+    grep -F 'Fix the problems above or use --no-verify' result
+    [ ! -e deleted ]
+
+    # Check the index in an ordinary Git repo, and restore unstaged edits.
+    rm directory
+    mv saved-directory directory
+    git rm -q directory/child
+    git add -u -- deleted
+    printf 'fixed\n' > 'space name'
+    git add 'space name'
+    printf 'bad' > 'space name'
+    FLAKEBOX_GIT_LS_TEXT_IGNORE='^(-leading-dash|literal\[glob\]|embedded|non-utf8-|global[.]ignore|text[.]ignore)' \
+      bash ${newlineHooks}/misc/git-hooks/pre-commit
+    [ "$(cat 'space name')" = bad ]
+
+    # Zero selected files is success, both with filtered and empty inventories.
+    FLAKEBOX_GIT_LS_IGNORE='.' bash ${newlineHooks}/misc/git-hooks/pre-commit
+    FLAKEBOX_GIT_LS_TEXT_IGNORE='.' bash ${newlineHooks}/misc/git-hooks/pre-commit
+    git rm -qrf --cached .
+    bash ${newlineHooks}/misc/git-hooks/pre-commit
     cd ..
 
     # Private patch restoration exposes indexed content to checks and restores

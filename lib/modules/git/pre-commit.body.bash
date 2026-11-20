@@ -40,14 +40,14 @@ fi
 
 export FLAKEBOX_GIT_LS
 if [ -z "${FLAKEBOX_GIT_LS_IGNORE:-}" ]; then
-  FLAKEBOX_GIT_LS="$(git ls-files | while read -r file; do [ ! -L "$file" ] && echo "$file"; done)"
+  FLAKEBOX_GIT_LS="$(git ls-files | while read -r file; do if [ ! -L "$file" ]; then printf '%s\n' "$file"; fi; done)"
 else
-  FLAKEBOX_GIT_LS="$(git ls-files | grep -v -E "${FLAKEBOX_GIT_LS_IGNORE}" | while read -r file; do [ ! -L "$file" ] && echo "$file"; done)"
+  FLAKEBOX_GIT_LS="$(git ls-files | { grep -v -E -e "${FLAKEBOX_GIT_LS_IGNORE}" || [[ $? == 1 ]]; } | while read -r file; do if [ ! -L "$file" ]; then printf '%s\n' "$file"; fi; done)"
 fi
 
 export FLAKEBOX_GIT_LS_TEXT
 if [ -z "${FLAKEBOX_GIT_LS_TEXT_IGNORE:-}" ]; then
-  FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)\$")"
+  FLAKEBOX_GIT_LS_TEXT="$(printf '%s\n' "$FLAKEBOX_GIT_LS" | { grep -v -E -e '@textExclude@' || [[ $? == 1 ]]; })"
 else
-  FLAKEBOX_GIT_LS_TEXT="$(echo "$FLAKEBOX_GIT_LS" | grep -v -E "\.(png|ods|jpg|jpeg|woff2|keystore|wasm|ttf|jar|ico|gif)\$" | grep -v -E "${FLAKEBOX_GIT_LS_TEXT_IGNORE}")"
+  FLAKEBOX_GIT_LS_TEXT="$(printf '%s\n' "$FLAKEBOX_GIT_LS" | { grep -v -E -e '@textExclude@' -e "${FLAKEBOX_GIT_LS_TEXT_IGNORE}" || [[ $? == 1 ]]; })"
 fi
