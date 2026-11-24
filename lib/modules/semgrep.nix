@@ -39,9 +39,11 @@
       '';
     };
 
-    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
-      pkgs.semgrep
-    ];
+    env.shellPackages =
+      lib.optionals (!pkgs.stdenv.hostPlatform.isAarch64 && !pkgs.stdenv.hostPlatform.isDarwin)
+        [
+          pkgs.semgrep
+        ];
 
     just.rules = {
       semgrep = {

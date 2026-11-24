@@ -9,7 +9,7 @@ let
     ) "${name}: expected ${builtins.toJSON expected}, got ${builtins.toJSON actual}";
 
   stdToolchains = flakeboxLib.mkStdToolchains { };
-  isLinux = pkgs.stdenv.isLinux;
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
   hasAndroid = stdToolchains ? aarch64-android;
   crossPkgs = pkgs.pkgsCross.aarch64-multiplatform;
 

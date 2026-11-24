@@ -72,7 +72,7 @@ in
   );
 
 }
-// lib.optionalAttrs pkgs.stdenv.isLinux {
+// lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
   aarch64-linux =
     mkFenixToolchainWithContext (dependencyContextFor pkgs.pkgsCross.aarch64-multiplatform)
       (

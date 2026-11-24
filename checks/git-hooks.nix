@@ -243,7 +243,7 @@ pkgs.runCommand "git-hooks-tests"
       testFlakeboxBin
     ]
     ++ newlineLib.config.env.shellPackages
-    ++ pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.util-linux ];
+    ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.util-linux ];
   }
   ''
     set -euo pipefail
@@ -899,7 +899,7 @@ pkgs.runCommand "git-hooks-tests"
       done
     )
 
-    ${pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+    ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
       # Git paths stay byte-exact on Unix. Dormant foreign configuration in a
       # non-UTF-8 repository path must still be found and preserved. APFS rejects
       # this filename, so supported macOS checks exercise the portable paths.
@@ -1480,7 +1480,7 @@ pkgs.runCommand "git-hooks-tests"
     [ -z "$(git for-each-ref --format='%(refname)' refs/flakebox/pre-commit/)" ]
     [ ! -s stash-failure.stderr ]
 
-    ${pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+    ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
       # Interrupting the whole generated-hook process group terminates workers
       # and still runs the top-level worktree patch restoration trap.
       export FLAKEBOX_INTERRUPT_READY="$PWD/interrupt.ready"
