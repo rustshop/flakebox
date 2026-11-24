@@ -15,7 +15,7 @@ craneLib.overrideScope (
 
       # without this any buildInputs and nativeBuildInputs can cause cargo's ./target invalidations
       strictDeps = true;
-      buildInputs = lib.optionals pkgs.stdenv.isDarwin [
+      buildInputs = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
         pkgs.libiconv
         # pkgs.darwin.apple-sdk.frameworks.Security
       ];

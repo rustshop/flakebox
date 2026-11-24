@@ -29,8 +29,10 @@
       '';
     };
 
-    env.shellPackages = lib.optionals (!pkgs.stdenv.isAarch64 && !pkgs.stdenv.isDarwin) [
-      pkgs.shellcheck
-    ];
+    env.shellPackages =
+      lib.optionals (!pkgs.stdenv.hostPlatform.isAarch64 && !pkgs.stdenv.hostPlatform.isDarwin)
+        [
+          pkgs.shellcheck
+        ];
   };
 }

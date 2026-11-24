@@ -1,7 +1,8 @@
 { pkgs, flakeboxLib }:
 let
 
-  llvmPackages = if pkgs.stdenv.isDarwin then pkgs.llvmPackages else pkgs.llvmPackages_18;
+  llvmPackages =
+    if pkgs.stdenv.hostPlatform.isDarwin then pkgs.llvmPackages else pkgs.llvmPackages_18;
   clangMajor = pkgs.lib.versions.major llvmPackages.clang.version;
 
   toolchainArgs = {

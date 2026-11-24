@@ -42,9 +42,11 @@ let
 
   mkShell = pkgs.mkShell.override {
     stdenv =
-      if baseStdenv.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
+      if baseStdenv.hostPlatform.isLinux && config.linker.wild.enable && pkgs ? useWildLinker then
         pkgs.useWildLinker baseStdenv
-      else if pkgs.stdenv.isLinux && config.linker.mold.enable && pkgs.stdenvAdapters ? useMoldLinker then
+      else if
+        pkgs.stdenv.hostPlatform.isLinux && config.linker.mold.enable && pkgs.stdenvAdapters ? useMoldLinker
+      then
         pkgs.stdenvAdapters.useMoldLinker baseStdenv
       else
         baseStdenv;

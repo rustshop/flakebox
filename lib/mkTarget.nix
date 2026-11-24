@@ -88,7 +88,9 @@ else
       }
 
       (
-        if pkgs.stdenv.isLinux && config.linker.wild.enable && canUseWild && pkgs ? useWildLinker then
+        if
+          pkgs.stdenv.hostPlatform.isLinux && config.linker.wild.enable && canUseWild && pkgs ? useWildLinker
+        then
           {
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
               "-C link-arg=--ld-path=${wild-wrapped}/bin/wild "
@@ -98,7 +100,7 @@ else
         else if
           config.linker.mold.enable
           && canUseMold
-          && pkgs.stdenv.isLinux
+          && pkgs.stdenv.hostPlatform.isLinux
           && pkgs.stdenvAdapters ? useMoldLinker
         then
           # mold only supported on Linux, and supports compressed debug sections
@@ -106,7 +108,7 @@ else
             "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" =
               "-C link-arg=-fuse-ld=${pkgs.mold}/bin/mold -C link-arg=-Wl,--compress-debug-sections=zstd ${extraRustFlags}";
           }
-        else if pkgs.stdenv.isLinux then
+        else if pkgs.stdenv.hostPlatform.isLinux then
           # GNU ld builds do not necessarily include zstd support. Nixpkgs'
           # binutils supports the older and more widely available zlib format.
           {

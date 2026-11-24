@@ -35,7 +35,7 @@ in
     canUseWild = true;
   };
 }
-// lib.optionalAttrs pkgs.stdenv.isLinux {
+// lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
   aarch64-linux = mkClangTarget {
     target = "aarch64-unknown-linux-gnu";
     clang = pkgs.pkgsCross.aarch64-multiplatform.buildPackages.llvmPackages.clang;
@@ -137,7 +137,7 @@ in
           "CARGO_TARGET_${target_underscores_upper}_LINKER" = null;
           "CARGO_TARGET_${target_underscores_upper}_RUSTFLAGS" = "${extraRustFlags}";
         }
-        // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
           AR_wasm32_unknown_unknown = "${pkgs.llvmPackages_20.llvm}/bin/llvm-ar";
         }
       );
@@ -216,7 +216,7 @@ in
     };
   };
 }
-// lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+// lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin) {
   aarch64-ios = mkIOSTarget ({
     target = "aarch64-apple-ios";
   });
